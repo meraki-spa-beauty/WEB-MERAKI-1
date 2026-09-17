@@ -1,0 +1,1 @@
+export function Manifesto() { return <section className="manifesto section-pad"><div className="container manifesto-grid"><span className="eyebrow">MERAKI</span><div><h2>El bienestar<br/>también puede<br/>ser un ritual.</h2><p>Creemos en esos pequeños momentos que nos devuelven al cuerpo, a la calma y a nosotros mismos.</p></div></div></section>; }
