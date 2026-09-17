@@ -21,7 +21,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
       - name: Vendor anti-slop
         run: npm run vendor:anti-slop
@@ -30,7 +29,7 @@ jobs:
         run: npm install --package-lock-only --ignore-scripts
 
       - name: Persist generated lockfile
-        if: github.event_name == 'push' && github.ref == 'refs/heads/chore/engineering-quality-gates' && hashFiles('package-lock.json') != ''
+        if: github.event_name == 'push' && github.ref == 'refs/heads/chore/engineering-quality-gates'
         run: |
           if git diff --quiet -- package-lock.json; then
             exit 0
