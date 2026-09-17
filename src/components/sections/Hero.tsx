@@ -1,2 +1,41 @@
 import { ArrowLink } from '../ui/ArrowLink';
-export function Hero() { return <section className="hero"><div className="container hero-grid"><div className="hero-copy"><span className="eyebrow">MERAKI</span><h1>Un espacio<br/>para volver<br/>a ti.</h1><p>Bienestar, belleza y rituales diseñados para regalarte una pausa.</p><div className="hero-actions"><ArrowLink href="#experiencias" variant="primary">Descubrir Meraki</ArrowLink><ArrowLink href="#experiencias">Conocer experiencias</ArrowLink></div></div><div className="hero-art" role="img" aria-label="Composición abstracta inspirada en naturaleza y ritual"><div className="hero-art__ring"/><div className="hero-art__stone hero-art__stone--one"/><div className="hero-art__stone hero-art__stone--two"/><div className="hero-art__line hero-art__line--one"/><div className="hero-art__line hero-art__line--two"/><div className="hero-art__leaf hero-art__leaf--one"/><div className="hero-art__leaf hero-art__leaf--two"/><div className="hero-art__label">Ritual · pausa · presencia</div></div></div></section>; }
+
+export function Hero() {
+  return (
+    <section className="hero">
+      <div className="container hero-grid">
+        <div className="hero-copy">
+          <span className="eyebrow">MERAKI</span>
+          <h1>
+            Un espacio
+            <br />
+            para volver
+            <br />
+            a ti.
+          </h1>
+          <p>Bienestar, belleza y rituales diseñados para regalarte una pausa.</p>
+          <div className="hero-actions">
+            <ArrowLink href="#experiencias" variant="primary">
+              Descubrir Meraki
+            </ArrowLink>
+            <ArrowLink href="#experiencias">Conocer experiencias</ArrowLink>
+          </div>
+        </div>
+        <div
+          className="hero-art"
+          role="img"
+          aria-label="Composición abstracta inspirada en naturaleza y ritual"
+        >
+          <div className="hero-art__ring" />
+          <div className="hero-art__stone hero-art__stone--one" />
+          <div className="hero-art__stone hero-art__stone--two" />
+          <div className="hero-art__line hero-art__line--one" />
+          <div className="hero-art__line hero-art__line--two" />
+          <div className="hero-art__leaf hero-art__leaf--one" />
+          <div className="hero-art__leaf hero-art__leaf--two" />
+          <div className="hero-art__label">Ritual · pausa · presencia</div>
+        </div>
+      </div>
+    </section>
+  );
+}
