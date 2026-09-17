@@ -1,5 +1,7 @@
 {
   "projects": {
-    "default": "web-meraki-14bc4"
-  }
+    "production": "web-meraki-14bc4"
+  },
+  "targets": {},
+  "etags": {}
 }
