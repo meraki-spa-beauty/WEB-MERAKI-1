@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://meraki.spa.pe/sitemap.xml
