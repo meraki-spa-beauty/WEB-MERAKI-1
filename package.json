@@ -3,8 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "packageManager": "npm@10.9.2",
   "scripts": {
     "dev": "vite",
+    "vendor:anti-slop": "node scripts/vendor-anti-slop.mjs",
     "typecheck": "tsc --noEmit",
     "lint:oxlint": "oxlint src",
     "lint": "npm run typecheck && npm run lint:oxlint",
