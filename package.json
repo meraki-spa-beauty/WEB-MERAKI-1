@@ -5,17 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview",
-    "lint": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "lint:oxlint": "oxlint src",
+    "lint": "npm run typecheck && npm run lint:oxlint",
+    "build": "npm run typecheck && vite build",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "react-router-dom": "latest",
-    "typescript": "latest",
-    "vite": "latest"
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-router-dom": "7.18.4"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@oxlint/plugins": "1.78.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "oxlint": "1.78.0",
+    "typescript": "7.0.2",
+    "vite": "8.3.0"
+  }
 }
