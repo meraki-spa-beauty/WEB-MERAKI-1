@@ -28,7 +28,9 @@ export function Header({ onOpenBookingModal }: HeaderProps) {
         setIsScrolled(false);
       }
     };
+
     window.addEventListener('scroll', handleScroll, { passive: true });
+
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -39,6 +41,7 @@ export function Header({ onOpenBookingModal }: HeaderProps) {
     } else {
       document.body.style.overflow = '';
     }
+
     return () => {
       document.body.style.overflow = '';
     };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { SPA_INFO } from '../../data/spaData';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle2 } from 'lucide-react';
+import { MapPin, Phone, Clock, Send, CheckCircle2 } from 'lucide-react';
 
 export function LocationContact() {
   const [formName, setFormName] = useState('');

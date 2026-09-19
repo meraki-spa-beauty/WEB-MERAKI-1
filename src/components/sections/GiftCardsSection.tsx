@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Gift, Sparkles, Send, Check } from 'lucide-react';
+import { Gift, Sparkles, Send } from 'lucide-react';
 import { SPA_INFO } from '../../data/spaData';
 
 export function GiftCardsSection() {
@@ -19,6 +19,7 @@ export function GiftCardsSection() {
 💌 *De:* ${customSender || 'Por definir'}
 ━━━━━━━━━━━━━━━━━━━━
 Deseo coordinar la emisión y dedicatoria personalizada.`;
+
     return encodeURIComponent(text);
   };
 

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { TREATMENTS } from '../../data/treatments';
 import { SPA_INFO } from '../../data/spaData';
-import { X, Calendar, Clock, User, Phone, Mail, CheckCircle2, Sparkles, MessageCircle } from 'lucide-react';
+import { X, CheckCircle2, Sparkles, MessageCircle } from 'lucide-react';
 
 interface BookingModalProps {
   isOpen: boolean;
@@ -9,18 +9,23 @@ interface BookingModalProps {
   preselectedTreatmentId?: string;
 }
 
+type TherapistPreference = 'any' | 'female' | 'specialist';
+
 export function BookingModal({ isOpen, onClose, preselectedTreatmentId }: BookingModalProps) {
   const [selectedTreatmentId, setSelectedTreatmentId] = useState<string>(
     preselectedTreatmentId || TREATMENTS[0]?.id || ''
   );
+
   const [date, setDate] = useState<string>(() => {
     const today = new Date();
     today.setDate(today.getDate() + 1);
+
     return today.toISOString().split('T')[0];
   });
+
   const [timeSlot, setTimeSlot] = useState<string>('15:00');
   const [peopleCount, setPeopleCount] = useState<1 | 2>(1);
-  const [therapistPref, setTherapistPref] = useState<'any' | 'female' | 'specialist'>('any');
+  const [therapistPref, setTherapistPref] = useState<TherapistPreference>('any');
   const [clientName, setClientName] = useState<string>('');
   const [clientPhone, setClientPhone] = useState<string>('');
   const [clientEmail, setClientEmail] = useState<string>('');
@@ -37,10 +42,12 @@ export function BookingModal({ isOpen, onClose, preselectedTreatmentId }: Bookin
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
     };
+
     if (isOpen) {
       document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', handleKeyDown);
     }
+
     return () => {
       document.body.style.overflow = '';
       window.removeEventListener('keydown', handleKeyDown);
@@ -72,6 +79,7 @@ export function BookingModal({ isOpen, onClose, preselectedTreatmentId }: Bookin
 ${specialRequests ? `📝 *Notas/Ocasión:* ${specialRequests}` : ''}
 ━━━━━━━━━━━━━━━━━━━━
 Solicito confirmación de disponibilidad para esta sesión en Lima, Perú.`;
+
     return encodeURIComponent(text);
   };
 
@@ -227,7 +235,15 @@ Solicito confirmación de disponibilidad para esta sesión en Lima, Perú.`;
                   </label>
                   <select
                     value={therapistPref}
-                    onChange={(e) => setTherapistPref(e.target.value as any)}
+                    onChange={(e) => {
+                      const val = e.target.value;
+
+                      if (val === 'female' || val === 'specialist') {
+                        setTherapistPref(val);
+                      } else {
+                        setTherapistPref('any');
+                      }
+                    }}
                     className="w-full px-4 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
                   >
                     <option value="any">Cualquiera disponible</option>

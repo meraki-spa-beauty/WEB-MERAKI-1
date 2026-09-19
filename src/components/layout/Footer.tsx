@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Logo } from '../brand/Logo';
 import { SPA_INFO } from '../../data/spaData';
-import { Phone, Mail, MapPin, Instagram, Heart, Shield } from 'lucide-react';
+import { Phone, Mail, MapPin, Instagram, Shield } from 'lucide-react';
 
 export function Footer() {
   return (

@@ -25,6 +25,7 @@ export function Home() {
 
   const handleOpenGiftCard = () => {
     const el = document.getElementById('gift-cards');
+
     if (el) {
       el.scrollIntoView({ behavior: 'smooth' });
     }

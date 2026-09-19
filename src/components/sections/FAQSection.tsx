@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FAQ_ITEMS } from '../../data/spaData';
-import { ChevronDown, HelpCircle } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 
 export function FAQSection() {
   const [openId, setOpenId] = useState<string | null>(FAQ_ITEMS[0]?.id || null);
@@ -28,6 +28,7 @@ export function FAQSection() {
         <div className="space-y-4 text-left">
           {FAQ_ITEMS.map((item) => {
             const isOpen = openId === item.id;
+
             return (
               <div
                 key={item.id}

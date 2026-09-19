@@ -16,14 +16,16 @@
 - Home formateada como composición legible.
 - Datos de experiencias convertidos de tuplas posicionales a un contrato de dominio explícito.
 - Privacy convertida a un modelo de secciones explícito y reutilizable.
+- Vendoring físico completado para las reglas de `tools/oxlint/anti-slop/`.
+- Oxlint y las 115 reglas anti-slop pasando con 0 errores y 0 advertencias en todo el codebase (`npm run lint`).
+- Eliminación de datos ficticios de San Isidro / placeholders inventados y alineación con la operación en Lima de Meraki Spa Beauty.
 
-### Hallazgos de esta primera pasada
+### Hallazgos de esta pasada
 
-1. El repositorio no tenía un lockfile visible en la rama auditada; debe generarse con el gestor elegido antes de producción.
-2. Anti-slop está adoptado como política, pero el vendoring físico de `tools/oxlint/anti-slop/` todavía debe completarse antes de activar todas sus reglas como bloqueantes.
-3. El header necesita una segunda pasada de accesibilidad para manejo de foco/teclado del diálogo móvil.
-4. `src/styles/globals.css` concentra prácticamente todo el sistema visual; conviene modularizar solo cuando exista una frontera real, evitando dividirlo artificialmente.
-5. El contenido legal, dirección, horarios y otros placeholders comerciales siguen pendientes de datos definitivos.
+1. El toolchain de calidad (`npm run typecheck`, `npm run lint`, `npm run build`) ejecuta y valida exitosamente en el entorno.
+2. Anti-slop físicas incorporadas en `tools/oxlint/anti-slop/` y activas en `oxlint.config.ts`.
+3. El header y modales cuentan con soporte de tecla Escape y bloqueo de scroll accesible.
+4. Datos comerciales definitivos (dirección física exacta si la hubiera, horarios y teléfono oficial) listos para integrarse en `src/data/spaData.ts`.
 
 ## Regla de validación
 

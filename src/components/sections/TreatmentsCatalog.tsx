@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { TREATMENTS, CATEGORIES_CONFIG } from '../../data/treatments';
-import type { Treatment, TreatmentCategory } from '../../types';
+import type { Treatment } from '../../types';
 import { Clock, Sparkles, Eye, Calendar, ArrowRight } from 'lucide-react';
 
 interface TreatmentsCatalogProps {
@@ -43,6 +43,7 @@ export function TreatmentsCatalog({ onSelectTreatment, onBookTreatment }: Treatm
         <div className="flex items-center gap-2 overflow-x-auto pb-4 mb-12 scrollbar-none border-b border-[#5E765E]/15">
           {CATEGORIES_CONFIG.map((cat) => {
             const isActive = activeCategory === cat.id;
+
             return (
               <button
                 key={cat.id}
