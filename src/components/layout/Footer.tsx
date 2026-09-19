@@ -15,7 +15,7 @@ export function Footer() {
           <div className="lg:col-span-4">
             <Logo variant="stacked" color="light" className="items-start" />
             <p className="font-['Montserrat',sans-serif] text-xs text-[#FFF2DE]/80 mt-6 leading-relaxed max-w-sm font-light">
-              Un santuario de calma y bienestar sensorial en el corazón de San Isidro, Lima. Rindiendo homenaje a la naturaleza, las terapias botánicas y el autocuidado consciente.
+              Un santuario de calma y bienestar sensorial para volver a ti. Rindiendo homenaje a la naturaleza, las terapias botánicas y el autocuidado consciente.
             </p>
             <div className="flex items-center gap-3 mt-6">
               <a
@@ -112,7 +112,7 @@ export function Footer() {
           {/* Location & Attention */}
           <div className="lg:col-span-3">
             <h4 className="font-['Montserrat',sans-serif] text-xs font-bold uppercase tracking-[0.2em] text-[#D5A688] mb-5">
-              Atención en Lima
+              Atención &amp; Citas
             </h4>
             <div className="space-y-3 font-['Montserrat',sans-serif] text-xs font-light text-[#FFF2DE]/85">
               <div className="flex items-start gap-2.5">
@@ -139,7 +139,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-['Montserrat',sans-serif] text-[#FFF2DE]/65">
-          <p>© {new Date().getFullYear()} Meraki Spa Beauty. Todos los derechos reservados. Lima, Perú.</p>
+          <p>© {new Date().getFullYear()} Meraki Spa Beauty. Todos los derechos reservados.</p>
           
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="hover:text-[#FFF2DE] transition-colors">

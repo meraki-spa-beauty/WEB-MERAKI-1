@@ -11,12 +11,14 @@ import { FAQSection } from '../components/sections/FAQSection';
 import { LocationContact } from '../components/sections/LocationContact';
 import { TreatmentDetailModal } from '../components/modals/TreatmentDetailModal';
 import { BookingModal } from '../components/modals/BookingModal';
+import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import type { Treatment } from '../types';
 
 export function Home() {
   const [selectedTreatment, setSelectedTreatment] = useState<Treatment | null>(null);
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingTreatmentId, setBookingTreatmentId] = useState<string | undefined>(undefined);
+  const [selectedCategory, setSelectedCategory] = useState<string>('todos');
 
   const handleOpenBooking = (treatmentId?: string) => {
     setBookingTreatmentId(treatmentId);
@@ -31,18 +33,27 @@ export function Home() {
     }
   };
 
+  const handleCategorySelect = (categoryKey: string) => {
+    setSelectedCategory(categoryKey);
+  };
+
   return (
     <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
       {/* Upper Announcement & Quick Coordinates Bar */}
       <TopBar onOpenGiftCardModal={handleOpenGiftCard} />
 
       {/* Main Sticky Header */}
-      <Header onOpenBookingModal={handleOpenBooking} />
+      <Header
+        onOpenBookingModal={handleOpenBooking}
+        onSelectCategory={handleCategorySelect}
+      />
 
       {/* Main Page Flow */}
       <main className="flex-1">
         <Hero onOpenBookingModal={() => handleOpenBooking()} />
         <TreatmentsCatalog
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategorySelect}
           onSelectTreatment={(treatment) => setSelectedTreatment(treatment)}
           onBookTreatment={(id) => handleOpenBooking(id)}
         />
@@ -55,6 +66,9 @@ export function Home() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Floating Interactive WhatsApp Action Button */}
+      <FloatingWhatsAppButton />
 
       {/* Modals */}
       <TreatmentDetailModal

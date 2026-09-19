@@ -19,7 +19,7 @@ export function Hero({ onOpenBookingModal }: HeroProps) {
             {/* Eyebrow Pill */}
             <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-[11px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] mb-6">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5E765E] animate-pulse" />
-              <span>Oasis de Bienestar en San Isidro · Lima</span>
+              <span>Oasis de Bienestar &amp; Cuidado Consciente</span>
             </div>
 
             {/* Main Headline */}
@@ -30,7 +30,7 @@ export function Hero({ onOpenBookingModal }: HeroProps) {
 
             {/* Refined Subtitle */}
             <p className="font-['Montserrat',sans-serif] text-base sm:text-lg text-[#111111]/75 max-w-xl font-light leading-relaxed mb-8">
-              Inspirado en los rituales sensoriales más exclusivos de Lima. Masajes de autor con piedras volcánicas, tratamientos faciales botánicos y experiencias privadas en pareja diseñadas para desacelerar el ritmo cotidiano.
+              Inspirado en rituales sensoriales de autor. Masajes con piedras volcánicas, tratamientos faciales botánicos y experiencias privadas en pareja diseñadas para desacelerar el ritmo cotidiano.
             </p>
 
             {/* Action CTAs */}
@@ -78,7 +78,7 @@ export function Hero({ onOpenBookingModal }: HeroProps) {
               <div className="relative rounded-2xl overflow-hidden shadow-2xl border-4 border-white/80 aspect-[4/5] bg-[#EAE2D5]">
                 <img
                   src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1200&q=80"
-                  alt="Atmósfera y Masaje en Meraki Spa Lima"
+                  alt="Atmósfera y Masaje en Meraki Spa"
                   className="w-full h-full object-cover transition-transform duration-700 hover:scale-105"
                   referrerPolicy="no-referrer"
                 />
@@ -110,7 +110,7 @@ export function Hero({ onOpenBookingModal }: HeroProps) {
                 <Sparkles className="w-5 h-5 text-[#D5A688]" />
                 <div className="text-left font-['Montserrat',sans-serif]">
                   <span className="block text-[11px] font-bold uppercase tracking-wider">Top Spa de Autor</span>
-                  <span className="text-[9px] text-[#AEC2AE] tracking-widest uppercase">San Isidro · Lima 2026</span>
+                  <span className="text-[9px] text-[#AEC2AE] tracking-widest uppercase">Bienestar Sensorial</span>
                 </div>
               </div>
 

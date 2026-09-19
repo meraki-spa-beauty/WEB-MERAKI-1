@@ -22,7 +22,7 @@ export function TopBar({ onOpenGiftCardModal }: TopBarProps) {
 
         <div className="flex items-center gap-6">
           <a
-            href={`https://wa.me/${SPA_INFO.whatsappNumber}?text=Hola%20Meraki,%20deseo%20consultar%20sobre%20sus%20servicios%20de%20spa`}
+            href={SPA_INFO.whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-1.5 hover:text-[#D5A688] transition-colors"

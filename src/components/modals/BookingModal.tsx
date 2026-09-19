@@ -78,7 +78,7 @@ export function BookingModal({ isOpen, onClose, preselectedTreatmentId }: Bookin
 📧 *Email:* ${clientEmail || 'No especificado'}
 ${specialRequests ? `📝 *Notas/Ocasión:* ${specialRequests}` : ''}
 ━━━━━━━━━━━━━━━━━━━━
-Solicito confirmación de disponibilidad para esta sesión en Lima, Perú.`;
+Solicito confirmación de disponibilidad para esta sesión.`;
 
     return encodeURIComponent(text);
   };
@@ -113,7 +113,7 @@ Solicito confirmación de disponibilidad para esta sesión en Lima, Perú.`;
             Reservar Cita en Meraki
           </h2>
           <p className="font-['Montserrat',sans-serif] text-xs font-light text-[#FFF2DE]/80 mt-1">
-            Atención personalizada en Lima · Sin pago adelantado requerido para solicitar
+            Atención personalizada · Sin pago adelantado requerido para solicitar
           </p>
         </div>
 

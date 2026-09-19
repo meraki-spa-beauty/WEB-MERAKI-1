@@ -69,7 +69,7 @@ export function Privacy() {
               <span className="italic text-[#5E765E]">son nuestro compromiso.</span>
             </h1>
             <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/60 uppercase tracking-widest mt-6">
-              Lima, Perú · Actualizado a 2026
+              Actualizado a 2026
             </p>
           </div>
         </section>

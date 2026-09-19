@@ -58,7 +58,7 @@ Deseo coordinar la emisión y dedicatoria personalizada.`;
                     Meraki Luxury Box (Física)
                   </h4>
                   <p className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 mt-1">
-                    Presentación de lujo en estuche rígido texturizado con cinta de raso, vela aromática botánica de soya y tarjeta con sello de cera. Entrega por courier en Lima o retiro en tienda.
+                    Presentación de lujo en estuche rígido texturizado con cinta de raso, vela aromática botánica de soya y tarjeta con sello de cera. Entrega por courier o retiro coordinado.
                   </p>
                 </div>
               </div>

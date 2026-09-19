@@ -3,10 +3,11 @@ import type { Testimonial, FAQItem } from '../types';
 export const SPA_INFO = {
   name: 'Meraki Spa Beauty',
   tagline: 'Un espacio para volver a ti',
-  city: 'Lima, Perú',
-  coverage: 'Cobertura en Lima Metropolitana · Atención previa reserva',
-  whatsappDisplay: '+51 987 654 321',
-  whatsappNumber: '51987654321',
+  city: 'Atención Personalizada',
+  coverage: 'Atención exclusiva bajo reserva programada',
+  whatsappDisplay: '+51 993 067 291',
+  whatsappNumber: '51993067291',
+  whatsappLink: 'https://wa.link/86seuh',
   email: 'hello@meraki.spa.pe',
   instagram: '@meraki.spa.pe',
   instagramUrl: 'https://www.instagram.com/meraki.spa.pe/',
@@ -26,7 +27,7 @@ export const WELCOME_RITUAL_STEPS = [
   {
     step: '01',
     title: 'Infusión Botánica de Bienvenida',
-    description: 'A tu llegada a nuestro santuario en Lima, te recibimos con una tisana tibia de hierbaluisa orgánica, muña andina y rodaja de naranja deshidratada para empezar a desacelerar los sentidos.',
+    description: 'A tu llegada a nuestro santuario, te recibimos con una tisana tibia de hierbaluisa orgánica, muña silvestre y rodaja de naranja deshidratada para empezar a desacelerar los sentidos.',
     time: '5 min'
   },
   {
@@ -38,7 +39,7 @@ export const WELCOME_RITUAL_STEPS = [
   {
     step: '03',
     title: 'Respiración Consciente & Aromaterapia',
-    description: 'Tu terapeuta guía una breve armonización respiratoria de 3 ciclos profundos con bruma de eucalipto silvestre, desconectando tu mente del ruido de la ciudad.',
+    description: 'Tu terapeuta guía una breve armonización respiratoria de 3 ciclos profundos con bruma de eucalipto silvestre, desconectando tu mente del ruido exterior.',
     time: '3 min'
   },
   {
@@ -61,7 +62,7 @@ export const TESTIMONIALS: Testimonial[] = [
     author: 'Camila Valdivia',
     role: 'Cliente frecuente',
     rating: 5,
-    comment: 'Meraki es verdaderamente el oasis que Lima necesitaba. El Ritual Renovación con piedras volcánicas me quitó un dolor de espalda que arrastraba desde hacía meses. La atención de las terapeutas es impecable, suave y respetuosa.',
+    comment: 'Meraki es verdaderamente el oasis que necesitaba. El Ritual Renovación con piedras volcánicas me quitó un dolor de espalda que arrastraba desde hacía meses. La atención de las terapeutas es impecable, suave y respetuosa.',
     treatment: 'Ritual Renovación Meraki',
     date: 'Hace 1 semana'
   },
@@ -107,8 +108,8 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'faq-4',
     category: 'instalaciones',
-    question: '¿Tienen estacionamiento en la sede de San Isidro?',
-    answer: 'Sí, contamos con estacionamiento privado vigilado las 24 horas y servicio de Valet Parking de cortesía para todos nuestros clientes de spa.'
+    question: '¿Cómo se coordina el acceso y llegada a la sesión?',
+    answer: 'Al confirmar tu reserva por WhatsApp, te compartimos los detalles de acceso y recomendaciones de llegada para que disfrutes de tu experiencia con total tranquilidad y puntualidad.'
   },
   {
     id: 'faq-5',

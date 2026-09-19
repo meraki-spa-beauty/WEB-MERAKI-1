@@ -1,15 +1,32 @@
 import { useState } from 'react';
 import { TREATMENTS, CATEGORIES_CONFIG } from '../../data/treatments';
+import { SPA_INFO } from '../../data/spaData';
 import type { Treatment } from '../../types';
 import { Clock, Sparkles, Eye, Calendar, ArrowRight } from 'lucide-react';
 
 interface TreatmentsCatalogProps {
   onSelectTreatment: (treatment: Treatment) => void;
   onBookTreatment: (treatmentId: string) => void;
+  selectedCategory?: string;
+  onCategoryChange?: (category: string) => void;
 }
 
-export function TreatmentsCatalog({ onSelectTreatment, onBookTreatment }: TreatmentsCatalogProps) {
-  const [activeCategory, setActiveCategory] = useState<string>('todos');
+export function TreatmentsCatalog({
+  onSelectTreatment,
+  onBookTreatment,
+  selectedCategory,
+  onCategoryChange
+}: TreatmentsCatalogProps) {
+  const [internalCategory, setInternalCategory] = useState<string>('todos');
+  const activeCategory = selectedCategory !== undefined ? selectedCategory : internalCategory;
+
+  const handleCategorySelect = (catId: string) => {
+    if (onCategoryChange) {
+      onCategoryChange(catId);
+    } else {
+      setInternalCategory(catId);
+    }
+  };
 
   const filteredTreatments = activeCategory === 'todos'
     ? TREATMENTS
@@ -48,7 +65,7 @@ export function TreatmentsCatalog({ onSelectTreatment, onBookTreatment }: Treatm
               <button
                 key={cat.id}
                 type="button"
-                onClick={() => setActiveCategory(cat.id)}
+                onClick={() => handleCategorySelect(cat.id)}
                 className={`whitespace-nowrap px-5 py-2.5 rounded-full text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.14em] transition-all cursor-pointer ${
                   isActive
                     ? 'bg-[#5E765E] text-[#FFF2DE] font-semibold shadow-sm'
@@ -166,7 +183,7 @@ export function TreatmentsCatalog({ onSelectTreatment, onBookTreatment }: Treatm
           </div>
 
           <a
-            href="https://wa.me/51987654321?text=Hola%20Meraki,%20deseo%20consultar%20por%20un%20paquete%20personalizado"
+            href={SPA_INFO.whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#FFF2DE] hover:bg-white text-[#5E765E] px-7 py-3.5 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] transition-all shrink-0 shadow"

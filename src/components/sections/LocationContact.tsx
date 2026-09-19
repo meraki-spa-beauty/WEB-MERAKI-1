@@ -22,13 +22,13 @@ export function LocationContact() {
           {/* Left Column: Coordinates & Hours */}
           <div className="lg:col-span-6">
             <span className="text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-[0.24em] text-[#5E765E] block mb-2">
-              Atención en Lima · Previa Reserva
+              Atención Personalizada · Previa Reserva
             </span>
             <h2 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-6">
               Coordinemos tu próxima <span className="italic text-[#5E765E]">pausa de bienestar.</span>
             </h2>
             <p className="font-['Montserrat',sans-serif] text-sm text-[#111111]/75 font-light leading-relaxed mb-8 max-w-lg">
-              Brindamos atención personalizada con cita programada en Lima Metropolitana. Te acompañamos a diseñar una experiencia a tu medida.
+              Brindamos atención personalizada con cita programada. Te acompañamos a diseñar una experiencia a tu medida.
             </p>
 
             <div className="space-y-6">
@@ -38,7 +38,7 @@ export function LocationContact() {
                 </div>
                 <div>
                   <h4 className="font-['Montserrat',sans-serif] text-xs font-bold uppercase tracking-wider text-[#111111]">
-                    Cobertura y Modalidad
+                    Modalidad de Atención
                   </h4>
                   <p className="text-xs text-[#111111]/75 mt-0.5">{SPA_INFO.coverage}</p>
                   <span className="text-[11px] text-[#5E765E] font-medium block mt-1">
@@ -69,7 +69,7 @@ export function LocationContact() {
                     Canal Directo &amp; WhatsApp
                   </h4>
                   <a
-                    href={`https://wa.me/${SPA_INFO.whatsappNumber}`}
+                    href={SPA_INFO.whatsappLink}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs text-[#5E765E] font-medium hover:underline block mt-0.5"
