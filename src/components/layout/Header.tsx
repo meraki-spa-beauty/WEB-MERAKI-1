@@ -1,118 +1,96 @@
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../brand/Logo';
 import {
   Menu,
   X,
   Calendar,
-  Sparkles,
   ChevronDown,
   ArrowRight,
-  Flame,
-  Droplet,
-  Heart,
+  Sparkles,
+  Hand,
+  Footprints,
+  Eye,
   Scissors,
-  Layers
+  Flame,
+  Smile
 } from 'lucide-react';
 import { SPA_INFO } from '../../data/spaData';
 
-export interface ServiceSubMenuItem {
+export interface HeaderCategoryItem {
   id: string;
   label: string;
   categoryKey: string;
   shortDesc: string;
   startingPrice: string;
-  icon: 'flame' | 'droplet' | 'heart' | 'scissors' | 'layers';
+  icon: 'manos' | 'pies' | 'pestanas' | 'depilacion' | 'masajes' | 'faciales';
 }
 
-export const SERVICES_MENU: ServiceSubMenuItem[] = [
+export const HEADER_CATEGORIES: HeaderCategoryItem[] = [
   {
-    id: 'todos-rituales',
-    label: 'Carta Completa',
-    categoryKey: 'todos',
-    shortDesc: 'Todos los rituales y experiencias de autor',
-    startingPrice: 'Desde S/. 190',
-    icon: 'layers'
+    id: 'cat-manos',
+    label: 'Manos & Uñas',
+    categoryKey: 'manos',
+    shortDesc: 'Básica, Gel, Rubber, Acrílicos y Esculpidas',
+    startingPrice: 'Desde S/ 60',
+    icon: 'manos'
   },
   {
-    id: 'masajes-rituales',
-    label: 'Masajes & Rituales',
+    id: 'cat-pies',
+    label: 'Cuidado de Pies',
+    categoryKey: 'pies',
+    shortDesc: 'Pedicura básica, gel y jellyparafina spa',
+    startingPrice: 'Desde S/ 70',
+    icon: 'pies'
+  },
+  {
+    id: 'cat-pestanas',
+    label: 'Pestañas',
+    categoryKey: 'pestanas',
+    shortDesc: 'Lifting y extensiones (clásicas, rímel, volumen, híbrido)',
+    startingPrice: 'Desde S/ 100',
+    icon: 'pestanas'
+  },
+  {
+    id: 'cat-depilacion',
+    label: 'Depilación Cera & Hilo',
+    categoryKey: 'depilacion',
+    shortDesc: 'Facial (cera/hilo), axilas, piernas y zonas íntimas',
+    startingPrice: 'Desde S/ 15',
+    icon: 'depilacion'
+  },
+  {
+    id: 'cat-masajes',
+    label: 'Masajes & Packs',
     categoryKey: 'masajes',
-    shortDesc: 'Técnicas holísticas con piedras volcánicas andinas',
-    startingPrice: 'Desde S/. 190',
-    icon: 'flame'
+    shortDesc: 'Relajantes, descontracturantes, drenaje y reductores',
+    startingPrice: 'Desde S/ 60',
+    icon: 'masajes'
   },
   {
-    id: 'faciales-cosmetica',
-    label: 'Faciales Botánicos',
+    id: 'cat-faciales',
+    label: 'Faciales Profesionales',
     categoryKey: 'faciales',
-    shortDesc: 'Alta cosmética celular, hidratación y luminosidad',
-    startingPrice: 'Desde S/. 210',
-    icon: 'droplet'
-  },
-  {
-    id: 'experiencias-parejas',
-    label: 'Experiencias Dúo',
-    categoryKey: 'parejas',
-    shortDesc: 'Rituales privados en cabina doble para dos',
-    startingPrice: 'Desde S/. 450',
-    icon: 'heart'
-  },
-  {
-    id: 'corporales-circuito',
-    label: 'Corporales & Exfoliación',
-    categoryKey: 'corporales',
-    shortDesc: 'Renovación de sales marinas y envolturas botánicas',
-    startingPrice: 'Desde S/. 220',
-    icon: 'layers'
-  },
-  {
-    id: 'salon-belleza',
-    label: 'Salón & Manicura Spa',
-    categoryKey: 'salon',
-    shortDesc: 'Cuidado de manos y pies con parafina botánica',
-    startingPrice: 'Desde S/. 95',
-    icon: 'scissors'
+    shortDesc: 'Facial básico, intermedio y profundo con máscara LED',
+    startingPrice: 'Desde S/ 120',
+    icon: 'faciales'
   }
 ];
 
-interface HeaderProps {
-  onOpenBookingModal?: (treatmentId?: string) => void;
-  onSelectCategory?: (categoryKey: string) => void;
-}
-
-export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
+export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
-  const [mobileServicesOpen, setMobileServicesOpen] = useState(true);
+  const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const location = useLocation();
 
-  const handleBookingClick = () => {
-    if (onOpenBookingModal) {
-      onOpenBookingModal();
-    } else {
-      window.location.href = '/#tratamientos';
-    }
-  };
-
-  const handleSelectServiceCategory = (categoryKey: string) => {
-    setServicesDropdownOpen(false);
+  // Close dropdown on route change
+  useEffect(() => {
     setIsOpen(false);
-
-    if (onSelectCategory) {
-      onSelectCategory(categoryKey);
-    }
-
-    const treatmentsSection = document.getElementById('tratamientos');
-
-    if (treatmentsSection) {
-      treatmentsSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      window.location.href = '/#tratamientos';
-    }
-  };
+    setCatalogDropdownOpen(false);
+  }, [location.pathname]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -120,7 +98,7 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
       const target = event.target;
 
       if (dropdownRef.current && target instanceof Node && !dropdownRef.current.contains(target)) {
-        setServicesDropdownOpen(false);
+        setCatalogDropdownOpen(false);
       }
     }
 
@@ -131,22 +109,18 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
 
   const handleMouseEnter = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    setServicesDropdownOpen(true);
+    setCatalogDropdownOpen(true);
   };
 
   const handleMouseLeave = () => {
     timeoutRef.current = setTimeout(() => {
-      setServicesDropdownOpen(false);
+      setCatalogDropdownOpen(false);
     }, 200);
   };
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 30) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 25);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -167,19 +141,35 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
     };
   }, [isOpen]);
 
-  const renderIcon = (iconName: ServiceSubMenuItem['icon']) => {
+  const renderIcon = (iconName: HeaderCategoryItem['icon']) => {
     switch (iconName) {
-      case 'flame':
-        return <Flame className="w-4 h-4 text-[#D5A688]" />;
-      case 'droplet':
-        return <Droplet className="w-4 h-4 text-[#5E765E]" />;
-      case 'heart':
-        return <Heart className="w-4 h-4 text-[#D5A688]" />;
-      case 'scissors':
-        return <Scissors className="w-4 h-4 text-[#5E765E]" />;
+      case 'manos':
+        return <Hand className="w-4 h-4 text-[#5E765E]" />;
+      case 'pies':
+        return <Footprints className="w-4 h-4 text-[#D5A688]" />;
+      case 'pestanas':
+        return <Eye className="w-4 h-4 text-[#5E765E]" />;
+      case 'depilacion':
+        return <Scissors className="w-4 h-4 text-[#D5A688]" />;
+      case 'masajes':
+        return <Flame className="w-4 h-4 text-[#5E765E]" />;
+      case 'faciales':
+        return <Smile className="w-4 h-4 text-[#D5A688]" />;
       default:
-        return <Layers className="w-4 h-4 text-[#5E765E]" />;
+        return <Sparkles className="w-4 h-4 text-[#5E765E]" />;
     }
+  };
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') {
+      return true;
+    }
+
+    if (path !== '/' && location.pathname.startsWith(path)) {
+      return true;
+    }
+
+    return false;
   };
 
   return (
@@ -187,62 +177,72 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
       className={`sticky top-0 z-50 transition-all duration-300 ${
         isScrolled
           ? 'bg-[#FFFFFF]/95 backdrop-blur-md shadow-sm border-b border-[#5E765E]/15 py-3'
-          : 'bg-[#FFF2DE]/85 backdrop-blur-sm py-4 border-b border-[#5E765E]/10'
+          : 'bg-[#FFF2DE]/90 backdrop-blur-sm py-4 border-b border-[#5E765E]/10'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
         {/* Brand Logo */}
         <Logo variant="horizontal" color="dark" />
 
-        {/* Desktop Navigation with Interactive Services Submenu */}
+        {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-7 text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.14em] text-[#111111]/85 font-medium">
-          
-          {/* Services with Sub-Menu (Interactive Popover) */}
+          <Link
+            to="/"
+            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
+              isActive('/') ? 'text-[#5E765E] font-semibold' : ''
+            }`}
+          >
+            Inicio
+          </Link>
+
+          {/* Catálogo con Menú Desplegable */}
           <div
             ref={dropdownRef}
             className="relative"
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
           >
-            <button
-              id="btn-nav-services-submenu"
-              type="button"
-              onClick={() => setServicesDropdownOpen(!servicesDropdownOpen)}
-              aria-expanded={servicesDropdownOpen}
-              aria-haspopup="true"
-              className={`inline-flex items-center gap-1.5 py-1 transition-colors relative cursor-pointer ${
-                servicesDropdownOpen ? 'text-[#5E765E]' : 'hover:text-[#5E765E]'
+            <Link
+              to="/catalogo"
+              className={`inline-flex items-center gap-1.5 py-1 transition-colors relative cursor-pointer hover:text-[#5E765E] ${
+                isActive('/catalogo') ? 'text-[#5E765E] font-semibold' : ''
               }`}
             >
-              <span>Servicios</span>
+              <span>Catálogo</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                  servicesDropdownOpen ? 'rotate-180 text-[#5E765E]' : 'text-[#111111]/50'
+                  catalogDropdownOpen ? 'rotate-180 text-[#5E765E]' : 'text-[#111111]/50'
                 }`}
               />
-            </button>
+            </Link>
 
-            {/* Interactive Sub-Menu Floating Panel */}
-            {servicesDropdownOpen && (
+            {/* Submenú Flotante */}
+            {catalogDropdownOpen && (
               <div
-                id="menu-services-dropdown"
+                id="menu-catalog-dropdown"
                 role="menu"
-                className="absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/95 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                className="absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-left"
               >
-                <div className="px-3 py-2 border-b border-[#5E765E]/10 mb-2">
+                <div className="px-3 py-2 border-b border-[#5E765E]/10 mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                    Menú de Servicios &amp; Experiencias
+                    Servicios Oficiales
                   </span>
+                  <Link
+                    to="/catalogo"
+                    className="text-[10px] text-[#D5A688] font-semibold hover:underline"
+                  >
+                    Ver Todo
+                  </Link>
                 </div>
 
                 <div className="space-y-1">
-                  {SERVICES_MENU.map((item) => (
-                    <button
+                  {HEADER_CATEGORIES.map((item) => (
+                    <Link
                       key={item.id}
-                      type="button"
+                      to={`/catalogo?cat=${item.categoryKey}`}
                       role="menuitem"
-                      onClick={() => handleSelectServiceCategory(item.categoryKey)}
-                      className="w-full text-left p-3 rounded-xl hover:bg-[#FFF2DE]/70 transition-all flex items-start gap-3.5 group cursor-pointer"
+                      onClick={() => setCatalogDropdownOpen(false)}
+                      className="w-full text-left p-2.5 rounded-xl hover:bg-[#FFF2DE]/70 transition-all flex items-start gap-3 group cursor-pointer"
                     >
                       <div className="w-8 h-8 rounded-lg bg-[#5E765E]/10 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#5E765E]/20 transition-colors">
                         {renderIcon(item.icon)}
@@ -260,71 +260,78 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
                           {item.shortDesc}
                         </p>
                       </div>
-                    </button>
+                    </Link>
                   ))}
                 </div>
 
                 <div className="mt-2 pt-2 border-t border-[#5E765E]/10 px-3 py-1.5 flex items-center justify-between text-[11px] text-[#5E765E] font-semibold tracking-normal normal-case">
-                  <span className="text-[#111111]/60 font-normal">¿Citas personalizadas?</span>
-                  <a
-                    href={SPA_INFO.whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <span className="text-[#111111]/60 font-normal">A domicilio y oficina</span>
+                  <Link
+                    to="/catalogo"
+                    onClick={() => setCatalogDropdownOpen(false)}
                     className="inline-flex items-center gap-1 text-[#5E765E] hover:underline"
                   >
-                    <span>Asesoría directa</span>
+                    <span>Explorar catálogo completo</span>
                     <ArrowRight className="w-3 h-3" />
-                  </a>
+                  </Link>
                 </div>
               </div>
             )}
           </div>
 
-          <a
-            href="#ritual-bienvenida"
-            className="hover:text-[#5E765E] transition-colors relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#5E765E] hover:after:w-full after:transition-all after:duration-300"
+          <Link
+            to="/como-reservar"
+            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
+              isActive('/como-reservar') ? 'text-[#5E765E] font-semibold' : ''
+            }`}
           >
-            El Ritual
-          </a>
+            Cómo Reservar
+          </Link>
 
-          <a
-            href="#gift-cards"
-            className="hover:text-[#5E765E] transition-colors relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#5E765E] hover:after:w-full after:transition-all after:duration-300"
+          <Link
+            to="/nosotros"
+            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
+              isActive('/nosotros') ? 'text-[#5E765E] font-semibold' : ''
+            }`}
           >
-            Gift Cards
-          </a>
+            Nosotros
+          </Link>
 
-          <a
-            href="#contacto"
-            className="hover:text-[#5E765E] transition-colors relative py-1 after:content-[''] after:absolute after:bottom-0 after:left-0 after:w-0 after:h-[1.5px] after:bg-[#5E765E] hover:after:w-full after:transition-all after:duration-300"
+          <Link
+            to="/contacto"
+            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
+              isActive('/contacto') ? 'text-[#5E765E] font-semibold' : ''
+            }`}
           >
             Contacto
-          </a>
+          </Link>
         </nav>
 
         {/* Right CTA */}
         <div className="hidden sm:flex items-center gap-3">
-          <button
-            id="btn-header-booking"
-            type="button"
-            onClick={handleBookingClick}
+          <a
+            id="btn-header-whatsapp-booking"
+            href={SPA_INFO.whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-5 py-2.5 rounded-full text-xs font-['Montserrat',sans-serif] font-medium uppercase tracking-[0.14em] transition-all shadow-sm hover:shadow-md cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
-            <span>Reservar Cita</span>
-          </button>
+            <span>Agendar Cita</span>
+          </a>
         </div>
 
         {/* Mobile Hamburger Button */}
         <div className="flex sm:hidden items-center gap-2">
-          <button
-            type="button"
-            onClick={handleBookingClick}
+          <a
+            href={SPA_INFO.whatsappLink}
+            target="_blank"
+            rel="noopener noreferrer"
             className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs"
-            aria-label="Reservar cita"
+            aria-label="Agendar por WhatsApp"
           >
             <Calendar className="w-4 h-4 text-[#D5A688]" />
-          </button>
+          </a>
           <button
             id="btn-mobile-nav-toggle"
             type="button"
@@ -346,107 +353,119 @@ export function Header({ onOpenBookingModal, onSelectCategory }: HeaderProps) {
           aria-modal="true"
           aria-label="Menú principal de navegación"
         >
-          <div className="flex flex-col gap-6 pt-2">
+          <div className="flex flex-col gap-5 pt-2">
             <div className="flex justify-center pb-4 border-b border-[#5E765E]/20">
               <Logo variant="stacked" color="dark" />
             </div>
 
-            {/* Mobile Submenu for Services */}
-            <div className="text-left">
-              <button
-                type="button"
-                onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
-                className="w-full flex items-center justify-between py-2 text-left font-['Cormorant_Garamond',serif] text-2xl text-[#111111] border-b border-[#5E765E]/15"
+            <nav className="flex flex-col gap-2 text-left">
+              <Link
+                to="/"
+                onClick={() => setIsOpen(false)}
+                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
               >
-                <span>Servicios de Spa</span>
-                <ChevronDown
-                  className={`w-5 h-5 text-[#5E765E] transition-transform duration-200 ${
-                    mobileServicesOpen ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
+                <span>Inicio</span>
+                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+              </Link>
 
-              {mobileServicesOpen && (
-                <div className="mt-3 space-y-2 pl-2">
-                  {SERVICES_MENU.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => handleSelectServiceCategory(item.categoryKey)}
-                      className="w-full text-left p-2.5 rounded-xl bg-white/70 hover:bg-white border border-[#5E765E]/15 flex items-center justify-between"
+              {/* Mobile Submenu for Catálogo */}
+              <div className="py-2 border-b border-[#5E765E]/15">
+                <button
+                  type="button"
+                  onClick={() => setMobileCatalogOpen(!mobileCatalogOpen)}
+                  className="w-full flex items-center justify-between font-['Cormorant_Garamond',serif] text-2xl text-[#111111]"
+                >
+                  <span>Catálogo de Servicios</span>
+                  <ChevronDown
+                    className={`w-5 h-5 text-[#5E765E] transition-transform duration-200 ${
+                      mobileCatalogOpen ? 'rotate-180' : ''
+                    }`}
+                  />
+                </button>
+
+                {mobileCatalogOpen && (
+                  <div className="mt-3 space-y-2 pl-2">
+                    <Link
+                      to="/catalogo"
+                      onClick={() => setIsOpen(false)}
+                      className="block p-2 rounded-xl bg-white/80 font-medium text-xs text-[#5E765E]"
                     >
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-md bg-[#5E765E]/10 flex items-center justify-center">
-                          {renderIcon(item.icon)}
+                      Ver Catálogo Completo (36 Servicios) →
+                    </Link>
+                    {HEADER_CATEGORIES.map((item) => (
+                      <Link
+                        key={item.id}
+                        to={`/catalogo?cat=${item.categoryKey}`}
+                        onClick={() => setIsOpen(false)}
+                        className="w-full text-left p-2.5 rounded-xl bg-white/60 hover:bg-white border border-[#5E765E]/15 flex items-center justify-between"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-6 h-6 rounded bg-[#5E765E]/10 flex items-center justify-center">
+                            {renderIcon(item.icon)}
+                          </div>
+                          <span className="font-['Montserrat',sans-serif] text-xs font-medium text-[#111111]">
+                            {item.label}
+                          </span>
                         </div>
-                        <span className="font-['Montserrat',sans-serif] text-xs font-medium text-[#111111]">
-                          {item.label}
+                        <span className="text-[10px] text-[#5E765E] font-semibold">
+                          {item.startingPrice}
                         </span>
-                      </div>
-                      <span className="text-[10px] text-[#5E765E] font-semibold">
-                        {item.startingPrice}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
 
-            <nav className="flex flex-col gap-3 text-left">
-              <a
-                href="#ritual-bienvenida"
+              <Link
+                to="/como-reservar"
                 onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-1 border-b border-[#5E765E]/15"
+                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
               >
-                El Ritual
-              </a>
+                <span>Cómo Reservar</span>
+                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+              </Link>
 
-              <a
-                href="#gift-cards"
+              <Link
+                to="/nosotros"
                 onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-1 border-b border-[#5E765E]/15"
+                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
               >
-                Gift Cards
-              </a>
+                <span>Nosotros</span>
+                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+              </Link>
 
-              <a
-                href="#contacto"
+              <Link
+                to="/contacto"
                 onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-1 border-b border-[#5E765E]/15"
+                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
               >
-                Contacto
-              </a>
+                <span>Contacto</span>
+                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+              </Link>
             </nav>
           </div>
 
-          <div className="flex flex-col gap-4 pt-6 border-t border-[#5E765E]/20 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                handleBookingClick();
-              }}
-              className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md"
-            >
-              <Sparkles className="w-4 h-4 text-[#D5A688]" />
-              <span>Agendar mi Experiencia</span>
-            </button>
-
+          <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center">
             <a
               href={SPA_INFO.whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 text-xs font-['Montserrat',sans-serif] uppercase tracking-wider text-[#5E765E] font-medium"
+              className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md"
             >
-              <span>WhatsApp: {SPA_INFO.whatsappDisplay}</span>
+              <Sparkles className="w-4 h-4 text-[#D5A688]" />
+              <span>Agendar por WhatsApp</span>
             </a>
+
+            <div className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 pt-1">
+              WhatsApp Directo: <span className="font-semibold text-[#5E765E]">{SPA_INFO.whatsappDisplay}</span>
+            </div>
 
             <div className="flex justify-center gap-4 text-[11px] uppercase tracking-wider text-[#111111]/60 pt-2">
               <Link to="/privacy" onClick={() => setIsOpen(false)}>
-                Privacidad
+                Políticas de Privacidad
               </Link>
               <span>•</span>
-              <span>Atención Personalizada</span>
+              <span>A Domicilio &amp; Oficina</span>
             </div>
           </div>
         </div>

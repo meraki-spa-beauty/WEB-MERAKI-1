@@ -1,47 +1,37 @@
-export type TreatmentCategory = 'masajes' | 'faciales' | 'corporales' | 'parejas' | 'salon';
+export type ServiceCategory = 'manos' | 'pies' | 'pestanas' | 'depilacion' | 'masajes' | 'faciales';
 
-export type ExperienceTone = 'sage' | 'cream' | 'terracotta';
-
-export interface Treatment {
-  id: string;
-  slug: string;
-  title: string;
-  subtitle: string;
-  category: TreatmentCategory;
-  categoryLabel: string;
-  durationMin: number;
-  durationLabel: string;
+export interface ServicePriceOption {
+  label: string;
   pricePEN: number;
-  shortDescription: string;
-  fullDescription: string;
-  benefits: string[];
+  sessions?: number;
+}
+
+export interface CatalogService {
+  id: string;
+  name: string;
+  category: ServiceCategory;
+  categoryLabel: string;
+  subcategory: string;
+  pricePEN?: number;
+  priceOptions?: ServicePriceOption[];
+  priceNote?: string;
+  description: string;
   includes: string[];
-  image: string;
-  isPopular?: boolean;
-  tone: ExperienceTone;
+  note?: string;
+  popular?: boolean;
+  image?: string;
 }
 
-export interface BookingRequest {
-  treatmentId: string;
-  treatmentTitle: string;
-  date: string;
-  timeSlot: string;
-  peopleCount: 1 | 2;
-  therapistPreference: 'any' | 'female' | 'specialist';
+export interface BookingData {
+  serviceId?: string;
+  serviceName?: string;
+  category?: ServiceCategory;
   clientName: string;
-  clientPhone: string;
-  clientEmail: string;
-  specialRequests: string;
-}
-
-export interface GiftCardSelection {
-  type: 'digital' | 'luxury-box';
-  amount: number;
-  treatmentName?: string;
-  recipientName: string;
-  recipientEmail?: string;
-  senderName: string;
-  personalMessage: string;
+  phone: string;
+  district: string;
+  serviceLocationType: 'casa' | 'trabajo';
+  preferredDate: string;
+  preferredTime: string;
 }
 
 export interface Testimonial {
@@ -50,13 +40,13 @@ export interface Testimonial {
   role: string;
   rating: number;
   comment: string;
-  treatment: string;
-  date: string;
+  service: string;
+  location: string;
 }
 
 export interface FAQItem {
   id: string;
   question: string;
   answer: string;
-  category: 'reservas' | 'servicios' | 'instalaciones' | 'giftcards';
+  category: 'reservas' | 'servicios' | 'movilidad' | 'bioseguridad';
 }

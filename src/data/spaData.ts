@@ -2,87 +2,58 @@ import type { Testimonial, FAQItem } from '../types';
 
 export const SPA_INFO = {
   name: 'Meraki Spa Beauty',
-  tagline: 'Un espacio para volver a ti',
-  city: 'Atención Personalizada',
-  coverage: 'Atención exclusiva bajo reserva programada',
+  tagline: 'Spa y Belleza en la comodidad de tu casa y/o trabajo',
+  founder: 'Ana Maria Díaz',
+  experience: 'Más de 10 años de experiencia profesional',
+  mission: 'Que te sientas feliz y empoderada',
+  serviceModel: 'Servicio a domicilio y oficina con equipamiento profesional completo',
+  city: 'Lima, Perú',
+  coverage: 'Atención a domicilio y oficinas en Lima (consultar movilidad según distrito)',
   whatsappDisplay: '+51 993 067 291',
   whatsappNumber: '51993067291',
   whatsappLink: 'https://wa.link/86seuh',
-  email: 'hello@meraki.spa.pe',
+  email: 'contacto@meraki.spa.pe',
   instagram: '@meraki.spa.pe',
   instagramUrl: 'https://www.instagram.com/meraki.spa.pe/',
   hours: {
-    weekdays: 'Lunes a Sábado: 09:00 - 20:00',
-    weekends: 'Domingos: Previa coordinación',
+    weekdays: 'Lunes a Sábado: 09:00 - 20:00 (Previa cita)',
+    weekends: 'Domingos: Previa coordinación de agenda',
   },
   pillars: [
-    'Atención personalizada previa reserva',
-    'Insumos botánicos y aromaterapia de alta calidad',
-    'Protocolos de bienestar diseñados para regalarte una pausa',
-    'Experiencia cuidada al detalle para volver a ti',
+    'Marca liderada por Ana Maria Díaz con más de 10 años de experiencia',
+    'Llegamos con todo lo necesario a la comodidad de tu casa y/o trabajo',
+    'Cumplimiento estricto de todos los protocolos de bioseguridad',
+    'Atención cálida, respetuosa y 100% personalizada'
   ]
 };
-
-export const WELCOME_RITUAL_STEPS = [
-  {
-    step: '01',
-    title: 'Infusión Botánica de Bienvenida',
-    description: 'A tu llegada a nuestro santuario, te recibimos con una tisana tibia de hierbaluisa orgánica, muña silvestre y rodaja de naranja deshidratada para empezar a desacelerar los sentidos.',
-    time: '5 min'
-  },
-  {
-    step: '02',
-    title: 'Baño Podal Aromático & Sales de Maras',
-    description: 'Tus pies reposan en agua tibia aromatizada con aceite esencial de lavanda y cristales de sal marina rica en minerales, liberando la pesadez acumulada.',
-    time: '10 min'
-  },
-  {
-    step: '03',
-    title: 'Respiración Consciente & Aromaterapia',
-    description: 'Tu terapeuta guía una breve armonización respiratoria de 3 ciclos profundos con bruma de eucalipto silvestre, desconectando tu mente del ruido exterior.',
-    time: '3 min'
-  },
-  {
-    step: '04',
-    title: 'Tu Tratamiento Personalizado',
-    description: 'La sesión se ejecuta en camillas ergonómicas climatizadas con sábanas de algodón egipcio, música binaural y la técnica especializada de tu elección.',
-    time: '60 - 120 min'
-  },
-  {
-    step: '05',
-    title: 'Tiempo de Reintegración & Descanso',
-    description: 'Concluimos en nuestra sala de relajación con luz natural tamizada, té de manzanilla silvestre y frutos secos para volver a ti con serenidad y calma.',
-    time: '15 min'
-  }
-];
 
 export const TESTIMONIALS: Testimonial[] = [
   {
     id: 't-1',
-    author: 'Camila Valdivia',
-    role: 'Cliente frecuente',
+    author: 'Claudia Mendoza',
+    role: 'Clienta a Domicilio',
     rating: 5,
-    comment: 'Meraki es verdaderamente el oasis que necesitaba. El Ritual Renovación con piedras volcánicas me quitó un dolor de espalda que arrastraba desde hacía meses. La atención de las terapeutas es impecable, suave y respetuosa.',
-    treatment: 'Ritual Renovación Meraki',
-    date: 'Hace 1 semana'
+    comment: 'Tener una manicura en acrílico con baby boomer tan prolija en mi propia sala me ahorró horas de tráfico. Ana María es súper detallista y llegó con todo impecable.',
+    service: 'Poligel Baby Boomer & Manos',
+    location: 'Miraflores'
   },
   {
     id: 't-2',
-    author: 'Rodrigo & Natalia Ferrand',
-    role: 'Experiencia Aniversario',
+    author: 'Valeria Rivas',
+    role: 'Atención en Oficina',
     rating: 5,
-    comment: 'Reservamos la experiencia "Pausa para Dos" para celebrar nuestro aniversario. La cabina privada con hidromasaje, la música y el masaje simultáneo superaron todas nuestras expectativas. Salimos renovados.',
-    treatment: 'Pausa para Dos (Ritual en Pareja)',
-    date: 'Hace 2 semanas'
+    comment: 'Agendé un masaje descontracturante y facial intermedio después de una semana pesada de trabajo. El vaporizador, la alta frecuencia y la comodidad de no tener que salir de casa fue una maravilla.',
+    service: 'Masaje Descontracturante & Facial Intermedio',
+    location: 'San Isidro'
   },
   {
     id: 't-3',
-    author: 'Luciana Morales',
-    role: 'Diseñadora de Interiores',
+    author: 'Silvana Ramos',
+    role: 'Clienta Frecuente',
     rating: 5,
-    comment: 'La estética del lugar, los aromas y el facial glow botánico son de otro nivel. Cuidan cada detalle, desde el té de bienvenida hasta la temperatura de las toallas. Ya tengo agendada mi próxima cita.',
-    treatment: 'Facial Glow Botánico & Vitamina C',
-    date: 'Hace 3 semanas'
+    comment: 'El lifting de pestañas y la pedicura jellyparafina me duraron intactos semanas. Es genial que te envíen la rutina de skincare personalizada con el facial profundo.',
+    service: 'Facial Profundo & Jellyparafina Pies',
+    location: 'Surco'
   }
 ];
 
@@ -90,37 +61,37 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     id: 'faq-1',
     category: 'reservas',
-    question: '¿Con cuánta anticipación debo reservar mi cita?',
-    answer: 'Recomendamos agendar con 24 a 48 horas de anticipación, especialmente para fines de semana o rituales en pareja. Puedes reservar en línea mediante nuestro formulario o directamente a través de nuestro WhatsApp oficial.'
+    question: '¿Cómo agendo mi cita con Meraki?',
+    answer: 'Es muy fácil: eliges tu servicio en nuestro catálogo, nos escribes al WhatsApp 993 067 291 con tu fecha tentativa y lugar (casa o trabajo), realizas el adelanto del 40% de la reserva y nos compartes tu voucher junto con tus datos para agendarte.'
   },
   {
     id: 'faq-2',
-    category: 'reservas',
-    question: '¿Cuál es la política de cancelación o reprogramación?',
-    answer: 'Entendemos que pueden surgir imprevistos. Agradecemos avisar con al menos 4 horas de anticipación para reprogramar tu horario sin penalidad. Para cancelaciones con menor tiempo o no asistencia, se podría retener el 50% del depósito de reserva.'
+    category: 'movilidad',
+    question: '¿El precio incluye el costo de movilidad?',
+    answer: 'Los servicios no incluyen el costo de la movilidad. El valor de la misma dependerá de tu distrito en Lima, por lo que te invitamos a consultar el costo exacto al escribirnos por WhatsApp.'
   },
   {
     id: 'faq-3',
-    category: 'instalaciones',
-    question: '¿Qué debo llevar para mi visita al spa?',
-    answer: 'No necesitas traer nada especial. En Meraki te proporcionamos bata de algodón afelpada, pantuflas desechables ecológicas, toallas de spa, gorros y todos los amenities orgánicos necesarios (shampoo, acondicionador y crema hidratante).'
+    category: 'servicios',
+    question: '¿Qué necesito tener listo en mi casa o trabajo para la atención?',
+    answer: '¡No te preocupes por nada! Nosotras llevamos todos los materiales esterilizados, productos de alta cosmética y equipamiento portátil necesario (lámparas LED, vaporizador facial, toallas descartables, etc.). Solo requerimos un espacio cómodo con buena iluminación y una toma de corriente.'
   },
   {
     id: 'faq-4',
-    category: 'instalaciones',
-    question: '¿Cómo se coordina el acceso y llegada a la sesión?',
-    answer: 'Al confirmar tu reserva por WhatsApp, te compartimos los detalles de acceso y recomendaciones de llegada para que disfrutes de tu experiencia con total tranquilidad y puntualidad.'
+    category: 'reservas',
+    question: '¿Cuál es la política de cancelación o cambios de cita?',
+    answer: 'Los cambios o cancelaciones deben realizarse con al menos 24 horas de anticipación. De lo contrario, el previo depósito del 40% no será reembolsable, ya que reservamos el bloque horario y transporte exclusivamente para ti.'
   },
   {
     id: 'faq-5',
-    category: 'servicios',
-    question: '¿Puedo personalizar la presión del masaje y los aceites?',
-    answer: 'Absolutamente. Al inicio de cada sesión tu terapeuta te consultará sobre tus preferencias de presión (suave, media o intensa), zonas prioritarias a trabajar y posibles alergias para seleccionar la sinergia de aceites esenciales idónea para ti.'
+    category: 'bioseguridad',
+    question: '¿Qué protocolos de bioseguridad aplican?',
+    answer: 'En Meraki cumplimos rigurosos protocolos de bioseguridad: esterilización de instrumental con grado hospitalario, uso de material descartable por cliente, desinfección antes de cada procedimiento y uso de guantes y mascarilla.'
   },
   {
     id: 'faq-6',
-    category: 'giftcards',
-    question: '¿Cómo funcionan las Gift Cards de Meraki?',
-    answer: 'Ofrecemos Gift Cards virtuales que se envían inmediatamente por WhatsApp o email con un mensaje personalizado, así como nuestra "Meraki Luxury Box" física con empaque de terciopelo, vela aromática y voucher sellado con cera para regalar una experiencia inolvidable. Tienen una validez de 6 meses.'
+    category: 'servicios',
+    question: '¿Cómo funciona el mantenimiento en uñas y retoque de pestañas?',
+    answer: 'En uñas acrílicas o poligel, el mantenimiento tiene el mismo costo que la puesta inicial porque se remueve el 90% del producto para estructurar un sistema nuevo y sano. En extensiones de pestañas, el retoque a S/ 100 aplica dentro de los primeros 15 días tras la colocación según el estado en que lleguen.'
   }
 ];
