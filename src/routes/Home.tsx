@@ -3,8 +3,10 @@ import { TopBar } from '../components/layout/TopBar';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
-import { SPA_INFO, TESTIMONIALS } from '../data/spaData';
+import { EditorialHeroFeed } from '../components/sections/EditorialHeroFeed';
+import { TESTIMONIALS } from '../data/spaData';
 import { CATEGORIES_DATA } from '../data/catalog';
+import { useBooking } from '../context/BookingContext';
 import {
   Sparkles,
   ArrowRight,
@@ -20,10 +22,13 @@ import {
   Eye,
   Scissors,
   Flame,
-  Smile
+  Smile,
+  Calendar
 } from 'lucide-react';
 
 export function Home() {
+  const { openBooking } = useBooking();
+
   const getCategoryIcon = (id: string) => {
     switch (id) {
       case 'manos':
@@ -52,117 +57,10 @@ export function Home() {
 
       <main className="flex-1">
         {/* =========================================================================
-            1. HERO SECTION: Clean, focused, welcoming for a new client
+            1. EDITORIAL HERO FEED: Full-bleed photo, moody gray filter, centered semitransparent isotype
+            (Inspired by Heavenly Spa by Westin reference & Meraki brand identity)
            ========================================================================= */}
-        <section className="relative overflow-hidden pt-12 pb-20 md:py-24 border-b border-[#5E765E]/15 text-left">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              
-              <div className="lg:col-span-7">
-                {/* Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-6">
-                  <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-                  <span>Servicio a Domicilio y Oficina • Lima</span>
-                </div>
-
-                {/* Main Headline */}
-                <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl lg:text-6xl font-normal text-[#111111] leading-[1.1] mb-6">
-                  Spa y Belleza en la comodidad de tu casa y/o trabajo
-                </h1>
-
-                {/* Subtitle */}
-                <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 font-light leading-relaxed max-w-xl mb-8">
-                  Marca liderada por <strong>Ana Maria Díaz</strong> con más de 10 años de experiencia profesional. Llegamos donde estés con todo el equipamiento necesario para que disfrutes de tu momento especial, te sientas feliz y empoderada.
-                </p>
-
-                {/* CTAs */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-10">
-                  <Link
-                    to="/catalogo"
-                    className="bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md hover:shadow-lg inline-flex items-center justify-center gap-2 group"
-                  >
-                    <span>Ver Catálogo Completo</span>
-                    <ArrowRight className="w-4 h-4 text-[#D5A688] transition-transform group-hover:translate-x-1" />
-                  </Link>
-
-                  <a
-                    href={SPA_INFO.whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-white/80 hover:bg-white text-[#5E765E] border border-[#5E765E]/25 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-sm hover:shadow-md inline-flex items-center justify-center gap-2"
-                  >
-                    <MessageSquare className="w-4 h-4 text-[#D5A688]" />
-                    <span>WhatsApp: 993 067 291</span>
-                  </a>
-                </div>
-
-                {/* Quick Trust Highlights */}
-                <div className="grid grid-cols-3 gap-4 pt-6 border-t border-[#5E765E]/15 text-left">
-                  <div>
-                    <span className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#5E765E] block">
-                      10+ Años
-                    </span>
-                    <span className="text-[11px] text-[#111111]/65 font-light block mt-0.5">
-                      De experiencia profesional
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#5E765E] block">
-                      100% Móvil
-                    </span>
-                    <span className="text-[11px] text-[#111111]/65 font-light block mt-0.5">
-                      En tu casa o trabajo
-                    </span>
-                  </div>
-                  <div>
-                    <span className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#5E765E] block">
-                      Bioseguridad
-                    </span>
-                    <span className="text-[11px] text-[#111111]/65 font-light block mt-0.5">
-                      Kits esterilizados y descartables
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Hero Image Card */}
-              <div className="lg:col-span-5">
-                <div className="relative rounded-3xl overflow-hidden shadow-2xl border border-[#5E765E]/20 bg-white">
-                  <div className="aspect-[4/5] w-full overflow-hidden relative">
-                    <img
-                      src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1000&q=80"
-                      alt="Servicio de Spa y Belleza Meraki"
-                      className="w-full h-full object-cover"
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                    
-                    {/* Floating Info Overlay */}
-                    <div className="absolute bottom-6 left-6 right-6 p-6 rounded-2xl bg-white/95 backdrop-blur-md border border-[#5E765E]/20 text-[#111111]">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#5E765E]">
-                          Experiencia Meraki
-                        </span>
-                        <div className="flex items-center gap-1 text-[#D5A688]">
-                          {[...Array(5)].map((_, i) => (
-                            <Star key={i} className="w-3.5 h-3.5 fill-current" />
-                          ))}
-                        </div>
-                      </div>
-                      <p className="font-['Cormorant_Garamond',serif] text-xl font-bold leading-snug">
-                        “Nos acomodamos a tu estilo de vida para que disfrutes un momento especial.”
-                      </p>
-                      <p className="text-[11px] text-[#111111]/60 font-light mt-1">
-                        Ana Maria Díaz • Fundadora
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </section>
+        <EditorialHeroFeed onOpenBooking={() => openBooking()} />
 
         {/* =========================================================================
             2. CÓMO FUNCIONA EL SERVICIO A DOMICILIO (Para quien recién conoce la marca)
@@ -521,15 +419,14 @@ export function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <a
-                href={SPA_INFO.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto bg-[#FFF2DE] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2"
+              <button
+                type="button"
+                onClick={() => openBooking()}
+                className="w-full sm:w-auto bg-[#FFF2DE] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-[#D5A688]" />
-                <span>Escríbenos por WhatsApp: 993 067 291</span>
-              </a>
+                <Calendar className="w-4 h-4 text-[#D5A688]" />
+                <span>Agendar Cita en el Formulario</span>
+              </button>
 
               <Link
                 to="/catalogo"

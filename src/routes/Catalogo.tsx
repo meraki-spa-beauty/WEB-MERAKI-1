@@ -6,6 +6,7 @@ import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import { CATALOG_SERVICES, CATEGORIES_DATA, POLICIES_DATA } from '../data/catalog';
 import { SPA_INFO } from '../data/spaData';
+import { useBooking } from '../context/BookingContext';
 import type { CatalogService, ServiceCategory } from '../types';
 import {
   Search,
@@ -16,7 +17,8 @@ import {
   ShieldCheck,
   Truck,
   Clock,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
 
 function parseCategory(val: string | null): ServiceCategory | 'todos' {
@@ -35,6 +37,7 @@ function parseCategory(val: string | null): ServiceCategory | 'todos' {
 }
 
 export function Catalogo() {
+  const { openBooking } = useBooking();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = parseCategory(searchParams.get('cat'));
 
@@ -340,15 +343,24 @@ export function Catalogo() {
                         </div>
 
                         {/* Card Action Button */}
-                        <div className="pt-4 border-t border-[#5E765E]/10 mt-auto">
+                        <div className="pt-4 border-t border-[#5E765E]/10 mt-auto flex flex-col sm:flex-row gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openBooking(service.id)}
+                            className="flex-1 inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] py-2.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer"
+                          >
+                            <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
+                            <span>Agendar Cita • S/ {priceInfo.pricePEN}</span>
+                          </button>
                           <a
                             href={waLink}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="w-full inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] py-2.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-colors shadow-sm"
+                            className="inline-flex items-center justify-center p-2.5 rounded-xl border border-[#5E765E]/20 bg-white hover:bg-[#FFF2DE] text-[#5E765E] text-xs transition-colors"
+                            aria-label={`Consultar ${service.name} por WhatsApp`}
+                            title="Consulta directa por WhatsApp"
                           >
-                            <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
-                            <span>Agendar en WhatsApp • S/ {priceInfo.pricePEN}</span>
+                            <MessageSquare className="w-4 h-4 text-[#25D366]" />
                           </a>
                         </div>
                       </div>

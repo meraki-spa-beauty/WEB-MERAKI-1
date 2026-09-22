@@ -4,7 +4,8 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import { BOOKING_STEPS, POLICIES_DATA } from '../data/catalog';
-import { SPA_INFO, FAQ_ITEMS } from '../data/spaData';
+import { FAQ_ITEMS } from '../data/spaData';
+import { useBooking } from '../context/BookingContext';
 import {
   Calendar,
   MessageSquare,
@@ -20,6 +21,8 @@ import {
 } from 'lucide-react';
 
 export function ComoReservar() {
+  const { openBooking } = useBooking();
+
   const getStepIcon = (num: string) => {
     switch (num) {
       case '1':
@@ -57,15 +60,14 @@ export function ComoReservar() {
               Llevamos la experiencia completa de spa y estética a la comodidad de tu casa o trabajo. Sigue estos 5 sencillos pasos para asegurar tu atención.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
-              <a
-                href={SPA_INFO.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md inline-flex items-center gap-2"
+              <button
+                type="button"
+                onClick={() => openBooking()}
+                className="bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md inline-flex items-center gap-2 cursor-pointer"
               >
-                <MessageSquare className="w-4 h-4 text-[#D5A688]" />
-                <span>Escribir al WhatsApp: 993 067 291</span>
-              </a>
+                <Calendar className="w-4 h-4 text-[#D5A688]" />
+                <span>Agendar Cita en el Formulario</span>
+              </button>
               <Link
                 to="/catalogo"
                 className="bg-white/80 hover:bg-white text-[#5E765E] border border-[#5E765E]/20 px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-sm inline-flex items-center gap-2"

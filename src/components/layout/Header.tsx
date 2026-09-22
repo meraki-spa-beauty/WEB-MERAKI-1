@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../brand/Logo';
+import { useBooking } from '../../context/BookingContext';
 import {
   Menu,
   X,
@@ -78,6 +79,7 @@ export const HEADER_CATEGORIES: HeaderCategoryItem[] = [
 ];
 
 export function Header() {
+  const { openBooking } = useBooking();
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
@@ -309,29 +311,27 @@ export function Header() {
 
         {/* Right CTA */}
         <div className="hidden sm:flex items-center gap-3">
-          <a
-            id="btn-header-whatsapp-booking"
-            href={SPA_INFO.whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            id="btn-header-booking"
+            type="button"
+            onClick={() => openBooking()}
             className="inline-flex items-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-5 py-2.5 rounded-full text-xs font-['Montserrat',sans-serif] font-medium uppercase tracking-[0.14em] transition-all shadow-sm hover:shadow-md cursor-pointer"
           >
             <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
             <span>Agendar Cita</span>
-          </a>
+          </button>
         </div>
 
         {/* Mobile Hamburger Button */}
         <div className="flex sm:hidden items-center gap-2">
-          <a
-            href={SPA_INFO.whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs"
-            aria-label="Agendar por WhatsApp"
+          <button
+            type="button"
+            onClick={() => openBooking()}
+            className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs cursor-pointer"
+            aria-label="Agendar Cita"
           >
             <Calendar className="w-4 h-4 text-[#D5A688]" />
-          </a>
+          </button>
           <button
             id="btn-mobile-nav-toggle"
             type="button"
@@ -446,15 +446,17 @@ export function Header() {
           </div>
 
           <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center">
-            <a
-              href={SPA_INFO.whatsappLink}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md"
+            <button
+              type="button"
+              onClick={() => {
+                setIsOpen(false);
+                openBooking();
+              }}
+              className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md cursor-pointer hover:bg-[#4d634d] transition-colors"
             >
               <Sparkles className="w-4 h-4 text-[#D5A688]" />
-              <span>Agendar por WhatsApp</span>
-            </a>
+              <span>Agendar Cita (Formulario)</span>
+            </button>
 
             <div className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 pt-1">
               WhatsApp Directo: <span className="font-semibold text-[#5E765E]">{SPA_INFO.whatsappDisplay}</span>
