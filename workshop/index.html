@@ -41,11 +41,38 @@
         max-width: 100%;
         height: auto;
       }
+      .meraki-header-brand {
+        width: 38%;
+        max-width: 140px;
+        display: flex;
+        align-items: center;
+      }
       .meraki-header-logo {
-        height: 36px;
+        height: 26px;
         width: auto;
-        max-width: 180px;
+        max-width: 100%;
         object-fit: contain;
+      }
+      .meraki-header-actions {
+        width: 62%;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 6px;
+      }
+      @media (min-width: 640px) {
+        .meraki-header-brand {
+          width: auto;
+          max-width: none;
+        }
+        .meraki-header-logo {
+          height: 36px;
+          max-width: 180px;
+        }
+        .meraki-header-actions {
+          width: auto;
+          gap: 14px;
+        }
       }
     </style>
 
@@ -56,19 +83,20 @@
     
     <!-- TOP NAVIGATION BAR -->
     <header class="sticky top-0 z-40 bg-[#FFF2DE]/95 backdrop-blur-md border-b border-[#5E765E]/15">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
-        <a href="/" class="flex items-center gap-3 transition-opacity hover:opacity-85" title="Volver a la página principal de Meraki">
-          <img src="/assets/brand/official-horizontal-dark.png" alt="Meraki Spa Beauty" width="160" height="36" class="meraki-header-logo h-8 sm:h-9 w-auto object-contain" style="height: 36px; width: auto; max-width: 180px; object-fit: contain;" />
-          <span class="hidden sm:inline-block text-xs uppercase tracking-widest text-[#5E765E] font-medium border-l border-[#5E765E]/20 pl-3">Workshop Exclusivo</span>
+      <div class="max-w-6xl mx-auto px-2.5 sm:px-6 h-14 sm:h-18 flex items-center justify-between">
+        <a href="/" class="meraki-header-brand flex items-center gap-2 sm:gap-3 transition-opacity hover:opacity-85 shrink" title="Volver a la página principal de Meraki">
+          <img src="/assets/brand/official-horizontal-dark.png" alt="Meraki Spa Beauty" width="140" height="32" class="meraki-header-logo object-contain" />
+          <span class="hidden sm:inline-block text-xs uppercase tracking-widest text-[#5E765E] font-medium border-l border-[#5E765E]/20 pl-3 whitespace-nowrap">Workshop Exclusivo</span>
         </a>
         
-        <div class="flex items-center gap-3 sm:gap-4">
-          <a href="/" class="text-xs sm:text-sm font-medium text-stone-600 hover:text-[#5E765E] transition-colors py-2 px-3 rounded-lg hover:bg-[#AEC2AE]/20">
-            ← Web Principal
+        <div class="meraki-header-actions flex items-center justify-end gap-1.5 sm:gap-4 shrink-0">
+          <a href="/" class="text-[10px] sm:text-xs md:text-sm font-medium text-stone-600 hover:text-[#5E765E] transition-colors py-1 px-1.5 sm:py-2 sm:px-3 rounded-lg hover:bg-[#AEC2AE]/20 whitespace-nowrap">
+            <span class="sm:hidden">← Inicio</span>
+            <span class="hidden sm:inline">← Web Principal</span>
           </a>
-          <a href="#registro-section" class="scroll-to-form inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-white text-xs sm:text-sm font-semibold py-2.5 px-4 sm:px-5 rounded-full shadow-sm transition-all transform hover:-translate-y-0.5">
+          <a href="#registro-section" class="scroll-to-form inline-flex items-center justify-center gap-1 sm:gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-white text-[11px] sm:text-xs md:text-sm font-semibold py-1.5 px-2.5 sm:py-2.5 sm:px-5 rounded-full shadow-sm transition-all transform hover:-translate-y-0.5 whitespace-nowrap">
             <span>Apartar Cupo</span>
-            <span class="bg-white/20 text-white text-[11px] px-2 py-0.5 rounded-full">S/ 50</span>
+            <span class="bg-white/20 text-white text-[9px] sm:text-[11px] px-1.5 py-0.5 rounded-full font-bold">S/ 50</span>
           </a>
         </div>
       </div>
