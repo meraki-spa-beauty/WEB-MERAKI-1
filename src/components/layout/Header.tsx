@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../brand/Logo';
 import { useBooking } from '../../context/BookingContext';
@@ -307,6 +308,14 @@ export function Header() {
           >
             Contacto
           </Link>
+
+          <a
+            href="/workshop/"
+            className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-[#5E765E]/10 hover:bg-[#5E765E]/20 text-[#5E765E] font-semibold transition-all border border-[#5E765E]/20"
+          >
+            <span>Workshop</span>
+            <span className="text-xs">🎃</span>
+          </a>
         </nav>
 
         {/* Right CTA */}
@@ -345,132 +354,182 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
-      {isOpen && (
+      {/* Mobile Menu Drawer (Portaled to document.body to prevent containing-block clipping from header backdrop-filter) */}
+      {isOpen && typeof document !== 'undefined' && createPortal(
         <div
-          className="fixed inset-0 top-[65px] z-50 bg-[#FFF2DE] text-[#111111] flex flex-col justify-between p-6 overflow-y-auto lg:hidden"
+          id="mobile-nav-drawer"
+          className="fixed inset-0 z-[9999] bg-[#FFF2DE] text-[#111111] flex flex-col h-[100dvh] w-screen overflow-hidden lg:hidden"
           role="dialog"
           aria-modal="true"
           aria-label="Menú principal de navegación"
         >
-          <div className="flex flex-col gap-5 pt-2">
-            <div className="flex justify-center pb-4 border-b border-[#5E765E]/20">
-              <Logo variant="stacked" color="dark" />
-            </div>
+          {/* Top Bar inside portal matching main header */}
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-[#5E765E]/15 bg-[#FFF2DE] shrink-0">
+            <Link to="/" onClick={() => setIsOpen(false)} className="inline-block">
+              <Logo variant="horizontal" color="dark" />
+            </Link>
 
-            <nav className="flex flex-col gap-2 text-left">
-              <Link
-                to="/"
-                onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  openBooking();
+                }}
+                className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs cursor-pointer shadow-xs hover:bg-[#4d634d] transition-colors"
+                aria-label="Agendar Cita"
               >
-                <span>Inicio</span>
-                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
-              </Link>
+                <Calendar className="w-4 h-4 text-[#D5A688]" />
+              </button>
 
-              {/* Mobile Submenu for Catálogo */}
-              <div className="py-2 border-b border-[#5E765E]/15">
-                <button
-                  type="button"
-                  onClick={() => setMobileCatalogOpen(!mobileCatalogOpen)}
-                  className="w-full flex items-center justify-between font-['Cormorant_Garamond',serif] text-2xl text-[#111111]"
-                >
-                  <span>Catálogo de Servicios</span>
-                  <ChevronDown
-                    className={`w-5 h-5 text-[#5E765E] transition-transform duration-200 ${
-                      mobileCatalogOpen ? 'rotate-180' : ''
-                    }`}
-                  />
-                </button>
+              <button
+                id="btn-mobile-nav-close"
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-2 text-[#111111] hover:text-[#5E765E] focus:outline-none rounded-full"
+                aria-label="Cerrar menú"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
 
-                {mobileCatalogOpen && (
-                  <div className="mt-3 space-y-2 pl-2">
-                    <Link
-                      to="/catalogo"
-                      onClick={() => setIsOpen(false)}
-                      className="block p-2 rounded-xl bg-white/80 font-medium text-xs text-[#5E765E]"
-                    >
-                      Ver Catálogo Completo (36 Servicios) →
-                    </Link>
-                    {HEADER_CATEGORIES.map((item) => (
-                      <Link
-                        key={item.id}
-                        to={`/catalogo?cat=${item.categoryKey}`}
-                        onClick={() => setIsOpen(false)}
-                        className="w-full text-left p-2.5 rounded-xl bg-white/60 hover:bg-white border border-[#5E765E]/15 flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-6 h-6 rounded bg-[#5E765E]/10 flex items-center justify-center">
-                            {renderIcon(item.icon)}
-                          </div>
-                          <span className="font-['Montserrat',sans-serif] text-xs font-medium text-[#111111]">
-                            {item.label}
-                          </span>
-                        </div>
-                        <span className="text-[10px] text-[#5E765E] font-semibold">
-                          {item.startingPrice}
-                        </span>
-                      </Link>
-                    ))}
-                  </div>
-                )}
+          {/* Scrollable Content Body */}
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-between gap-6">
+            <div className="flex flex-col gap-5 pt-1">
+              <div className="flex justify-center pb-4 border-b border-[#5E765E]/20">
+                <Logo variant="stacked" color="dark" />
               </div>
 
-              <Link
-                to="/como-reservar"
-                onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
-              >
-                <span>Cómo Reservar</span>
-                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
-              </Link>
+              <nav className="flex flex-col gap-2 text-left">
+                <Link
+                  to="/"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Inicio</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
 
-              <Link
-                to="/nosotros"
-                onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
-              >
-                <span>Nosotros</span>
-                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
-              </Link>
+                {/* Mobile Submenu for Catálogo */}
+                <div className="py-2 border-b border-[#5E765E]/15">
+                  <button
+                    type="button"
+                    onClick={() => setMobileCatalogOpen(!mobileCatalogOpen)}
+                    className="w-full flex items-center justify-between font-['Cormorant_Garamond',serif] text-2xl text-[#111111]"
+                  >
+                    <span>Catálogo de Servicios</span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-[#5E765E] transition-transform duration-200 ${
+                        mobileCatalogOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
 
-              <Link
-                to="/contacto"
-                onClick={() => setIsOpen(false)}
-                className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
-              >
-                <span>Contacto</span>
-                <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
-              </Link>
-            </nav>
-          </div>
+                  {mobileCatalogOpen && (
+                    <div className="mt-3 space-y-2 pl-2">
+                      <Link
+                        to="/catalogo"
+                        onClick={() => setIsOpen(false)}
+                        className="block p-2 rounded-xl bg-white/80 font-medium text-xs text-[#5E765E]"
+                      >
+                        Ver Catálogo Completo (36 Servicios) →
+                      </Link>
+                      {HEADER_CATEGORIES.map((item) => (
+                        <Link
+                          key={item.id}
+                          to={`/catalogo?cat=${item.categoryKey}`}
+                          onClick={() => setIsOpen(false)}
+                          className="w-full text-left p-2.5 rounded-xl bg-white/60 hover:bg-white border border-[#5E765E]/15 flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <div className="w-6 h-6 rounded bg-[#5E765E]/10 flex items-center justify-center">
+                              {renderIcon(item.icon)}
+                            </div>
+                            <span className="font-['Montserrat',sans-serif] text-xs font-medium text-[#111111]">
+                              {item.label}
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-[#5E765E] font-semibold">
+                            {item.startingPrice}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
-          <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center">
-            <button
-              type="button"
-              onClick={() => {
-                setIsOpen(false);
-                openBooking();
-              }}
-              className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md cursor-pointer hover:bg-[#4d634d] transition-colors"
-            >
-              <Sparkles className="w-4 h-4 text-[#D5A688]" />
-              <span>Agendar Cita (Formulario)</span>
-            </button>
+                <Link
+                  to="/como-reservar"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Cómo Reservar</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
 
-            <div className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 pt-1">
-              WhatsApp Directo: <span className="font-semibold text-[#5E765E]">{SPA_INFO.whatsappDisplay}</span>
+                <Link
+                  to="/nosotros"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Nosotros</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <Link
+                  to="/contacto"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Contacto</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <a
+                  href="/workshop/"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#5E765E] font-medium py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>Press On Workshop</span>
+                    <span className="text-base">🎃</span>
+                  </span>
+                  <span className="text-xs font-['Montserrat',sans-serif] uppercase tracking-wider bg-[#5E765E]/15 px-2.5 py-1 rounded-full text-[#5E765E] font-semibold">
+                    3 Oct
+                  </span>
+                </a>
+              </nav>
             </div>
 
-            <div className="flex justify-center gap-4 text-[11px] uppercase tracking-wider text-[#111111]/60 pt-2">
-              <Link to="/privacy" onClick={() => setIsOpen(false)}>
-                Políticas de Privacidad
-              </Link>
-              <span>•</span>
-              <span>A Domicilio &amp; Oficina</span>
+            <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  openBooking();
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md cursor-pointer hover:bg-[#4d634d] transition-colors"
+              >
+                <Sparkles className="w-4 h-4 text-[#D5A688]" />
+                <span>Agendar Cita (Formulario)</span>
+              </button>
+
+              <div className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 pt-1">
+                WhatsApp Directo: <span className="font-semibold text-[#5E765E]">{SPA_INFO.whatsappDisplay}</span>
+              </div>
+
+              <div className="flex justify-center gap-4 text-[11px] uppercase tracking-wider text-[#111111]/60 pt-2">
+                <Link to="/privacy" onClick={() => setIsOpen(false)}>
+                  Políticas de Privacidad
+                </Link>
+                <span>•</span>
+                <span>A Domicilio &amp; Oficina</span>
+              </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );

@@ -7,6 +7,14 @@ import { Contacto } from '../routes/Contacto';
 import { Privacy } from '../routes/Privacy';
 import { NotFound } from '../routes/NotFound';
 
+function WorkshopRedirect() {
+  if (typeof window !== 'undefined') {
+    window.location.replace('/workshop/');
+  }
+
+  return null;
+}
+
 export const router = createBrowserRouter([
   { path: '/', element: <Home /> },
   { path: '/catalogo', element: <Catalogo /> },
@@ -17,5 +25,7 @@ export const router = createBrowserRouter([
   { path: '/nosotros', element: <Nosotros /> },
   { path: '/contacto', element: <Contacto /> },
   { path: '/privacy', element: <Privacy /> },
+  { path: '/workshop', element: <WorkshopRedirect /> },
+  { path: '/press-on-workshop', element: <WorkshopRedirect /> },
   { path: '*', element: <NotFound /> },
 ]);

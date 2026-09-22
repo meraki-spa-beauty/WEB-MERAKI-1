@@ -1,0 +1,896 @@
+<!doctype html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#5E765E" />
+    <link rel="icon" type="image/svg+xml" href="/assets/brand/meraki-monogram.svg" />
+    
+    <title>Meraki Press On Workshop · Halloween Edition 🎃 | Taller Práctico en Jesús María</title>
+    <meta name="description" content="Aprende a crear y decorar tus propias Press On Nails en una experiencia práctica y llena de detalles. Técnicas Cat Eye, Blooming, Chrome, 3D, Spider Web y Ghost. Sábado 3 de Octubre en Jesús María." />
+    <meta property="og:title" content="Meraki Press On Workshop · Halloween Edition 🎃✨" />
+    <meta property="og:description" content="Taller práctico presencial de Press On Nails en Jesús María. No necesitas experiencia previa. Sábado 3 de Octubre. ¡Cupos limitados!" />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="/assets/brand/official-horizontal-dark.png" />
+    
+    <!-- Stylesheets: Explicit link to index.css prevents FOUC in both dev and production -->
+    <link rel="stylesheet" href="/src/index.css" />
+    
+    <!-- Google Fonts: Cormorant Garamond & Montserrat -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,600&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    
+    <!-- Inline Critical Styles to guarantee instant, zero-flicker presentation -->
+    <style>
+      :root {
+        --color-cream: #FFF2DE;
+        --color-sage: #5E765E;
+      }
+      html {
+        background-color: #FFF2DE;
+        color: #111111;
+      }
+      body {
+        background-color: #FFF2DE;
+        color: #111111;
+        margin: 0;
+        font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .meraki-header-logo {
+        height: 36px;
+        width: auto;
+        max-width: 180px;
+        object-fit: contain;
+      }
+    </style>
+
+    <!-- Vite script entry -->
+    <script type="module" src="/src/workshop.ts"></script>
+  </head>
+  <body class="bg-[#FFF2DE] text-[#111111] font-sans antialiased selection:bg-[#5E765E] selection:text-white">
+    
+    <!-- TOP NAVIGATION BAR -->
+    <header class="sticky top-0 z-40 bg-[#FFF2DE]/95 backdrop-blur-md border-b border-[#5E765E]/15">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 h-18 flex items-center justify-between">
+        <a href="/" class="flex items-center gap-3 transition-opacity hover:opacity-85" title="Volver a la página principal de Meraki">
+          <img src="/assets/brand/official-horizontal-dark.png" alt="Meraki Spa Beauty" width="160" height="36" class="meraki-header-logo h-8 sm:h-9 w-auto object-contain" style="height: 36px; width: auto; max-width: 180px; object-fit: contain;" />
+          <span class="hidden sm:inline-block text-xs uppercase tracking-widest text-[#5E765E] font-medium border-l border-[#5E765E]/20 pl-3">Workshop Exclusivo</span>
+        </a>
+        
+        <div class="flex items-center gap-3 sm:gap-4">
+          <a href="/" class="text-xs sm:text-sm font-medium text-stone-600 hover:text-[#5E765E] transition-colors py-2 px-3 rounded-lg hover:bg-[#AEC2AE]/20">
+            ← Web Principal
+          </a>
+          <a href="#registro-section" class="scroll-to-form inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-white text-xs sm:text-sm font-semibold py-2.5 px-4 sm:px-5 rounded-full shadow-sm transition-all transform hover:-translate-y-0.5">
+            <span>Apartar Cupo</span>
+            <span class="bg-white/20 text-white text-[11px] px-2 py-0.5 rounded-full">S/ 50</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <!-- HERO SECTION -->
+      <section class="relative overflow-hidden pt-12 pb-16 sm:pt-16 sm:pb-24 border-b border-[#5E765E]/10">
+        <!-- Subtle ambient backdrop accents -->
+        <div class="absolute -top-24 -right-24 w-96 h-96 bg-[#D5A688]/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-[#AEC2AE]/30 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
+          <!-- Edition Badge -->
+          <div class="inline-flex items-center gap-2 bg-[#5E765E]/10 border border-[#5E765E]/20 px-3.5 py-1.5 rounded-full mb-6">
+            <span class="text-base sm:text-lg">🎃</span>
+            <span class="text-xs sm:text-sm uppercase tracking-widest font-semibold text-[#5E765E]">Edición Especial Halloween · Presencial</span>
+            <span class="text-base sm:text-lg">✨</span>
+          </div>
+
+          <!-- Main Title -->
+          <h1 class="font-serif text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-light text-[#111111] leading-[1.08] tracking-tight mb-4">
+            Meraki Press On <br class="hidden sm:inline" />
+            <span class="italic font-normal text-[#5E765E]">Workshop</span>
+          </h1>
+
+          <p class="font-serif italic text-xl sm:text-2xl text-stone-700 max-w-2xl mx-auto mb-6">
+            HALLOWEEN EDITION
+          </p>
+
+          <!-- Hook & Description -->
+          <p class="text-base sm:text-lg text-stone-800 leading-relaxed max-w-2xl mx-auto mb-4 font-normal">
+            Aprende a crear y decorar tus propias <strong class="font-semibold text-[#111111]">Press On Nails</strong> en una experiencia creativa, práctica y llena de detalles.
+          </p>
+
+          <p class="text-sm sm:text-base text-[#5E765E] font-medium max-w-xl mx-auto mb-10 flex items-center justify-center gap-2">
+            <span>🤍</span>
+            <span>No necesitas experiencia previa. Este taller está dirigido a todo público.</span>
+          </p>
+
+          <!-- Key Event Info Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-3xl mx-auto mb-10 text-left">
+            <!-- Fecha y Horario -->
+            <div class="bg-white/80 backdrop-blur-sm border border-[#5E765E]/20 rounded-2xl p-5 shadow-xs transition-transform hover:-translate-y-0.5">
+              <div class="flex items-center gap-2.5 text-[#5E765E] font-semibold text-xs uppercase tracking-wider mb-2">
+                <span class="text-base">📅</span> Fecha & Horario
+              </div>
+              <div class="font-serif text-lg text-stone-900 font-semibold mb-1">
+                Sábado 3 de Octubre
+              </div>
+              <div class="text-xs text-stone-600">
+                10:30 a. m. – 2:30 p. m. <br />
+                <span class="text-[#5E765E] font-medium">(4 horas prácticas completas)</span>
+              </div>
+            </div>
+
+            <!-- Ubicación -->
+            <div class="bg-white/80 backdrop-blur-sm border border-[#5E765E]/20 rounded-2xl p-5 shadow-xs transition-transform hover:-translate-y-0.5">
+              <div class="flex items-center gap-2.5 text-[#5E765E] font-semibold text-xs uppercase tracking-wider mb-2">
+                <span class="text-base">📍</span> Ubicación
+              </div>
+              <div class="font-serif text-lg text-stone-900 font-semibold mb-1">
+                Jesús María, Lima
+              </div>
+              <div class="text-xs text-stone-600">
+                Jirón Santo Domingo 153 <br />
+                <span class="text-stone-500">Espacio studio cómodo y equipado</span>
+              </div>
+            </div>
+
+            <!-- Inversión -->
+            <div class="bg-white/80 backdrop-blur-sm border border-[#5E765E]/20 rounded-2xl p-5 shadow-xs transition-transform hover:-translate-y-0.5 sm:col-span-1">
+              <div class="flex items-center gap-2.5 text-[#5E765E] font-semibold text-xs uppercase tracking-wider mb-2">
+                <span class="text-base">🎟️</span> Inversión Total
+              </div>
+              <div class="font-serif text-2xl text-stone-900 font-bold mb-1">
+                S/ 180
+              </div>
+              <div class="text-xs text-stone-700 font-medium">
+                Aparta tu cupo con solo <span class="bg-[#D5A688]/30 text-stone-900 font-semibold px-1.5 py-0.5 rounded">S/ 50</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- CTAs -->
+          <div class="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto">
+            <a href="#registro-section" class="scroll-to-form w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-white font-medium text-sm sm:text-base py-3.5 px-8 rounded-full shadow-md transition-all transform hover:-translate-y-0.5">
+              <span>Apartar mi Cupo con S/ 50</span>
+              <span>→</span>
+            </a>
+            <a href="#tecnicas-section" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-transparent hover:bg-stone-200/50 text-stone-800 font-medium text-sm sm:text-base py-3.5 px-6 rounded-full border border-stone-400/40 transition-colors">
+              Ver Qué Vas a Aprender
+            </a>
+          </div>
+
+          <!-- Cupos indicator -->
+          <div class="mt-6 flex items-center justify-center gap-2 text-xs text-stone-600 font-medium">
+            <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+            <span>Cupos estrictamente limitados para asegurar asesoría personalizada</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ¿QUÉ VAS A APRENDER? -->
+      <section id="tecnicas-section" class="py-16 sm:py-24 bg-white/60 border-b border-[#5E765E]/10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6">
+          <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
+            <span class="text-xs uppercase tracking-widest text-[#5E765E] font-semibold bg-[#5E765E]/10 px-3 py-1 rounded-full">
+              🎨 Técnicas de Nail Art Aplicadas a Press On
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl md:text-5xl text-stone-900 font-normal mt-4 mb-4">
+              ¿Qué vas a aprender?
+            </h2>
+            <p class="text-sm sm:text-base text-stone-600 leading-relaxed">
+              Durante el workshop dominarás las técnicas más solicitadas de la temporada de forma 100% práctica, guiada paso a paso.
+            </p>
+          </div>
+
+          <!-- Techniques Bento Grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+            <!-- 1. Cat Eye / Ojo de Gato -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                ✨
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Cat Eye / Ojo de Gato
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Manejo correcto de imanes para crear efectos magnéticos, halos misteriosos, destellos cósmicos y acabados de terciopelo.
+              </p>
+            </div>
+
+            <!-- 2. Efecto Blooming -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                ✨
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Efecto Blooming
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Aprende la técnica de difusión líquida para crear texturas orgánicas, humo fantasmagórico, marmolados y degradados artísticos.
+              </p>
+            </div>
+
+            <!-- 3. Chrome -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                ✨
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Chrome & Metalizados
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Aplicación impecable de polvos efecto espejo sin rayas, sellado de alta durabilidad y acentos cromados sobre relieve.
+              </p>
+            </div>
+
+            <!-- 4. Charms y decoración 3D -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                ✨
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Charms y Decoración 3D
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Fijación profesional de pedrería, lazos, perlas y figuras temáticas con gel de construcción para que no se desprendan.
+              </p>
+            </div>
+
+            <!-- 5. Spider Web -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                🕸️
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Spider Web (Telaraña)
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Dominio del spider gel elástico para trazos geométricos ultra finos y telas de araña definidas con total precisión.
+              </p>
+            </div>
+
+            <!-- 6. Ghost -->
+            <div class="bg-[#FFF2DE]/70 border border-[#5E765E]/20 rounded-2xl p-6 transition-all hover:shadow-md hover:border-[#5E765E]/40 group">
+              <div class="w-10 h-10 rounded-xl bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center text-xl mb-4 group-hover:scale-105 transition-transform">
+                👻
+              </div>
+              <h3 class="font-serif text-xl font-semibold text-stone-900 mb-2">
+                Ghost (Fantasmitas)
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Ilustración a mano alzada de fantasmitas adorables y góticos, técnicas de sombreado y textura tridimensional mate/brillo.
+              </p>
+            </div>
+
+            <!-- 7. Composición (Destacado horizontal) -->
+            <div class="bg-[#5E765E]/10 border border-[#5E765E]/30 rounded-2xl p-6 sm:col-span-2 lg:col-span-3 transition-all hover:shadow-md">
+              <div class="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-[#5E765E] text-white flex items-center justify-center text-2xl shrink-0">
+                  🎨
+                </div>
+                <div>
+                  <h3 class="font-serif text-xl font-semibold text-stone-900 mb-1">
+                    Composición y Combinación de Elementos
+                  </h3>
+                  <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                    Aprenderás a equilibrar color, peso visual, acabados mate vs. glossy y detalles temáticos para que tus sets tengan cohesión editorial y luzcan con calidad de salón profesional.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Y LO MÁS IMPORTANTE... -->
+      <section class="py-16 sm:py-24 relative overflow-hidden border-b border-[#5E765E]/10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+          <div class="bg-white/90 backdrop-blur-sm border border-[#5E765E]/25 rounded-3xl p-8 sm:p-12 shadow-sm relative">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+              <span class="text-xs uppercase tracking-widest text-[#5E765E] font-semibold bg-[#5E765E]/10 px-3.5 py-1.5 rounded-full inline-block mb-3">
+                💅🏻 Metodología Integral Meraki
+              </span>
+              <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 font-normal">
+                Y lo más importante… <br />
+                <span class="italic text-[#5E765E]">No solo aprenderás a decorar.</span>
+              </h2>
+              <p class="text-stone-700 text-sm sm:text-base mt-4 leading-relaxed">
+                Te enseñaré a trabajar tus Press On desde la elección de la talla y preparación, hasta la creación y aplicación, para que puedas crear diseños que <strong class="text-stone-900">realmente quieras volver a usar</strong>.
+              </p>
+            </div>
+
+            <!-- 4 Steps Flow -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 relative">
+              <!-- Paso 1 -->
+              <div class="flex gap-4 items-start">
+                <div class="w-8 h-8 rounded-full bg-[#5E765E] text-white font-serif text-sm font-semibold flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </div>
+                <div>
+                  <h4 class="font-semibold text-stone-900 text-base mb-1">Elección de la Talla & Tipología</h4>
+                  <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Medición milimétrica de tu uña natural para seleccionar tips que encajen anatómicamente sin apretar ni causar molestias.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Paso 2 -->
+              <div class="flex gap-4 items-start">
+                <div class="w-8 h-8 rounded-full bg-[#5E765E] text-white font-serif text-sm font-semibold flex items-center justify-center shrink-0 mt-0.5">
+                  2
+                </div>
+                <div>
+                  <h4 class="font-semibold text-stone-900 text-base mb-1">Preparación & Adherencia</h4>
+                  <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Técnica correcta de deshidratación y micro-porosidad para que el adhesivo sostenga tus press on sin despegarse prematuramente.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Paso 3 -->
+              <div class="flex gap-4 items-start">
+                <div class="w-8 h-8 rounded-full bg-[#5E765E] text-white font-serif text-sm font-semibold flex items-center justify-center shrink-0 mt-0.5">
+                  3
+                </div>
+                <div>
+                  <h4 class="font-semibold text-stone-900 text-base mb-1">Creación & Curado Pro</h4>
+                  <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Estructuración con base coat reforzada, sellado de bordes y polimerizado óptimo en lámpara para máxima resistencia.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Paso 4 -->
+              <div class="flex gap-4 items-start">
+                <div class="w-8 h-8 rounded-full bg-[#5E765E] text-white font-serif text-sm font-semibold flex items-center justify-center shrink-0 mt-0.5">
+                  4
+                </div>
+                <div>
+                  <h4 class="font-semibold text-stone-900 text-base mb-1">Aplicación & Reutilización</h4>
+                  <p class="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                    Uso de gel pads y adhesivo profesional, además del protocolo de retiro suave para conservarlas intactas y reutilizables.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ¿PARA QUIÉN ES? -->
+      <section class="py-16 sm:py-24 bg-white/50 border-b border-[#5E765E]/10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+          <div class="text-center max-w-2xl mx-auto mb-12">
+            <span class="text-xs uppercase tracking-widest text-[#5E765E] font-semibold bg-[#5E765E]/10 px-3 py-1 rounded-full">
+              👩🏻🎨 Tu Momento Creativo
+            </span>
+            <h2 class="font-serif text-3xl sm:text-4xl text-stone-900 font-normal mt-3 mb-2">
+              ¿Para quién es este workshop?
+            </h2>
+            <p class="text-stone-600 text-sm sm:text-base">
+              Diseñado con amor y dedicación tanto para principiantes como para apasionadas de la belleza.
+            </p>
+          </div>
+
+          <div class="bg-[#FFF2DE] border border-[#5E765E]/20 rounded-3xl p-6 sm:p-10 shadow-xs">
+            <div class="text-sm sm:text-base font-medium text-stone-800 mb-6">
+              Este taller es para ti si:
+            </div>
+
+            <div class="space-y-4 mb-8">
+              <div class="flex items-start gap-3.5">
+                <span class="text-stone-700 text-lg select-none">♡</span>
+                <span class="text-stone-800 text-sm sm:text-base font-normal">Te encantan las uñas y el Nail Art.</span>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <span class="text-stone-700 text-lg select-none">♡</span>
+                <span class="text-stone-800 text-sm sm:text-base font-normal">Quieres aprender algo nuevo en un ambiente relajado y acogedor.</span>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <span class="text-stone-700 text-lg select-none">♡</span>
+                <span class="text-stone-800 text-sm sm:text-base font-normal">Quieres comenzar a crear tus propias Press On Nails para ti o para regalar.</span>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <span class="text-stone-700 text-lg select-none">♡</span>
+                <span class="text-stone-800 text-sm sm:text-base font-normal">Ya haces uñas y quieres incorporar nuevas técnicas y tendencias a tu repertorio.</span>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <span class="text-stone-700 text-lg select-none">♡</span>
+                <span class="text-stone-800 text-sm sm:text-base font-normal">No tienes nada de experiencia, pero tienes muchísimas ganas de aprender.</span>
+              </div>
+            </div>
+
+            <div class="bg-[#5E765E]/10 border border-[#5E765E]/20 rounded-2xl p-5 text-center">
+              <p class="font-serif italic text-lg sm:text-xl text-[#5E765E] font-medium">
+                "No necesitas ser especialista. Solo traer tus ganas de crear. ✨"
+              </p>
+              <p class="text-xs text-stone-600 mt-1 uppercase tracking-wider font-semibold">
+                Una experiencia práctica, creativa y muy Meraki.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PRECIO, DETALLES Y FORMULARIO DE REGISTRO -->
+      <section id="registro-section" class="py-16 sm:py-24 relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+          
+          <!-- Pricing Highlight Card -->
+          <div class="bg-white border-2 border-[#5E765E]/30 rounded-3xl p-6 sm:p-10 shadow-lg mb-12">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-stone-200 pb-8">
+              <div>
+                <span class="inline-block bg-[#5E765E] text-white text-[11px] uppercase font-bold tracking-widest px-3 py-1 rounded-full mb-3">
+                  Inversión Transparente
+                </span>
+                <h3 class="font-serif text-3xl sm:text-4xl text-stone-900 font-semibold mb-1">
+                  S/ 180 <span class="text-base sm:text-lg font-normal text-stone-500 font-sans">por participante</span>
+                </h3>
+                <p class="text-xs sm:text-sm text-stone-600">
+                  Incluye 4 horas de taller presencial, insumos en clase y set diseñado para llevar a casa.
+                </p>
+              </div>
+
+              <!-- Breakdown pill -->
+              <div class="bg-[#FFF2DE] border border-[#5E765E]/30 rounded-2xl p-4 sm:p-5 text-left md:text-right min-w-[260px]">
+                <div class="text-xs text-stone-600 uppercase tracking-wider font-medium mb-1">
+                  Adelanto para apartar cupo:
+                </div>
+                <div class="text-2xl font-bold text-[#5E765E] font-serif">
+                  S/ 50 <span class="text-xs font-sans font-normal text-stone-600">(hoy)</span>
+                </div>
+                <div class="text-[11px] text-stone-600 mt-1">
+                  Saldo restante (S/ 130) se cancela el día del evento en clase.
+                </div>
+              </div>
+            </div>
+
+            <!-- What's included checklist -->
+            <div class="pt-6">
+              <h4 class="text-xs uppercase tracking-widest font-semibold text-stone-500 mb-4">
+                Tu entrada incluye:
+              </h4>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs sm:text-sm text-stone-700">
+                <div class="flex items-center gap-2.5">
+                  <span class="text-[#5E765E] font-bold">✓</span>
+                  <span>Todos los materiales para trabajar en clase</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <span class="text-[#5E765E] font-bold">✓</span>
+                  <span>Set de Press On Nails completo para llevarte</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <span class="text-[#5E765E] font-bold">✓</span>
+                  <span>Guía impresa con cuidados y paso a paso</span>
+                </div>
+                <div class="flex items-center gap-2.5">
+                  <span class="text-[#5E765E] font-bold">✓</span>
+                  <span>Coffee break & detallitos especiales Meraki</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- THE UNIQUE REGISTRATION FORM -->
+          <div class="bg-[#FFF2DE] border border-[#5E765E]/30 rounded-3xl p-6 sm:p-10 shadow-md">
+            <div class="text-center max-w-xl mx-auto mb-8">
+              <span class="text-xs uppercase tracking-widest text-[#5E765E] font-semibold bg-[#5E765E]/10 px-3 py-1 rounded-full">
+                📝 Formulario Oficial de Reserva
+              </span>
+              <h3 class="font-serif text-2xl sm:text-3xl text-stone-900 font-medium mt-3 mb-2">
+                Reserva tu Cupo en el Taller
+              </h3>
+              <p class="text-xs sm:text-sm text-stone-600">
+                Ingresa tus datos a continuación. Los cupos se confirman por orden de registro mediante el comprobante del adelanto de S/ 50.
+              </p>
+            </div>
+
+            <form id="workshop-booking-form" class="space-y-5">
+              <!-- Nombre completo -->
+              <div>
+                <label for="booking-name" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                  Nombre y Apellidos completos <span class="text-red-600">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="booking-name"
+                  required
+                  placeholder="Ej. Sofia Ramos Alvarado"
+                  class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                />
+              </div>
+
+              <!-- Teléfono / WhatsApp & Correo -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="booking-phone" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                    WhatsApp de Contacto <span class="text-red-600">*</span>
+                  </label>
+                  <div class="relative flex">
+                    <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-stone-300 bg-stone-100 text-stone-600 text-xs font-medium">
+                      +51
+                    </span>
+                    <input
+                      type="tel"
+                      id="booking-phone"
+                      required
+                      placeholder="999 999 999"
+                      class="w-full px-4 py-3 bg-white border border-stone-300 rounded-r-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label for="booking-email" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                    Correo Electrónico <span class="text-red-600">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    id="booking-email"
+                    required
+                    placeholder="ejemplo@correo.com"
+                    class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                  />
+                </div>
+              </div>
+
+              <!-- Nivel y Cantidad de Cupos -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="booking-experience" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                    ¿Tienes experiencia previa?
+                  </label>
+                  <select
+                    id="booking-experience"
+                    class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                  >
+                    <option value="No tengo experiencia, comienzo desde cero">No tengo experiencia (desde cero)</option>
+                    <option value="Me encanta hacerme las uñas / Aficionada">Aficionada / Me encanta hacerme las uñas</option>
+                    <option value="Tengo conocimientos básicos de manicura">Tengo conocimientos básicos</option>
+                    <option value="Hago uñas y quiero sumar técnicas Press On">Hago uñas profesionalmente</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label for="booking-spots" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                    ¿Cuántos cupos deseas apartar?
+                  </label>
+                  <select
+                    id="booking-spots"
+                    class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                  >
+                    <option value="1">1 cupo (S/ 50 de adelanto)</option>
+                    <option value="2">2 cupos (S/ 100 de adelanto)</option>
+                    <option value="3">3 cupos (S/ 150 de adelanto)</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Método de pago preferido -->
+              <div>
+                <label for="booking-payment" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                  Método para realizar el adelanto
+                </label>
+                <select
+                  id="booking-payment"
+                  class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                >
+                  <option value="Yape / Plin (993 067 291)">Yape o Plin (993 067 291)</option>
+                  <option value="Transferencia BCP">Transferencia BCP</option>
+                  <option value="Transferencia BBVA">Transferencia BBVA</option>
+                  <option value="Tarjeta de Crédito/Débito">Tarjeta de Crédito / Débito</option>
+                </select>
+              </div>
+
+              <!-- Notas o consultas -->
+              <div>
+                <label for="booking-notes" class="block text-xs font-semibold uppercase tracking-wider text-stone-700 mb-1.5">
+                  ¿Tienes alguna duda o requerimiento especial? (Opcional)
+                </label>
+                <textarea
+                  id="booking-notes"
+                  rows="2"
+                  placeholder="¿Irás acompañada? ¿Alguna consulta sobre los materiales?"
+                  class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-sm focus:outline-none focus:ring-2 focus:ring-[#5E765E] focus:border-transparent transition-all shadow-xs"
+                ></textarea>
+              </div>
+
+              <!-- Live dynamic summary banner -->
+              <div class="bg-white border border-[#5E765E]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+                <div>
+                  <span class="text-stone-500 font-medium">Resumen para <span id="calc-spots-label" class="font-bold text-stone-800">1 cupo</span>:</span>
+                  <div class="text-stone-800 font-medium">
+                    Total: <strong id="calc-total" class="font-bold text-stone-900">S/ 180</strong> · 
+                    Saldo en clase: <span id="calc-remaining" class="text-stone-600">S/ 130</span>
+                  </div>
+                </div>
+                <div class="text-right sm:border-l sm:border-stone-200 sm:pl-4">
+                  <span class="text-xs text-stone-500 uppercase tracking-wider block">Adelanto a pagar hoy:</span>
+                  <span id="calc-deposit" class="text-xl font-bold text-[#5E765E] font-serif">S/ 50</span>
+                </div>
+              </div>
+
+              <!-- Submit button -->
+              <button
+                type="submit"
+                id="submit-booking-btn"
+                class="w-full bg-[#5E765E] hover:bg-[#4d634d] active:scale-[0.99] text-white font-medium text-base py-4 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center gap-3 cursor-pointer"
+              >
+                <span>Confirmar Pre-Reserva y Coordinar por WhatsApp</span>
+                <span class="text-lg">📲</span>
+              </button>
+
+              <p class="text-center text-[11px] text-stone-500 leading-relaxed">
+                Al enviar el formulario, se abrirá WhatsApp con el resumen de tu reserva para que Ana Maria Díaz de Meraki confirme la disponibilidad y puedas adjuntar tu voucher del adelanto de S/ 50.
+              </p>
+            </form>
+          </div>
+        </div>
+      </section>
+
+      <!-- UBICACIÓN & DETALLES DEL LUGAR -->
+      <section class="py-16 bg-white/70 border-y border-[#5E765E]/10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div>
+              <span class="text-xs uppercase tracking-widest text-[#5E765E] font-semibold bg-[#5E765E]/10 px-3 py-1 rounded-full inline-block mb-3">
+                📍 Cómo Llegar
+              </span>
+              <h3 class="font-serif text-3xl text-stone-900 font-normal mb-3">
+                Jesús María, Lima
+              </h3>
+              <p class="text-stone-700 text-sm leading-relaxed mb-4">
+                <strong>Jirón Santo Domingo 153</strong>, Jesús María. Un espacio acogedor, bien iluminado y céntrico para que disfrutes tu taller cómodamente.
+              </p>
+              
+              <div class="space-y-2 mb-6 text-xs text-stone-600">
+                <div class="flex items-center gap-2">
+                  <span class="text-[#5E765E]">✓</span>
+                  <span>Cerca de avenidas principales (Av. Brasil, Av. San Felipe).</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[#5E765E]">✓</span>
+                  <span>Fácil acceso en transporte público o taxi/app.</span>
+                </div>
+              </div>
+
+              <div class="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  id="copy-address-btn"
+                  class="text-xs font-semibold py-2.5 px-4 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>📋 Copiar Dirección</span>
+                </button>
+                <a
+                  href="https://maps.google.com/?q=Jiron+Santo+Domingo+153+Jesus+Maria+Lima"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="text-xs font-semibold py-2.5 px-4 bg-[#5E765E]/15 hover:bg-[#5E765E]/25 text-[#5E765E] rounded-xl transition-colors inline-flex items-center gap-1.5"
+                >
+                  <span>Abrir en Google Maps ↗</span>
+                </a>
+              </div>
+            </div>
+
+            <!-- Visual Info Card -->
+            <div class="bg-[#FFF2DE] border border-[#5E765E]/20 rounded-3xl p-6 sm:p-8 text-stone-800 text-xs sm:text-sm">
+              <h4 class="font-serif text-lg font-semibold text-stone-900 mb-3">
+                Recomendaciones para el día del taller:
+              </h4>
+              <ul class="space-y-3 text-stone-600">
+                <li class="flex items-start gap-2.5">
+                  <span class="text-[#5E765E] font-bold">1.</span>
+                  <span><strong>Llega 10 minutos antes</strong> para registrarte y elegir tu estación de trabajo con calma.</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-[#5E765E] font-bold">2.</span>
+                  <span><strong>Uñas naturales limpias</strong> (si las tienes con esmalte o gel, no te preocupes, también te enseñaremos la preparación).</span>
+                </li>
+                <li class="flex items-start gap-2.5">
+                  <span class="text-[#5E765E] font-bold">3.</span>
+                  <span><strong>No necesitas traer materiales</strong>: todo el instrumental, lámparas UV/LED y geles están cubiertos en tu entrada.</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PREGUNTAS FRECUENTES DEL WORKSHOP -->
+      <section class="py-16 sm:py-20 border-b border-[#5E765E]/10">
+        <div class="max-w-3xl mx-auto px-4 sm:px-6">
+          <div class="text-center mb-10">
+            <h3 class="font-serif text-3xl text-stone-900 font-normal mb-2">
+              Preguntas Frecuentes
+            </h3>
+            <p class="text-xs sm:text-sm text-stone-600">
+              Respuestas rápidas para resolver todas tus dudas sobre el taller.
+            </p>
+          </div>
+
+          <div class="space-y-3">
+            <!-- FAQ 1 -->
+            <div class="bg-white/80 border border-[#5E765E]/20 rounded-2xl overflow-hidden">
+              <button
+                type="button"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-stone-900 text-sm sm:text-base cursor-pointer"
+                aria-expanded="false"
+              >
+                <span>¿Realmente puedo asistir si nunca antes he hecho uñas?</span>
+                <span class="faq-icon text-stone-500 transition-transform duration-200">↓</span>
+              </button>
+              <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-5 text-xs sm:text-sm text-stone-600 leading-relaxed">
+                ¡Sí, totalmente! El taller está estructurado desde los fundamentos más básicos (medición de la uña y preparación) hasta las técnicas de decoración. Ana María te acompañará de manera personalizada para que avances a tu propio ritmo.
+              </div>
+            </div>
+
+            <!-- FAQ 2 -->
+            <div class="bg-white/80 border border-[#5E765E]/20 rounded-2xl overflow-hidden">
+              <button
+                type="button"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-stone-900 text-sm sm:text-base cursor-pointer"
+                aria-expanded="false"
+              >
+                <span>¿Cómo funciona el pago del adelanto de S/ 50?</span>
+                <span class="faq-icon text-stone-500 transition-transform duration-200">↓</span>
+              </button>
+              <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-5 text-xs sm:text-sm text-stone-600 leading-relaxed">
+                Para apartar tu cupo en el sistema se abona un adelanto de S/ 50 mediante Yape, Plin o Transferencia bancaria. El saldo restante de S/ 130 se cancela directamente el día del taller en efectivo, Yape o tarjeta.
+              </div>
+            </div>
+
+            <!-- FAQ 3 -->
+            <div class="bg-white/80 border border-[#5E765E]/20 rounded-2xl overflow-hidden">
+              <button
+                type="button"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-semibold text-stone-900 text-sm sm:text-base cursor-pointer"
+                aria-expanded="false"
+              >
+                <span>¿El set de Press On que diseñe me lo llevo a casa?</span>
+                <span class="faq-icon text-stone-500 transition-transform duration-200">↓</span>
+              </button>
+              <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-5 text-xs sm:text-sm text-stone-600 leading-relaxed">
+                ¡Claro que sí! Todo el set de Press On Nails que diseñes, estructures y decores en clase es 100% tuyo, listo para que te lo lleves y lo uses las veces que quieras gracias a las técnicas de retiro y reutilización que aprenderás.
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-stone-900 text-stone-300 py-12 border-t border-stone-800">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-3">
+          <img src="/assets/brand/meraki-official-white.svg" alt="Meraki" width="120" height="32" class="h-8 w-auto" style="height: 32px; width: auto; max-width: 140px;" />
+          <span class="text-xs text-stone-400 border-l border-stone-700 pl-3">
+            Meraki Spa Beauty · Experiencias de Bienestar y Estética
+          </span>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-5 text-xs text-stone-400">
+          <a href="/" class="hover:text-white transition-colors">Inicio</a>
+          <a href="/catalogo" class="hover:text-white transition-colors">Catálogo de Servicios</a>
+          <a href="/como-reservar" class="hover:text-white transition-colors">Cómo Reservar</a>
+          <a href="https://instagram.com/meraki.spa.pe" target="_blank" rel="noopener noreferrer" class="hover:text-white transition-colors">@meraki.spa.pe</a>
+        </div>
+
+        <div class="text-xs text-stone-500">
+          © 2026 Meraki Spa Beauty. Todos los derechos reservados.
+        </div>
+      </div>
+    </footer>
+
+    <!-- CONFIRMATION & PAYMENT MODAL -->
+    <div
+      id="confirmation-modal"
+      class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/60 backdrop-blur-xs"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div id="modal-backdrop" class="absolute inset-0"></div>
+
+      <div class="relative bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-stone-200 z-10 animate-in fade-in zoom-in-95 duration-200 max-h-[92vh] overflow-y-auto">
+        <button
+          type="button"
+          id="close-modal-btn"
+          class="absolute top-5 right-5 text-stone-400 hover:text-stone-700 text-2xl font-light w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-100 transition-colors"
+          aria-label="Cerrar ventana"
+        >
+          ×
+        </button>
+
+        <div class="text-center mb-6">
+          <div class="w-14 h-14 rounded-full bg-[#5E765E]/15 text-[#5E765E] text-2xl flex items-center justify-center mx-auto mb-3">
+            ✨
+          </div>
+          <span class="text-[11px] uppercase tracking-widest font-bold text-[#5E765E] bg-[#5E765E]/10 px-3 py-1 rounded-full">
+            Pre-Reserva Registrada
+          </span>
+          <h3 class="font-serif text-2xl sm:text-3xl text-stone-900 font-semibold mt-2">
+            ¡Ya casi tienes tu lugar, <span id="modal-client-name"></span>!
+          </h3>
+          <p class="text-xs text-stone-500 mt-1">
+            Código de reserva: <strong id="modal-booking-id" class="text-stone-900 font-mono"></strong>
+          </p>
+        </div>
+
+        <!-- Summary card -->
+        <div class="bg-[#FFF2DE] border border-[#5E765E]/20 rounded-2xl p-4 mb-5 text-xs text-stone-700 space-y-1.5">
+          <div class="flex justify-between">
+            <span class="text-stone-500">Evento:</span>
+            <span class="font-semibold text-stone-900">Meraki Press On Workshop 🎃</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-500">Fecha:</span>
+            <span class="font-semibold text-stone-900">Sábado 3 de Octubre (10:30 a. m.)</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-500">Lugar:</span>
+            <span class="font-semibold text-stone-900">Jirón Santo Domingo 153, Jesús María</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-stone-500">Cupos:</span>
+            <span id="modal-spots-count" class="font-semibold text-stone-900"></span>
+          </div>
+          <div class="flex justify-between border-t border-[#5E765E]/20 pt-2 mt-2">
+            <span class="text-stone-900 font-semibold">Adelanto requerido:</span>
+            <span id="modal-deposit-amount" class="font-bold text-[#5E765E] text-sm"></span>
+          </div>
+          <div class="text-[11px] text-stone-500 text-right" id="modal-total-amount"></div>
+        </div>
+
+        <!-- Payment Instructions Box -->
+        <div class="bg-stone-50 border border-stone-200 rounded-2xl p-4 mb-6 text-xs text-stone-800">
+          <div class="flex items-center justify-between mb-2">
+            <span class="font-semibold uppercase tracking-wider text-stone-600 text-[11px]">
+              Instrucciones para apartar cupo:
+            </span>
+            <button
+              type="button"
+              id="copy-yape-btn"
+              class="text-[11px] font-semibold text-[#5E765E] bg-[#5E765E]/10 hover:bg-[#5E765E]/20 px-2.5 py-1 rounded-lg transition-colors cursor-pointer"
+            >
+              Copiar Yape
+            </button>
+          </div>
+
+          <div class="space-y-1.5">
+            <div>
+              📱 <strong>Yape / Plin:</strong> <code class="font-bold text-stone-900 bg-white px-1.5 py-0.5 rounded border border-stone-200">993 067 291</code>
+              <div class="text-[11px] text-stone-500">A nombre de: <strong>Ana Maria Díaz</strong> (Meraki Spa)</div>
+            </div>
+            <div class="text-[11px] text-stone-600 pt-1">
+              💡 También puedes solicitar cuenta BCP / BBVA directamente por WhatsApp.
+            </div>
+          </div>
+        </div>
+
+        <!-- WhatsApp Action Button -->
+        <div class="space-y-2.5">
+          <a
+            id="modal-whatsapp-btn"
+            href="#"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="w-full bg-[#5E765E] hover:bg-[#4d634d] text-white font-semibold text-sm py-3.5 px-5 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2.5 text-center"
+          >
+            <span>Enviar Reserva por WhatsApp</span>
+            <span>📲</span>
+          </a>
+          
+          <p class="text-center text-[11px] text-stone-500">
+            Te responderemos al instante para confirmar la recepción y reservar tu kit.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
