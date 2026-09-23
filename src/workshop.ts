@@ -367,61 +367,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. YouTube Shorts Reel Loop & Sound Controller
+  // 6. YouTube Shorts Reel Loop Controller
   const reelIframe = document.getElementById('workshop-reel-video');
 
-  const soundBtn = document.getElementById('toggle-reel-sound-btn');
+  interface YouTubeEventMessage {
+    event?: string;
+    info?: number;
+  }
 
-  const soundIcon = document.getElementById('sound-icon');
+  function isEndedYouTubeEvent(event: MessageEvent): boolean {
+    try {
+      const raw = String(event.data);
 
-  const soundLabel = document.getElementById('sound-label');
+      if (!raw.startsWith('{')) {
+        return false;
+      }
 
-interface YouTubeEventMessage {
-  event?: string;
-  info?: number;
-}
+      // SAFETY: Verified raw payload is valid JSON object text from iframe postMessage
+      const parsed = JSON.parse(raw) as YouTubeEventMessage;
 
-function isEndedYouTubeEvent(event: MessageEvent): boolean {
-  try {
-    const raw = String(event.data);
-
-    if (!raw.startsWith('{')) {
+      return parsed.event === 'onStateChange' && parsed.info === 0;
+    } catch {
       return false;
     }
-
-    // SAFETY: Verified raw payload is valid JSON object text from iframe postMessage
-    const parsed = JSON.parse(raw) as YouTubeEventMessage;
-
-    return parsed.event === 'onStateChange' && parsed.info === 0;
-  } catch {
-    return false;
   }
-}
 
   if (reelIframe instanceof HTMLIFrameElement) {
-    let isMuted = true;
-
-    if (soundBtn) {
-      soundBtn.addEventListener('click', () => {
-        isMuted = !isMuted;
-
-        const command = isMuted ? 'mute' : 'unMute';
-
-        reelIframe.contentWindow?.postMessage(
-          JSON.stringify({ event: 'command', func: command, args: '' }),
-          '*'
-        );
-
-        if (soundIcon) {
-          soundIcon.textContent = isMuted ? '🔇' : '🔊';
-        }
-
-        if (soundLabel) {
-          soundLabel.textContent = isMuted ? 'Activar audio' : 'Silenciar';
-        }
-      });
-    }
-
     // Auto-replay on end guarantee via postMessage
     window.addEventListener('message', (event) => {
       if (isEndedYouTubeEvent(event)) {

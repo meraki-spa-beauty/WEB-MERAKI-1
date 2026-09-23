@@ -484,23 +484,23 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            <!-- Columna Video: Demostración en bucle (YouTube Short de Uñas Meraki) -->
+            <!-- Columna Video: Demostración en bucle en formato vertical 4:3 (3:4) -->
             <div class="lg:col-span-5 order-2 lg:order-1 flex flex-col items-center justify-center">
-              <div class="relative w-full max-w-[270px] sm:max-w-[285px] mx-auto flex flex-col items-center">
+              <div class="relative w-full max-w-[320px] sm:max-w-[340px] mx-auto flex flex-col items-center">
                 
-                <!-- Contenedor vertical 9:16 con esquinas curvas tipo Reel y sombra -->
-                <div class="relative w-full aspect-[9/16] overflow-hidden rounded-[2.2rem] border-2 border-[#A36395]/25 shadow-2xl bg-stone-900 group" style="isolation: isolate; transform: translateZ(0);">
+                <!-- Contenedor vertical 4:3 (relación 3:4) que recorta zonas sup/inf para alinear con el texto -->
+                <div class="relative w-full aspect-[3/4] overflow-hidden rounded-[2.2rem] border-2 border-[#A36395]/25 shadow-2xl bg-stone-900 group" style="isolation: isolate; transform: translateZ(0);">
                   
-                  <!-- Iframe oficial de YouTube con reproducción automática en bucle continuo y playsinline -->
+                  <!-- Iframe de YouTube Short con cc_load_policy=0 (subtítulos desactivados) y escalado para centrar el diseño -->
                   <iframe
                     id="workshop-reel-video"
-                    src="https://www.youtube-nocookie.com/embed/3Neet7VSojM?autoplay=1&mute=1&loop=1&playlist=3Neet7VSojM&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1"
+                    src="https://www.youtube-nocookie.com/embed/3Neet7VSojM?autoplay=1&mute=1&loop=1&playlist=3Neet7VSojM&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&cc_load_policy=0"
                     title="Demostración de Técnica Meraki Press On Nails"
-                    class="w-full h-full object-cover scale-[1.01]"
+                    class="object-cover"
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                     allowfullscreen
                     loading="lazy"
-                    style="border: 0; width: 100%; height: 100%;"
+                    style="position: absolute; top: 50%; left: 50%; width: 100%; height: 133.33%; transform: translate(-50%, -50%) scale(1.02); border: 0;"
                   ></iframe>
 
                   <!-- Badge flotante superior: Técnica en Video -->
@@ -508,18 +508,6 @@
                     <span class="w-1.5 h-1.5 rounded-full bg-[#E7C6E1] animate-pulse"></span>
                     <span>Técnica en Vivo</span>
                   </div>
-
-                  <!-- Botón flotante inferior: Activar / Silenciar Audio -->
-                  <button
-                    type="button"
-                    id="toggle-reel-sound-btn"
-                    class="absolute bottom-3.5 right-3.5 bg-black/60 hover:bg-black/85 active:scale-95 backdrop-blur-md border border-white/25 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-full shadow-lg transition-all flex items-center gap-1.5 cursor-pointer z-10 select-none"
-                    aria-label="Alternar sonido del video"
-                    title="Alternar audio"
-                  >
-                    <span id="sound-icon" class="text-xs">🔇</span>
-                    <span id="sound-label" class="text-[10px] tracking-wide">Activar audio</span>
-                  </button>
                 </div>
 
                 <!-- Nota manuscrita decorativa centrada -->
