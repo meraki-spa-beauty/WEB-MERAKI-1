@@ -696,34 +696,37 @@
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             
-            <!-- Mapa Preview interactivo con redirección directa a Google Maps -->
+            <!-- Mapa interactivo de Google Maps con redirección directa -->
             <div class="md:col-span-6 relative">
-              <a
-                href="https://www.google.com/maps/search/?api=1&query=Jir%C3%B3n+Santo+Domingo+153,+Jes%C3%BAs+Mar%C3%ADa,+Lima"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="block relative overflow-hidden rounded-3xl border border-[#3D1B28]/15 shadow-md bg-stone-100 group transition-all transform hover:-translate-y-0.5"
-                title="Abrir ubicación en Google Maps"
-              >
-                <img
-                  src="/assets/workshop/mapa-jesus-maria.png"
-                  alt="Mapa de Jesús María, Lima - Meraki Workshop"
-                  class="w-full h-48 sm:h-56 object-cover object-center group-hover:scale-105 transition-transform duration-500"
-                  width="800"
-                  height="490"
-                />
-                <!-- Overlay con botón Cómo llegar -->
-                <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent flex items-end justify-between p-4">
-                  <div class="bg-white/95 backdrop-blur-xs text-[#2A111E] text-[11px] font-semibold py-1.5 px-3 rounded-lg shadow-sm flex items-center gap-1.5">
+              <div class="relative overflow-hidden rounded-3xl border border-[#3D1B28]/15 shadow-md bg-stone-100 h-64 sm:h-72 group">
+                <!-- Google Maps Embed interactivo centrado en Jesús María -->
+                <iframe
+                  title="Ubicación del Workshop en Jesús María, Lima"
+                  src="https://maps.google.com/maps?q=Jir%C3%B3n+Santo+Domingo+153,+Jes%C3%BAs+Mar%C3%ADa,+Lima,+Per%C3%BA&t=&z=16&ie=UTF8&iwloc=&output=embed"
+                  class="w-full h-full border-0 rounded-3xl"
+                  loading="lazy"
+                  allowfullscreen
+                  referrerpolicy="no-referrer-when-downgrade"
+                ></iframe>
+
+                <!-- Overlay con botón Cómo llegar y chip de ubicación -->
+                <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
+                  <div class="bg-white/95 backdrop-blur-xs text-[#2A111E] text-[11px] font-semibold py-1.5 px-3 rounded-xl shadow-md flex items-center gap-1.5 pointer-events-auto border border-stone-200/80">
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                     <span>Jesús María, Lima</span>
                   </div>
-                  <span class="bg-[#3D1B28] hover:bg-[#27101B] text-white text-xs font-semibold py-2 px-3.5 rounded-xl shadow-md transition-all flex items-center gap-1.5">
+                  <a
+                    href="https://www.google.com/maps/search/?api=1&query=Jir%C3%B3n+Santo+Domingo+153,+Jes%C3%BAs+Mar%C3%ADa,+Lima"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="bg-[#3D1B28] hover:bg-[#27101B] active:scale-95 text-white text-xs font-semibold py-2 px-3.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 pointer-events-auto cursor-pointer"
+                    title="Abrir en Google Maps"
+                  >
                     <span>Cómo llegar</span>
                     <span>↗</span>
-                  </span>
+                  </a>
                 </div>
-              </a>
+              </div>
             </div>
 
             <!-- Detalles del lugar -->
