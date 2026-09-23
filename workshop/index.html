@@ -480,24 +480,50 @@
       </section>
 
       <!-- SECCIÓN: ¿PARA QUIÉN ES ESTE WORKSHOP? -->
-      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#854E79]/10">
+      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            <!-- Columna Imagen: Manos sobre tela vino -->
-            <div class="lg:col-span-5 order-2 lg:order-1">
-              <div class="relative max-w-sm mx-auto">
-                <div class="overflow-hidden rounded-3xl border border-[#854E79]/15 shadow-xl">
-                  <img
-                    src="/assets/workshop/para-quien-manos.png"
-                    alt="Manos con diseño de uñas de Halloween sobre tela de seda"
-                    class="w-full h-auto object-cover"
-                    width="400"
-                    height="339"
-                  />
+            <!-- Columna Video: Demostración en bucle (YouTube Short de Uñas Meraki) -->
+            <div class="lg:col-span-5 order-2 lg:order-1 flex flex-col items-center justify-center">
+              <div class="relative w-full max-w-[270px] sm:max-w-[285px] mx-auto flex flex-col items-center">
+                
+                <!-- Contenedor vertical 9:16 con esquinas curvas tipo Reel y sombra -->
+                <div class="relative w-full aspect-[9/16] overflow-hidden rounded-[2.2rem] border-2 border-[#A36395]/25 shadow-2xl bg-stone-900 group" style="isolation: isolate; transform: translateZ(0);">
+                  
+                  <!-- Iframe oficial de YouTube con reproducción automática en bucle continuo y playsinline -->
+                  <iframe
+                    id="workshop-reel-video"
+                    src="https://www.youtube-nocookie.com/embed/3Neet7VSojM?autoplay=1&mute=1&loop=1&playlist=3Neet7VSojM&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1"
+                    title="Demostración de Técnica Meraki Press On Nails"
+                    class="w-full h-full object-cover scale-[1.01]"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="lazy"
+                    style="border: 0; width: 100%; height: 100%;"
+                  ></iframe>
+
+                  <!-- Badge flotante superior: Técnica en Video -->
+                  <div class="absolute top-3.5 left-3.5 bg-black/60 backdrop-blur-md border border-white/20 text-[#FAF5F0] text-[10px] sm:text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none select-none z-10">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#E7C6E1] animate-pulse"></span>
+                    <span>Técnica en Vivo</span>
+                  </div>
+
+                  <!-- Botón flotante inferior: Activar / Silenciar Audio -->
+                  <button
+                    type="button"
+                    id="toggle-reel-sound-btn"
+                    class="absolute bottom-3.5 right-3.5 bg-black/60 hover:bg-black/85 active:scale-95 backdrop-blur-md border border-white/25 text-white text-[11px] font-medium px-2.5 py-1.5 rounded-full shadow-lg transition-all flex items-center gap-1.5 cursor-pointer z-10 select-none"
+                    aria-label="Alternar sonido del video"
+                    title="Alternar audio"
+                  >
+                    <span id="sound-icon" class="text-xs">🔇</span>
+                    <span id="sound-label" class="text-[10px] tracking-wide">Activar audio</span>
+                  </button>
                 </div>
-                <!-- Nota manuscrita decorativa -->
-                <div class="font-script text-2xl text-[#9D6092] text-center mt-2.5 select-none">
+
+                <!-- Nota manuscrita decorativa centrada -->
+                <div class="font-script text-2xl sm:text-3xl text-[#B376A8] text-center mt-3 select-none">
                   Tu set de uñas te espera ♡
                 </div>
               </div>
@@ -505,35 +531,35 @@
 
             <!-- Columna Texto y Checklist -->
             <div class="lg:col-span-7 order-1 lg:order-2 space-y-4 text-left">
-              <span class="text-xs uppercase tracking-[0.25em] text-[#9D6092] font-semibold block">
+              <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block">
                 ESTE TALLER ES PARA TI SI...
               </span>
-              <h2 class="text-3xl sm:text-4xl font-light text-[#3A1F34] leading-tight">
+              <h2 class="text-3xl sm:text-4xl font-light text-[#5B3151] leading-tight">
                 ¿Para quién es este workshop?
               </h2>
 
               <div class="space-y-3 pt-2">
                 <div class="flex items-start gap-3">
-                  <span class="text-[#854E79] font-bold text-sm mt-0.5">✓</span>
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
                   <span class="text-stone-700 text-xs sm:text-sm">Amas el mundo de la belleza y el nail art.</span>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="text-[#854E79] font-bold text-sm mt-0.5">✓</span>
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
                   <span class="text-stone-700 text-xs sm:text-sm">Quieres aprender una técnica en tendencia.</span>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="text-[#854E79] font-bold text-sm mt-0.5">✓</span>
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
                   <span class="text-stone-700 text-xs sm:text-sm">Buscas una experiencia diferente y creativa.</span>
                 </div>
                 <div class="flex items-start gap-3">
-                  <span class="text-[#854E79] font-bold text-sm mt-0.5">✓</span>
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
                   <span class="text-stone-700 text-xs sm:text-sm">Deseas consentirte y compartir con otras Mery girls.</span>
                 </div>
               </div>
 
               <!-- Frase Manuscrita destacada con luna y murciélago -->
-              <div class="pt-4 flex items-center justify-between border-t border-[#854E79]/10 max-w-md">
-                <div class="font-script text-2xl sm:text-3xl text-[#854E79]">
+              <div class="pt-4 flex items-center justify-between border-t border-[#A36395]/10 max-w-md">
+                <div class="font-script text-2xl sm:text-3xl text-[#A36395]">
                   No necesitas experiencia previa ♡
                 </div>
                 <div class="text-base select-none">
