@@ -735,11 +735,21 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                 </button>
               </div>
 
-              <div className="flex items-center gap-2 text-[10px] text-[#111111]/60 pt-1">
-                <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0" />
-                <span>
-                  Sin cobro automático. La reserva se formaliza al verificar agenda y abonar el 40% vía WhatsApp.
-                </span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] text-[#111111]/60 pt-1">
+                <div className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#5E765E] shrink-0" />
+                  <span>
+                    Sin cobro automático. La reserva se formaliza al abonar el 40% vía WhatsApp.
+                  </span>
+                </div>
+                <a
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="underline hover:text-[#5E765E] transition-colors"
+                >
+                  Políticas &amp; Privacidad
+                </a>
               </div>
             </form>
           )}
