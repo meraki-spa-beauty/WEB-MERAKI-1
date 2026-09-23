@@ -1,14 +1,16 @@
 import type { Testimonial, FAQItem } from '../types';
 
 export const SPA_INFO = {
-  name: 'Meraki Spa Beauty',
-  tagline: 'Spa y Belleza en la comodidad de tu casa y/o trabajo',
+  name: 'Meraki Spa',
+  tagline: 'Bienestar, belleza y rituales en nuestro estudio y a domicilio',
   founder: 'Ana Maria Díaz',
   experience: 'Más de 10 años de experiencia profesional',
   mission: 'Que te sientas feliz y empoderada',
-  serviceModel: 'Servicio a domicilio y oficina con equipamiento profesional completo',
+  serviceModel: 'Atención presencial en estudio (Pueblo Libre) y servicio a domicilio u oficina en Lima',
   city: 'Lima, Perú',
-  coverage: 'Atención a domicilio y oficinas en Lima (consultar movilidad según distrito)',
+  studioAddress: 'Calle Agustín Gamarra 515, Pueblo Libre, Lima',
+  studioDistrict: 'Pueblo Libre, Lima',
+  coverage: 'Estudio en Calle Agustín Gamarra 515 (Pueblo Libre) y servicio a domicilio en distritos de Lima',
   whatsappDisplay: '+51 993 067 291',
   whatsappNumber: '51993067291',
   whatsappLink: 'https://wa.link/86seuh',
@@ -21,7 +23,7 @@ export const SPA_INFO = {
   },
   pillars: [
     'Marca liderada por Ana Maria Díaz con más de 10 años de experiencia',
-    'Llegamos con todo lo necesario a la comodidad de tu casa y/o trabajo',
+    'Atención presencial en nuestro estudio en Pueblo Libre o a domicilio con equipamiento profesional completo',
     'Cumplimiento estricto de todos los protocolos de bioseguridad',
     'Atención cálida, respetuosa y 100% personalizada'
   ]
@@ -62,19 +64,19 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-1',
     category: 'reservas',
     question: '¿Cómo agendo mi cita con Meraki?',
-    answer: 'Es muy fácil: eliges tu servicio en nuestro catálogo, nos escribes al WhatsApp 993 067 291 con tu fecha tentativa y lugar (casa o trabajo), realizas el adelanto del 40% de la reserva y nos compartes tu voucher junto con tus datos para agendarte.'
+    answer: 'Es muy fácil: eliges tu servicio en nuestro catálogo, nos escribes al WhatsApp 993 067 291 con tu fecha tentativa y modalidad (en nuestro estudio de Pueblo Libre o a domicilio/oficina), realizas el adelanto del 40% de la reserva y nos compartes tu voucher junto con tus datos para agendarte.'
   },
   {
     id: 'faq-2',
     category: 'movilidad',
     question: '¿El precio incluye el costo de movilidad?',
-    answer: 'Los servicios no incluyen el costo de la movilidad. El valor de la misma dependerá de tu distrito en Lima, por lo que te invitamos a consultar el costo exacto al escribirnos por WhatsApp.'
+    answer: 'Para la atención presencial en nuestro estudio ubicado en Calle Agustín Gamarra 515, Pueblo Libre, no aplica ningún costo de movilidad. En caso prefieras el servicio a domicilio u oficina, el costo de movilidad se calcula de forma transparente según tu distrito en Lima.'
   },
   {
     id: 'faq-3',
     category: 'servicios',
-    question: '¿Qué necesito tener listo en mi casa o trabajo para la atención?',
-    answer: '¡No te preocupes por nada! Nosotras llevamos todos los materiales esterilizados, productos de alta cosmética y equipamiento portátil necesario (lámparas LED, vaporizador facial, toallas descartables, etc.). Solo requerimos un espacio cómodo con buena iluminación y una toma de corriente.'
+    question: '¿Dónde está ubicado el estudio y qué necesito si elijo atención a domicilio?',
+    answer: 'Nuestro estudio se encuentra en Calle Agustín Gamarra 515, Pueblo Libre, Lima (atención con previa cita). Si prefieres atención a domicilio o trabajo, nosotras llevamos todos los materiales esterilizados y equipamiento portátil necesario; solo requerimos un espacio cómodo con buena iluminación y toma de corriente.'
   },
   {
     id: 'faq-4',
@@ -86,7 +88,7 @@ export const FAQ_ITEMS: FAQItem[] = [
     id: 'faq-5',
     category: 'bioseguridad',
     question: '¿Qué protocolos de bioseguridad aplican?',
-    answer: 'En Meraki cumplimos rigurosos protocolos de bioseguridad: esterilización de instrumental con grado hospitalario, uso de material descartable por cliente, desinfección antes de cada procedimiento y uso de guantes y mascarilla.'
+    answer: 'En Meraki cumplimos rigurosos protocolos de bioseguridad tanto en estudio como a domicilio: esterilización de instrumental con grado hospitalario, uso de material descartable por cliente, desinfección antes de cada procedimiento y uso de indumentaria protectora.'
   },
   {
     id: 'faq-6',

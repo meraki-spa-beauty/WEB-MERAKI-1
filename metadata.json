@@ -1,6 +1,6 @@
 {
   "name": "Meraki | Bienestar, belleza y rituales",
-  "description": "Servicios de spa y estética en la comodidad de tu casa y oficina en Lima: manicura, pedicura, pestañas, depilación, masajes y faciales profesionales liderados por Ana Maria Díaz.",
+  "description": "Servicios de spa y estética en estudio (Pueblo Libre) y a domicilio u oficina en Lima: manicura, pedicura, pestañas, depilación, masajes y faciales profesionales liderados por Ana Maria Díaz.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

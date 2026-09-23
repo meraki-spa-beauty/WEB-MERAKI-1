@@ -9,7 +9,7 @@ export function TopBar() {
         <div className="flex items-center gap-6">
           <div className="flex items-center gap-1.5 opacity-90">
             <MapPin className="w-3.5 h-3.5 text-[#D5A688]" />
-            <span>Servicio a domicilio y oficina en Lima</span>
+            <span>Estudio en Pueblo Libre (C. Agustín Gamarra 515) &amp; A Domicilio</span>
           </div>
           <div className="flex items-center gap-1.5 opacity-90">
             <Clock className="w-3.5 h-3.5 text-[#D5A688]" />

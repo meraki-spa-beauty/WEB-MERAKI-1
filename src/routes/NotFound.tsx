@@ -22,7 +22,7 @@ export function NotFound() {
             Esta página no se encuentra disponible.
           </h1>
           <p className="text-xs text-[#111111]/70 mb-8 leading-relaxed font-light">
-            Te invitamos a explorar nuestro catálogo de servicios a domicilio u oficina o regresar a la página principal.
+            Te invitamos a explorar nuestro catálogo de servicios en estudio o a domicilio, o regresar a la página principal.
           </p>
           <div className="space-y-3">
             <Link

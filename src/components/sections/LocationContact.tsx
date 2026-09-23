@@ -38,9 +38,14 @@ export function LocationContact() {
                 </div>
                 <div>
                   <h4 className="font-['Montserrat',sans-serif] text-xs font-bold uppercase tracking-wider text-[#111111]">
-                    Modalidad de Atención
+                    Estudio &amp; A Domicilio
                   </h4>
-                  <p className="text-xs text-[#111111]/75 mt-0.5">{SPA_INFO.coverage}</p>
+                  <p className="text-xs text-[#111111]/75 mt-0.5 font-medium text-[#5E765E]">
+                    Estudio: {SPA_INFO.studioAddress}
+                  </p>
+                  <p className="text-xs text-[#111111]/75 mt-0.5">
+                    A Domicilio: Cobertura en distritos de Lima
+                  </p>
                   <span className="text-[11px] text-[#5E765E] font-medium block mt-1">
                     Atención exclusiva bajo reserva anticipada
                   </span>
@@ -109,7 +114,7 @@ export function LocationContact() {
                     ¡Mensaje Enviado con Éxito!
                   </h4>
                   <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/70 max-w-sm mx-auto">
-                    Gracias por comunicarte con Meraki Spa Beauty. Te responderemos vía WhatsApp o llamada en menos de 30 minutos hábiles.
+                    Gracias por comunicarte con Meraki Spa. Te responderemos vía WhatsApp o llamada en menos de 30 minutos hábiles.
                   </p>
                   <button
                     type="button"

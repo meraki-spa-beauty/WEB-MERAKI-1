@@ -5,7 +5,7 @@ export const CATEGORIES_DATA: { id: ServiceCategory | 'todos'; label: string; co
     id: 'todos',
     label: 'Todo el Catálogo',
     count: 36,
-    description: 'Catálogo oficial de servicios de spa y belleza a domicilio y oficina'
+    description: 'Catálogo oficial de servicios de spa y belleza en estudio (Pueblo Libre) y a domicilio u oficina'
   },
   {
     id: 'manos',
@@ -655,8 +655,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
 // CONDICIONES OFICIALES DEL SERVICIO (Página 10 del Catálogo)
 export const POLICIES_DATA = {
   availability: 'Los servicios son previamente agendados según disponibilidad.',
-  mobility: 'Los servicios no incluyen el costo de la movilidad. El coste del mismo dependerá del distrito, así que consultar el costo según distrito.',
-  biosecurity: 'En Meraki cumplimos todos los protocolos de bioseguridad para garantizar una experiencia higiénica y segura.',
+  mobility: 'Para el servicio a domicilio u oficina, los servicios no incluyen el costo de la movilidad (se cotiza según el distrito de Lima). En nuestro estudio presencial en Calle Agustín Gamarra 515, Pueblo Libre, no aplica ningún costo de movilidad.',
+  biosecurity: 'En Meraki cumplimos todos los protocolos de bioseguridad tanto en estudio como a domicilio para garantizar una experiencia higiénica y segura.',
   cancellation: 'Cambio o cancelaciones de citas con 24h antes; de lo contrario el previo depósito del 40% no será reembolsable.',
   socialMedia: 'Los clientes aceptan el uso de fotos y videos para nuestras redes sociales.',
   depositPercentage: '40% de adelanto para reservar tu cita'
@@ -672,7 +672,7 @@ export const BOOKING_STEPS = [
   {
     number: '2',
     title: 'Escríbenos a WhatsApp',
-    description: 'Escríbenos a nuestro WhatsApp 993 067 291 y dinos qué servicio deseas, fecha tentativa y lugar (casa o trabajo).'
+    description: 'Escríbenos a nuestro WhatsApp 993 067 291 indicando el servicio deseado, fecha tentativa y si prefieres atención presencial en nuestro estudio (Pueblo Libre) o a domicilio (casa u oficina).'
   },
   {
     number: '3',
@@ -682,11 +682,11 @@ export const BOOKING_STEPS = [
   {
     number: '4',
     title: 'Envíanos tus datos',
-    description: 'Una vez realizado el depósito, nos envías el voucher junto a tus datos para agendarte: Nombre, Dirección, Hora de atención, Teléfono, Correo y Fecha de nacimiento.'
+    description: 'Una vez realizado el depósito, nos envías el voucher junto a tus datos para agendarte: Nombre, Modalidad/Dirección (o Estudio Pueblo Libre), Hora de atención, Teléfono, Correo y Fecha de nacimiento.'
   },
   {
     number: '5',
     title: '¡Listas para atenderte!',
-    description: 'Llegamos a tu domicilio o lugar de trabajo con todo lo necesario y protocolos de bioseguridad para disfrutar tu momento especial.'
+    description: 'Te recibimos en nuestro acogedor estudio en Pueblo Libre (Calle Agustín Gamarra 515) o nos trasladamos a tu domicilio u oficina con todo lo necesario y protocolos de bioseguridad.'
   }
 ];

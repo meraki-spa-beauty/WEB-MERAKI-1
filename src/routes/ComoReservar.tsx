@@ -57,7 +57,7 @@ export function ComoReservar() {
               ¿Cómo Reservas tu Cita en Meraki?
             </h1>
             <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Llevamos la experiencia completa de spa y estética a la comodidad de tu casa o trabajo. Sigue estos 5 sencillos pasos para asegurar tu atención.
+              Agenda tu atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o solicita el servicio a domicilio en la comodidad de tu casa u oficina. Sigue estos 5 sencillos pasos para asegurar tu atención.
             </p>
             <div className="flex flex-wrap items-center justify-center gap-4">
               <button
@@ -118,7 +118,7 @@ export function ComoReservar() {
                         </span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-[#111111]/85">
                           <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Nombre completo</div>
-                          <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Dirección exacta</div>
+                          <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Modalidad / Dirección (o Estudio Pueblo Libre)</div>
                           <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Hora de atención</div>
                           <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Número de teléfono</div>
                           <div className="p-2 rounded-lg bg-white border border-[#5E765E]/10">• Correo electrónico</div>
@@ -141,7 +141,7 @@ export function ComoReservar() {
                 Claridad y Transparencia
               </span>
               <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                Políticas del Servicio a Domicilio
+                Políticas de Atención en Estudio y a Domicilio
               </h2>
             </div>
 

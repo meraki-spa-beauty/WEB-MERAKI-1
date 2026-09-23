@@ -14,12 +14,12 @@ const privacySections: PrivacySection[] = [
   {
     id: 'privacy-1',
     title: 'Información que recopilamos',
-    content: 'En Meraki Spa Beauty recopilamos datos personales indispensables para la coordinación y prestación segura de nuestros servicios a domicilio y oficina: nombres y apellidos, dirección exacta de atención, número telefónico, correo electrónico, fecha de nacimiento y observaciones necesarias sobre tu tipo de piel o alergias previas.'
+    content: 'En Meraki Spa recopilamos datos personales indispensables para la coordinación y prestación segura de nuestros servicios en estudio, a domicilio u oficina: nombres y apellidos, modalidad o dirección de atención, número telefónico, correo electrónico, fecha de nacimiento y observaciones necesarias sobre tu tipo de piel o alergias previas.'
   },
   {
     id: 'privacy-2',
     title: 'Cómo utilizamos la información',
-    content: 'Tus datos son utilizados exclusivamente para coordinar tu cita, confirmar fecha y hora de llegada, calcular el costo de movilidad correspondiente a tu distrito en Lima y garantizar protocolos de bioseguridad personalizados.'
+    content: 'Tus datos son utilizados exclusivamente para coordinar tu cita presencial en estudio o a domicilio, confirmar fecha y hora de atención, calcular el costo de movilidad en caso de atención a domicilio en Lima y garantizar protocolos de bioseguridad personalizados.'
   },
   {
     id: 'privacy-3',
@@ -68,7 +68,7 @@ export function Privacy() {
               <span className="italic text-[#5E765E]">&amp; Políticas de Reserva</span>
             </h1>
             <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/60 uppercase tracking-widest mt-6">
-              Actualizado conforme al Catálogo Oficial de Meraki Spa Beauty
+              Actualizado conforme al Catálogo Oficial de Meraki Spa
             </p>
           </div>
         </section>

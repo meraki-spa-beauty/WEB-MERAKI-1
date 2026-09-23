@@ -127,12 +127,16 @@ export function Footer() {
           {/* Attention & Booking Info */}
           <div className="lg:col-span-3">
             <h4 className="font-['Montserrat',sans-serif] text-xs font-bold uppercase tracking-[0.2em] text-[#D5A688] mb-5">
-              Atención a Domicilio
+              Atención en Estudio &amp; Domicilio
             </h4>
             <div className="space-y-3 font-['Montserrat',sans-serif] text-xs font-light text-[#FFF2DE]/85">
               <div className="flex items-start gap-2.5">
                 <MapPin className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
-                <span>En tu casa y/o lugar de trabajo en Lima (movilidad según distrito)</span>
+                <span><strong>Estudio:</strong> Calle Agustín Gamarra 515, Pueblo Libre, Lima</span>
+              </div>
+              <div className="flex items-start gap-2.5">
+                <MapPin className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
+                <span><strong>A Domicilio:</strong> En tu casa u oficina en Lima (movilidad según distrito)</span>
               </div>
               <div className="flex items-start gap-2.5">
                 <Phone className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
@@ -161,7 +165,7 @@ export function Footer() {
 
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-['Montserrat',sans-serif] text-[#FFF2DE]/65">
-          <p>© {new Date().getFullYear()} Meraki Spa Beauty • Liderado por Ana Maria Díaz</p>
+          <p>© {new Date().getFullYear()} Meraki Spa • Liderado por Ana Maria Díaz</p>
           
           <div className="flex items-center gap-6">
             <Link to="/privacy" className="hover:text-[#FFF2DE] transition-colors">

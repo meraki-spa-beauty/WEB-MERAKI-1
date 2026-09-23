@@ -39,7 +39,7 @@ export function Contacto() {
   const [selectedServiceId, setSelectedServiceId] = useState(CATALOG_SERVICES[0].id);
   const [clientName, setClientName] = useState('');
   const [district, setDistrict] = useState(LIMA_DISTRICTS[0]);
-  const [locationType, setLocationType] = useState<'casa' | 'trabajo'>('casa');
+  const [locationType, setLocationType] = useState<'estudio' | 'casa' | 'trabajo'>('estudio');
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
   const [customNote, setCustomNote] = useState('');
@@ -53,17 +53,20 @@ export function Contacto() {
     const dateText = preferredDate ? `para el día ${preferredDate}` : '';
     const timeText = preferredTime ? ` a las ${preferredTime}` : '';
     const noteText = customNote ? `\nNota adicional: ${customNote}` : '';
+    const isStudio = locationType === 'estudio';
 
-    const message = `Hola Meraki Spa Beauty 👋
+    const placeText = isStudio
+      ? 'Atención presencial en Estudio (Calle Agustín Gamarra 515, Pueblo Libre, Lima)'
+      : `Atención en mi ${locationType === 'casa' ? 'Casa / Domicilio' : 'Lugar de trabajo / Oficina'}`;
+
+    const message = `Hola Meraki Spa 👋
 ${nameText}Quisiera consultar disponibilidad y agendar el siguiente servicio:
 
 • *Servicio:* ${selectedService.name} (${selectedService.categoryLabel})
-• *Lugar:* Atención en mi ${locationType === 'casa' ? 'Casa' : 'Lugar de trabajo / Oficina'}
-• *Distrito:* ${district}
-• *Fecha y Hora tentativa:* ${dateText || 'A coordinar'}${timeText}
-${noteText}
+• *Lugar:* ${placeText}
+${!isStudio ? `• *Distrito:* ${district}\n` : ''}• *Fecha y Hora tentativa:* ${dateText || 'A coordinar'}${timeText}${noteText}
 
-¿Me podrían confirmar disponibilidad y el costo de movilidad para mi distrito? Muchas gracias.`;
+${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudio de Pueblo Libre? Muchas gracias.' : '¿Me podrían confirmar disponibilidad y el costo de movilidad para mi distrito? Muchas gracias.'}`;
 
     const encoded = encodeURIComponent(message);
     window.open(`https://wa.me/${SPA_INFO.whatsappNumber}?text=${encoded}`, '_blank');
@@ -168,20 +171,38 @@ ${noteText}
                       </div>
                     </div>
 
-                    {/* Cobertura */}
+                    {/* Estudio Presencial */}
                     <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/20 flex items-center justify-center shrink-0">
-                        <MapPin className="w-6 h-6 text-[#5E765E]" />
+                      <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shrink-0 shadow-sm">
+                        <MapPin className="w-6 h-6 text-[#D5A688]" />
                       </div>
                       <div>
                         <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] block">
-                          Modalidad
+                          Estudio Presencial (Previa Cita)
                         </span>
                         <p className="font-semibold text-xs text-[#111111]">
-                          A domicilio y oficina en Lima
+                          Calle Agustín Gamarra 515, Pueblo Libre, Lima
                         </p>
                         <p className="text-xs text-[#111111]/60 font-light mt-0.5">
-                          Costo de movilidad se cotiza según distrito
+                          Atención en cabina privada • Sin costo de movilidad
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Cobertura a Domicilio */}
+                    <div className="flex items-start gap-4">
+                      <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/20 flex items-center justify-center shrink-0">
+                        <Home className="w-6 h-6 text-[#5E765E]" />
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] block">
+                          Servicio a Domicilio y Oficina
+                        </span>
+                        <p className="font-semibold text-xs text-[#111111]">
+                          Atención en distritos seleccionados de Lima
+                        </p>
+                        <p className="text-xs text-[#111111]/60 font-light mt-0.5">
+                          Costo de movilidad se cotiza según tu distrito
                         </p>
                       </div>
                     </div>
@@ -264,57 +285,86 @@ ${noteText}
                       </span>
                     </div>
 
-                    {/* Tipo de Ubicación (Casa u Oficina) */}
+                    {/* Modalidad de Atención: Estudio vs Casa vs Trabajo */}
                     <div>
                       <label className="block text-xs font-semibold text-[#111111] mb-1.5">
                         Lugar de Atención:
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setLocationType('estudio');
+                            setDistrict('Pueblo Libre');
+                          }}
+                          className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 cursor-pointer transition-all ${
+                            locationType === 'estudio'
+                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
+                              : 'bg-white text-[#111111]/80 border-[#5E765E]/20 hover:bg-[#FFF2DE]'
+                          }`}
+                        >
+                          <MapPin className="w-4 h-4 text-[#D5A688]" />
+                          <span>En Estudio (Pueblo Libre)</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => setLocationType('casa')}
                           className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 cursor-pointer transition-all ${
                             locationType === 'casa'
-                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E]'
+                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
                               : 'bg-white text-[#111111]/80 border-[#5E765E]/20 hover:bg-[#FFF2DE]'
                           }`}
                         >
                           <Home className="w-4 h-4" />
-                          <span>En mi Casa / Domicilio</span>
+                          <span>En Casa / Domicilio</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => setLocationType('trabajo')}
                           className={`p-3 rounded-xl border text-xs font-medium flex items-center justify-center gap-2 cursor-pointer transition-all ${
                             locationType === 'trabajo'
-                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E]'
+                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
                               : 'bg-white text-[#111111]/80 border-[#5E765E]/20 hover:bg-[#FFF2DE]'
                           }`}
                         >
                           <Briefcase className="w-4 h-4" />
-                          <span>En mi Lugar de Trabajo / Oficina</span>
+                          <span>En Oficina / Trabajo</span>
                         </button>
                       </div>
                     </div>
 
-                    {/* Distrito y Fecha */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-semibold text-[#111111] mb-1.5">
-                          Distrito en Lima:
-                        </label>
-                        <select
-                          value={district}
-                          onChange={(e) => setDistrict(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] focus:outline-none focus:border-[#5E765E] bg-white cursor-pointer"
-                        >
-                          {LIMA_DISTRICTS.map((d) => (
-                            <option key={d} value={d}>
-                              {d}
-                            </option>
-                          ))}
-                        </select>
+                    {locationType === 'estudio' && (
+                      <div className="p-3.5 rounded-xl bg-[#5E765E]/10 border border-[#5E765E]/20 text-xs">
+                        <div className="flex items-center gap-2 text-[#5E765E] font-semibold mb-1">
+                          <MapPin className="w-4 h-4 text-[#D5A688]" />
+                          <span>Estudio Meraki — Pueblo Libre</span>
+                        </div>
+                        <p className="text-[11px] text-[#111111]/80">
+                          Dirección: <strong>Calle Agustín Gamarra 515, Pueblo Libre, Lima</strong> (Previa cita • Sin costo de movilidad).
+                        </p>
                       </div>
+                    )}
+
+                    {/* Distrito y Fecha */}
+                    <div className={`grid grid-cols-1 ${locationType === 'estudio' ? 'sm:grid-cols-1' : 'sm:grid-cols-2'} gap-4`}>
+                      {locationType !== 'estudio' && (
+                        <div>
+                          <label className="block text-xs font-semibold text-[#111111] mb-1.5">
+                            Distrito en Lima:
+                          </label>
+                          <select
+                            value={district}
+                            onChange={(e) => setDistrict(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] focus:outline-none focus:border-[#5E765E] bg-white cursor-pointer"
+                          >
+                            {LIMA_DISTRICTS.map((d) => (
+                              <option key={d} value={d}>
+                                {d}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      )}
 
                       <div>
                         <label className="block text-xs font-semibold text-[#111111] mb-1.5">

@@ -21,7 +21,7 @@ export function FAQSection() {
             Preguntas Frecuentes
           </h2>
           <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/70 mt-3 font-light leading-relaxed">
-            Todo lo que necesitas saber antes de tu visita a Meraki Spa Beauty.
+            Todo lo que necesitas saber antes de tu cita en Meraki Spa.
           </p>
         </div>
 

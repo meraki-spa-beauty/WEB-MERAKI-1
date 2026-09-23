@@ -127,7 +127,7 @@ export function EditorialHeroFeed({ onOpenBooking }: EditorialHeroFeedProps) {
         {/* Eyebrow Pill */}
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-[#FFF2DE] text-[11px] sm:text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.22em] mb-6 shadow-sm">
           <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-          <span>Atención a Domicilio y Oficina • Lima</span>
+          <span>Atención en Estudio &amp; a Domicilio • Lima</span>
         </div>
 
         {/* Refined Headline */}
@@ -140,7 +140,7 @@ export function EditorialHeroFeed({ onOpenBooking }: EditorialHeroFeedProps) {
 
         {/* Clear, refined subtitle */}
         <p className="font-['Montserrat',sans-serif] text-sm sm:text-base md:text-lg text-white/90 font-light leading-relaxed max-w-2xl mx-auto mb-10 drop-shadow-sm">
-          Rituales de belleza de autor en la comodidad de tu hogar u oficina. Manicura, pedicura spa, masajes y cuidado facial profesional.
+          Rituales de belleza de autor en nuestro estudio de Pueblo Libre o en la comodidad de tu hogar u oficina. Manicura, pedicura spa, masajes y cuidado facial profesional.
         </p>
 
         {/* Action CTAs */}

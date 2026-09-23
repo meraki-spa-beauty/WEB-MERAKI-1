@@ -268,7 +268,7 @@ export function Header() {
                 </div>
 
                 <div className="mt-2 pt-2 border-t border-[#5E765E]/10 px-3 py-1.5 flex items-center justify-between text-[11px] text-[#5E765E] font-semibold tracking-normal normal-case">
-                  <span className="text-[#111111]/60 font-normal">A domicilio y oficina</span>
+                  <span className="text-[#111111]/60 font-normal">Estudio (Pueblo Libre) &amp; Domicilio</span>
                   <Link
                     to="/catalogo"
                     onClick={() => setCatalogDropdownOpen(false)}
@@ -524,7 +524,7 @@ export function Header() {
                   Políticas de Privacidad
                 </Link>
                 <span>•</span>
-                <span>A Domicilio &amp; Oficina</span>
+                <span>Estudio &amp; Domicilio</span>
               </div>
             </div>
           </div>

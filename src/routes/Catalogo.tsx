@@ -18,7 +18,8 @@ import {
   Truck,
   Clock,
   AlertCircle,
-  MessageSquare
+  MessageSquare,
+  MapPin
 } from 'lucide-react';
 
 function parseCategory(val: string | null): ServiceCategory | 'todos' {
@@ -114,7 +115,7 @@ export function Catalogo() {
   const buildWhatsAppLink = (service: CatalogService) => {
     const priceInfo = getServicePriceInfo(service);
     const variantText = priceInfo.isVariant ? ` (${priceInfo.label})` : '';
-    const message = `Hola Meraki Spa Beauty, deseo agendar el servicio *${service.name}*${variantText} de S/ ${priceInfo.pricePEN}. ¿Me podrían indicar disponibilidad y el costo de movilidad para mi distrito?`;
+    const message = `Hola Meraki Spa, deseo agendar el servicio *${service.name}*${variantText} de S/ ${priceInfo.pricePEN}. ¿Me podrían indicar disponibilidad para atención en su estudio de Pueblo Libre o a domicilio?`;
 
     return `https://wa.me/${SPA_INFO.whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -136,14 +137,14 @@ export function Catalogo() {
               Catálogo de Servicios &amp; Tarifas
             </h1>
             <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Todos nuestros servicios se realizan en la comodidad de tu casa u oficina con instrumental esterilizado, cosmética profesional y protocolos de bioseguridad.
+              Atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o en la comodidad de tu casa u oficina, con instrumental esterilizado, cosmética profesional y protocolos de bioseguridad.
             </p>
 
             {/* Direct Booking Reminder Bar */}
             <div className="inline-flex flex-wrap items-center justify-center gap-4 py-2.5 px-6 rounded-2xl bg-white/80 border border-[#5E765E]/20 shadow-sm text-xs text-[#111111]/80 max-w-3xl mx-auto">
               <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
-                <Truck className="w-4 h-4 text-[#D5A688]" />
-                <span>Movilidad según distrito</span>
+                <MapPin className="w-4 h-4 text-[#D5A688]" />
+                <span>Estudio en Pueblo Libre &amp; A Domicilio</span>
               </span>
               <span className="text-[#5E765E]/30 hidden sm:inline">•</span>
               <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">

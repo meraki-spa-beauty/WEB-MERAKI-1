@@ -75,7 +75,7 @@ export function Home() {
                 ¿Cómo funciona el servicio de Meraki?
               </h2>
               <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed">
-                Olvídate del tráfico y las salas de espera. Disfruta de un servicio de estética profesional sin salir de tu espacio personal o laboral.
+                Disfruta de una atención de estética profesional y bienestar en nuestro estudio de Pueblo Libre o sin salir de tu casa u oficina.
               </p>
             </div>
 
@@ -117,7 +117,7 @@ export function Home() {
                   Escríbenos por WhatsApp
                 </h3>
                 <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Indícanos qué servicio deseas, fecha, hora y distrito. Aseguras tu horario con el 40% de adelanto de la reserva.
+                  Indícanos tu servicio, fecha y si prefieres atención en estudio (Pueblo Libre) o a domicilio. Aseguras con el 40% de adelanto.
                 </p>
                 <div className="mt-4">
                   <Link
@@ -139,10 +139,10 @@ export function Home() {
                   <HomeIcon className="w-6 h-6 text-[#D5A688]" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Llegamos a tu Espacio
+                  En Estudio o a Domicilio
                 </h3>
                 <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Llegamos a tu casa u oficina con instrumental esterilizado, cosmética de alta gama y lámparas portátiles. ¡Tú solo relájate!
+                  Te recibimos en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o nos trasladamos a tu domicilio con instrumental esterilizado.
                 </p>
                 <div className="mt-4">
                   <span className="text-xs text-[#5E765E] font-medium flex items-center gap-1">
@@ -248,7 +248,7 @@ export function Home() {
                     Especialista en estética integral, cuidado de uñas, pestañas, masoterapia y faciales. Con el compromiso de que cada sesión sea un momento de desconexión y alegría personal.
                   </p>
                   <div className="pt-4 border-t border-[#5E765E]/15 flex items-center justify-between text-xs">
-                    <span className="text-[#111111]/70">Atención a domicilio y oficinas</span>
+                    <span className="text-[#111111]/70">En Estudio (Pueblo Libre) y a Domicilio</span>
                     <Link to="/nosotros" className="font-semibold text-[#5E765E] hover:underline">
                       Conoce más →
                     </Link>

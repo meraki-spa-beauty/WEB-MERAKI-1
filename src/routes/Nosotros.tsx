@@ -33,7 +33,7 @@ export function Nosotros() {
                   <span>Conoce Nuestra Esencia</span>
                 </div>
                 <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-6">
-                  ¡Bienvenid@ a Meraki Spa Beauty!
+                  ¡Bienvenid@ a Meraki Spa!
                 </h1>
                 <p className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl text-[#5E765E] italic mb-6">
                   “Tenemos como principal objetivo que te sientas feliz y empoderad@.”
@@ -42,7 +42,7 @@ export function Nosotros() {
                   Somos una marca liderada por <strong>Ana Maria Díaz</strong>, profesional con más de 10 años de experiencia en el mundo de la belleza, la estética integral y el bienestar.
                 </p>
                 <p className="text-sm sm:text-base text-[#111111]/80 font-light leading-relaxed mb-8">
-                  Nos acomodamos a tu ritmo y estilo de vida, llegando con todo lo que necesitas para disfrutar de una sesión de spa, uñas, pestañas, depilación, masajes o faciales en la comodidad de tu casa y/o lugar de trabajo.
+                  Nos acomodamos a tu ritmo y estilo de vida, recibiéndote en nuestro acogedor estudio en Pueblo Libre (Calle Agustín Gamarra 515) o llegando con todo lo que necesitas para disfrutar de una sesión de spa, uñas, pestañas, depilación, masajes o faciales en la comodidad de tu casa y/o lugar de trabajo.
                 </p>
 
                 <div className="flex flex-wrap gap-4">
@@ -91,7 +91,7 @@ export function Nosotros() {
                     </div>
                     <div className="flex items-start gap-2.5">
                       <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
-                      <span>Riguroso protocolo de esterilización y bioseguridad en cada servicio a domicilio u oficina.</span>
+                      <span>Riguroso protocolo de esterilización y bioseguridad en cada servicio en estudio o a domicilio/oficina.</span>
                     </div>
                     <div className="flex items-start gap-2.5">
                       <Heart className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />

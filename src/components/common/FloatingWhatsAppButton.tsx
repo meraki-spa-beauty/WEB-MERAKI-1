@@ -6,7 +6,7 @@ interface FloatingWhatsAppButtonProps {
 }
 
 export function FloatingWhatsAppButton({ customMessage }: FloatingWhatsAppButtonProps) {
-  const defaultMessage = 'Hola Meraki Spa Beauty, deseo solicitar información y reservar una experiencia.';
+  const defaultMessage = 'Hola Meraki Spa, deseo solicitar información y reservar una experiencia.';
   const message = customMessage || defaultMessage;
   const whatsappUrl = `${SPA_INFO.whatsappLink}?text=${encodeURIComponent(message)}`;
 
