@@ -367,8 +367,69 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. YouTube Shorts Reel Loop Controller
+  // 6. Mobile Hold Reel lateral slide exit on scroll
+  const heroMobileCard = document.getElementById('hero-mobile-reel-card');
+
+  if (heroMobileCard instanceof HTMLElement) {
+    let ticking = false;
+
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (!ticking) {
+          window.requestAnimationFrame(() => {
+            if (window.scrollY > 45) {
+              heroMobileCard.classList.add('is-scrolled-hidden');
+            } else {
+              heroMobileCard.classList.remove('is-scrolled-hidden');
+            }
+
+            ticking = false;
+          });
+
+          ticking = true;
+        }
+      },
+      { passive: true }
+    );
+  }
+
+  // 7. Responsive Alternating Left/Right Scroll Reveal
+  const revealElements = document.querySelectorAll<HTMLElement>('[data-reveal]');
+
+  if ('IntersectionObserver' in window && revealElements.length > 0) {
+    const revealObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed');
+
+            revealObserver.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+    );
+
+    revealElements.forEach((el) => {
+      revealObserver.observe(el);
+    });
+  }
+
+  // 8. YouTube Shorts Reel Loop Controller (Dual for desktop reel & mobile hold reel)
   const reelIframe = document.getElementById('workshop-reel-video');
+
+  const mobileHoldIframe = document.getElementById('mobile-hold-video');
+
+  const activeIframes: HTMLIFrameElement[] = [];
+
+  if (reelIframe instanceof HTMLIFrameElement) {
+    activeIframes.push(reelIframe);
+  }
+
+  if (mobileHoldIframe instanceof HTMLIFrameElement) {
+    activeIframes.push(mobileHoldIframe);
+  }
 
   interface YouTubeEventMessage {
     event?: string;
@@ -392,19 +453,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  if (reelIframe instanceof HTMLIFrameElement) {
-    // Auto-replay on end guarantee via postMessage
+  if (activeIframes.length > 0) {
+    // Auto-replay on end guarantee via postMessage for all active video iframes
     window.addEventListener('message', (event) => {
       if (isEndedYouTubeEvent(event)) {
-        reelIframe.contentWindow?.postMessage(
-          JSON.stringify({ event: 'command', func: 'seekTo', args: [0, true] }),
-          '*'
-        );
+        activeIframes.forEach((iframe) => {
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({ event: 'command', func: 'seekTo', args: [0, true] }),
+            '*'
+          );
 
-        reelIframe.contentWindow?.postMessage(
-          JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
-          '*'
-        );
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
+            '*'
+          );
+        });
       }
     });
 
@@ -413,8 +476,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
-            if (entry.isIntersecting) {
-              reelIframe.contentWindow?.postMessage(
+            if (entry.isIntersecting && entry.target instanceof HTMLIFrameElement) {
+              entry.target.contentWindow?.postMessage(
                 JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
                 '*'
               );
@@ -424,7 +487,10 @@ document.addEventListener('DOMContentLoaded', () => {
         { threshold: 0.25 }
       );
 
-      observer.observe(reelIframe);
+      activeIframes.forEach((iframe) => {
+        observer.observe(iframe);
+      });
     }
   }
 });
+

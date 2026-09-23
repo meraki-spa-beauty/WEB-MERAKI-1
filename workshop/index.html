@@ -46,6 +46,44 @@
       .font-script {
         font-family: 'Alex Brush', cursive;
       }
+
+      /* Animación de salida lateral para el video de bienvenida en mobile */
+      #hero-mobile-reel-card {
+        transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
+      }
+      #hero-mobile-reel-card.is-scrolled-hidden {
+        transform: translateX(115%) scale(0.92);
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      /* Animaciones responsive de revelado alternado izquierda / derecha */
+      [data-reveal="left"] {
+        opacity: 0;
+        transform: translateX(-24px);
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, opacity;
+      }
+      [data-reveal="right"] {
+        opacity: 0;
+        transform: translateX(24px);
+        transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        will-change: transform, opacity;
+      }
+      [data-reveal].is-revealed {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        #hero-mobile-reel-card,
+        [data-reveal="left"],
+        [data-reveal="right"] {
+          transition: none !important;
+          transform: none !important;
+          opacity: 1 !important;
+        }
+      }
     </style>
 
     <!-- Vite script entry -->
@@ -179,19 +217,36 @@
               </div>
             </div>
 
-            <!-- En Mobile: Imagen visible debajo del texto sin marco pesado -->
-            <div class="lg:col-span-5 block md:hidden pt-4">
-              <div class="overflow-hidden rounded-2xl border border-white/15 shadow-xl bg-black/30">
-                <img
-                  src="/assets/workshop/hero-desktop-bg.jpg"
-                  alt="Set de uñas Press On en caja con detalles de Halloween y Meraki"
-                  class="w-full h-auto object-cover"
-                  width="720"
-                  height="405"
-                />
-              </div>
-              <div class="font-script text-2xl text-[#E7C6E1] text-center mt-2.5 select-none">
-                Tu creatividad también es un ritual ♡
+            <!-- En Mobile: Video de Bienvenida "MANO OLLA" en el Hold con Ocultamiento Lateral al Scroll -->
+            <div class="lg:col-span-5 block md:hidden pt-4 pb-2 overflow-hidden">
+              <div
+                id="hero-mobile-reel-card"
+                class="relative ml-auto mr-1 max-w-[250px] w-[80%]"
+              >
+                <!-- Marco Reel estilo joya con resplandor suave y bordes curvos tipo smartphone -->
+                <div class="relative w-full aspect-[3/4] overflow-hidden rounded-[2.2rem] border-2 border-[#E7C6E1]/30 shadow-2xl bg-stone-950" style="isolation: isolate; transform: translateZ(0);">
+                  <iframe
+                    id="mobile-hold-video"
+                    src="https://www.youtube-nocookie.com/embed/1D0XcqXNhpU?autoplay=1&mute=1&loop=1&playlist=1D0XcqXNhpU&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&cc_load_policy=0"
+                    title="Mano Olla - Meraki Press On Nails Halloween Edition"
+                    class="object-cover"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowfullscreen
+                    loading="eager"
+                    style="position: absolute; top: 50%; left: 50%; width: 100%; height: 133.33%; transform: translate(-50%, -50%) scale(1.02); border: 0;"
+                  ></iframe>
+
+                  <!-- Badge chic de Halloween -->
+                  <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 text-[#FAF5F0] text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none select-none z-10">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#DDA77B] animate-pulse"></span>
+                    <span>🎃 Ritual de Temporada</span>
+                  </div>
+                </div>
+
+                <!-- Nota manuscrita decorativa alineada a la derecha -->
+                <div class="font-script text-xl text-[#F5D8EE] text-right pr-2 mt-2.5 select-none drop-shadow-xs">
+                  Tu creatividad también es un ritual ♡
+                </div>
               </div>
             </div>
 
@@ -200,30 +255,30 @@
       </section>
 
       <!-- SECCIÓN: ¿QUÉ VAS A APRENDER? (CON ISOTIPOS VECTORIALES) -->
-      <section id="tecnicas-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative border-b border-[#854E79]/10">
+      <section id="tecnicas-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative border-b border-[#A36395]/15">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
           
           <!-- Encabezado de la sección -->
           <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16 relative">
-            <span class="text-xs uppercase tracking-[0.25em] text-[#9D6092] font-semibold block mb-2">
-              TÉCNICAS Y DISEÑOS
+            <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block mb-2">
+              TÉCNICAS Y DISEÑOS · EDICIÓN HALLOWEEN
             </span>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-light text-[#3A1F34] leading-tight">
-              ¿Qué vas a <span class="font-serif-italic font-normal text-[#9D6092]">aprender?</span>
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-light text-[#5B3151] leading-tight">
+              ¿Qué vas a <span class="font-serif-italic font-normal text-[#B376A8]">aprender?</span>
             </h2>
             <p class="text-stone-600 text-xs sm:text-sm md:text-base mt-3 max-w-xl mx-auto leading-relaxed">
               Domina técnicas de tendencia y crea diseños únicos para esta temporada. No necesitas experiencia previa.
             </p>
             <!-- Murciélago decorativo de Halloween -->
-            <div class="text-xs opacity-40 mt-3 select-none text-[#854E79]">🦇</div>
+            <div class="text-xs opacity-40 mt-3 select-none text-[#A36395]">🦇</div>
           </div>
 
-          <!-- Grid de Técnicas con Isotipos Exclusivos (4 arriba + 3 abajo en Desktop, 2 cols en Mobile) -->
+          <!-- Grid de Técnicas con Isotipos Exclusivos y Alternancia Izquierda/Derecha -->
           <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5 sm:gap-6 max-w-5xl mx-auto">
             
-            <!-- 1. Cat Eye / Ojo de Gato -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+            <!-- 1. Cat Eye / Ojo de Gato (Izquierda) -->
+            <div data-reveal="left" class="bg-white border border-[#A36395]/15 border-l-3 border-l-[#DDA77B]/60 sm:border-l sm:border-l-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
                 <!-- Isotipo: Ojo de gato / Haz magnético -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor">
                   <ellipse cx="24" cy="24" rx="16" ry="21" stroke-width="2" />
@@ -233,42 +288,43 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Cat Eye
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Ojo de Gato</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Ojo de Gato</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Control de imanes para efectos magnéticos, halos y destellos cósmicos.
                 </p>
               </div>
             </div>
 
-            <!-- 2. Blooming -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
-                <!-- Isotipo: Blooming / Difusión orgánica líquida -->
-                <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
-                  <path d="M24 10C24 10 17 18 17 26C17 29.866 20.134 33 24 33C27.866 33 31 29.866 31 26C31 18 24 10 24 10Z" />
-                  <circle cx="24" cy="26" r="3" fill="currentColor" stroke="none" />
-                  <path d="M14 26C11 26 9 29 11 32" stroke-linecap="round" stroke-width="1.5" />
-                  <path d="M34 26C37 26 39 29 37 32" stroke-linecap="round" stroke-width="1.5" />
-                  <path d="M24 6V9" stroke-linecap="round" stroke-width="1.5" />
+            <!-- 2. Blooming Caldero (Derecha) -->
+            <div data-reveal="right" class="bg-white border border-[#A36395]/15 border-r-3 border-r-[#A36395]/60 sm:border-r sm:border-r-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+                <!-- Isotipo: Caldero de Poción & Difusión de Elixir -->
+                <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8">
+                  <ellipse cx="24" cy="16" rx="13" ry="3.5" />
+                  <path d="M11 16 C11 29, 37 29, 37 16" />
+                  <path d="M16 28 L13 36 M32 28 L35 36" stroke-linecap="round" />
+                  <circle cx="21" cy="10" r="1.5" fill="currentColor" />
+                  <circle cx="27" cy="8" r="1" fill="currentColor" />
+                  <circle cx="25" cy="12" r="1" fill="currentColor" />
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Blooming
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Difusión en Gel</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Difusión en Gel</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Efecto acuarela líquida para texturas orgánicas, humo y degradados.
                 </p>
               </div>
             </div>
 
-            <!-- 3. Chrome & Metalizados -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+            <!-- 3. Chrome & Metalizados (Izquierda) -->
+            <div data-reveal="left" class="bg-white border border-[#A36395]/15 border-l-3 border-l-[#DDA77B]/60 sm:border-l sm:border-l-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
                 <!-- Isotipo: Estrella especular / Acento metálico reflectivo -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M24 6L27 18L39 21L27 24L24 36L21 24L9 21L21 18L24 6Z" fill="currentColor" fill-opacity="0.2" />
@@ -277,19 +333,19 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Chrome &
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Metalizados</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Metalizados</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Aplicación pulida efecto espejo sin rayas y sellado de alta resistencia.
                 </p>
               </div>
             </div>
 
-            <!-- 4. Charms y Decoración 3D -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+            <!-- 4. Charms y Decoración 3D (Derecha) -->
+            <div data-reveal="right" class="bg-white border border-[#A36395]/15 border-r-3 border-r-[#A36395]/60 sm:border-r sm:border-r-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
                 <!-- Isotipo: Gema / Joya Facetada 3D -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 17L18 9H30L36 17L24 39L12 17Z" />
@@ -298,10 +354,10 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Charms y
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Decoración 3D</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Decoración 3D</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Fijación segura de pedrería, relieves y cristales temáticos.
                 </p>
@@ -310,12 +366,12 @@
 
           </div>
 
-          <!-- Fila Inferior (3 tarjetas centradas) -->
+          <!-- Fila Inferior (3 tarjetas centradas con alternancia) -->
           <div class="grid grid-cols-2 sm:grid-cols-3 gap-3.5 sm:gap-6 max-w-4xl mx-auto mt-3.5 sm:mt-6">
             
-            <!-- 5. Spider Web -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+            <!-- 5. Spider Web (Izquierda) -->
+            <div data-reveal="left" class="bg-white border border-[#A36395]/15 border-l-3 border-l-[#DDA77B]/60 sm:border-l sm:border-l-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
                 <!-- Isotipo: Spider Web elástica geométrica -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.8">
                   <path d="M8 8L40 40M8 40L40 8M8 24H40M24 8V40" stroke-width="1.2" stroke-opacity="0.4" />
@@ -325,19 +381,19 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Spider Web
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Trazos Elásticos</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Trazos Elásticos</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Líneas ultra finas y telarañas geométricas precisas con spider gel.
                 </p>
               </div>
             </div>
 
-            <!-- 6. Ghost -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+            <!-- 6. Ghost & Halloween Foil (Derecha) -->
+            <div data-reveal="right" class="bg-white border border-[#A36395]/15 border-r-3 border-r-[#A36395]/60 sm:border-r sm:border-r-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
                 <!-- Isotipo: Fantasmita chic minimalista -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M14 24C14 17.3726 18.4772 12 24 12C29.5228 12 34 17.3726 34 24V36C34 36 30 33 28 35C26 37 24 34 22 36C20 34 16 37 14 35V24Z" fill="currentColor" fill-opacity="0.15" />
@@ -347,20 +403,20 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
-                  Ghost
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
+                  Ghost Art
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Ilustración a Mano</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Ilustración a Mano</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Siluetas de fantasmitas temáticos con contrastes mate y relieve.
                 </p>
               </div>
             </div>
 
-            <!-- 7. Composición -->
-            <div class="col-span-2 sm:col-span-1 bg-white border border-[#854E79]/10 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#9D6092]/50 hover:shadow-md hover:-translate-y-1 flex flex-col items-center justify-between group">
-              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#854E79] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
-                <!-- Isotipo: Armonía y balance editorial -->
+            <!-- 7. Composición & Sellado (Izquierda) -->
+            <div data-reveal="left" class="col-span-2 sm:col-span-1 bg-white border border-[#A36395]/15 border-l-3 border-l-[#DDA77B]/60 sm:border-l sm:border-l-[#A36395]/15 rounded-2xl sm:rounded-3xl p-4 sm:p-6 text-center transition-all duration-300 hover:border-[#B376A8]/50 hover:shadow-lg hover:-translate-y-1 flex flex-col items-center justify-between group shadow-xs">
+              <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#A36395] text-[#FAF5F0] flex items-center justify-center mb-3 sm:mb-4 shadow-sm group-hover:scale-105 transition-transform">
+                <!-- Isotipo: Armonía, vela ritual y balance editorial -->
                 <svg class="w-8 h-8 text-[#F4D7C0]" viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="24" cy="24" r="15" stroke-dasharray="3 3" />
                   <rect x="18" y="18" width="12" height="12" rx="3" stroke-width="1.8" />
@@ -369,10 +425,10 @@
                 </svg>
               </div>
               <div>
-                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#3A1F34] leading-snug">
+                <h3 class="font-serif text-base sm:text-lg font-semibold text-[#5B3151] leading-snug">
                   Composición
                 </h3>
-                <span class="text-[11px] sm:text-xs text-[#9D6092] font-medium block mb-1.5">Armonía de Set</span>
+                <span class="text-[11px] sm:text-xs text-[#B376A8] font-medium block mb-1.5">Armonía de Set</span>
                 <p class="text-[11px] sm:text-xs text-stone-500 leading-relaxed hidden sm:block">
                   Equilibrio de colores, acabados glossy vs. mate y cohesión visual.
                 </p>
@@ -385,92 +441,119 @@
       </section>
 
       <!-- SECCIÓN: METODOLOGÍA (Y LO MÁS IMPORTANTE...) -->
-      <section class="py-16 sm:py-24 bg-[#F7EFE9] border-b border-[#854E79]/10">
+      <section class="py-16 sm:py-24 bg-[#F7EFE9] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           
           <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
-            <span class="text-xs uppercase tracking-[0.25em] text-[#9D6092] font-semibold block mb-2">
-              Y LO MÁS IMPORTANTE...
+            <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block mb-2">
+              ✦ Y LO MÁS IMPORTANTE... ✦
             </span>
-            <h2 class="text-3xl sm:text-4xl md:text-5xl font-light text-[#3A1F34] leading-tight">
+            <h2 class="text-3xl sm:text-4xl md:text-5xl font-light text-[#5B3151] leading-tight">
               Metodología
             </h2>
             <p class="text-stone-600 text-xs sm:text-sm md:text-base mt-3 max-w-xl mx-auto leading-relaxed">
-              Un taller práctico, guiado paso a paso, para que aprendas y te lleves resultados reales.
+              Un taller práctico y envolvente, guiado paso a paso para que aprendas técnicas de autor y te lleves resultados listos para usar.
             </p>
           </div>
 
-          <!-- 4 Pasos Metodológicos -->
+          <!-- 4 Pasos Metodológicos con ritmo alternado Izquierda / Derecha -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             
-            <!-- 01 Introducción -->
-            <div class="bg-white/80 backdrop-blur-xs border border-[#854E79]/10 rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full border border-[#854E79]/20 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#854E79]">
-                <!-- Icono Introducción / Materiales -->
+            <!-- 01 Introducción (Entrada izquierda) -->
+            <div
+              data-reveal="left"
+              class="bg-white/85 backdrop-blur-xs border border-[#A36395]/15 border-l-3 border-l-[#A36395] rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center hover:shadow-md transition-shadow"
+            >
+              <div class="w-12 h-12 rounded-full border border-[#A36395]/25 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#A36395]">
+                <!-- Icono Uñas Press On & Preparación -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <rect x="3" y="4" width="18" height="14" rx="2" stroke-width="1.8" />
-                  <path d="M8 20L12 18L16 20" stroke-width="1.8" stroke-linecap="round" />
+                  <path d="M12 2C9.5 2 7 6 7 13C7 16.5 9 22 12 22C15 22 17 16.5 17 13C17 6 14.5 2 12 2Z" stroke-width="1.8" />
+                  <path d="M7 11C9 12 15 12 17 11" stroke-width="1.5" stroke-dasharray="2 2" />
                 </svg>
               </div>
-              <div class="text-xs font-semibold text-[#9D6092] tracking-wider mb-1">01</div>
-              <h3 class="font-serif text-lg font-semibold text-[#3A1F34] mb-2">Introducción</h3>
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-[#B376A8] tracking-wider mb-1">
+                <span>01</span>
+                <span class="text-[10px]">✨</span>
+              </div>
+              <h3 class="font-serif text-lg font-semibold text-[#5B3151] mb-2">Introducción</h3>
               <p class="text-xs text-stone-600 leading-relaxed">
-                Conoce los materiales, herramientas y prepara tus uñas press on.
+                Conoce insumos profesionales, herramientas y mide tu set press on a la medida.
               </p>
             </div>
 
-            <!-- 02 Técnica guiada -->
-            <div class="bg-white/80 backdrop-blur-xs border border-[#854E79]/10 rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full border border-[#854E79]/20 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#854E79]">
-                <!-- Icono Pincel / Guía -->
+            <!-- 02 Técnica guiada (Entrada derecha) -->
+            <div
+              data-reveal="right"
+              class="bg-white/85 backdrop-blur-xs border border-[#A36395]/15 border-r-3 border-r-[#B376A8] rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center hover:shadow-md transition-shadow"
+            >
+              <div class="w-12 h-12 rounded-full border border-[#A36395]/25 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#A36395]">
+                <!-- Icono Pincel de Precisión & Trazo -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path d="M12 19L19 12L22 15L15 22L12 19Z" stroke-width="1.8" />
                   <path d="M18 13L9 4C8 3 6 3 5 4L4 5C3 6 3 8 4 9L13 18" stroke-width="1.8" />
                   <path d="M2 22C2 22 5 21 7 19" stroke-width="1.8" stroke-linecap="round" />
                 </svg>
               </div>
-              <div class="text-xs font-semibold text-[#9D6092] tracking-wider mb-1">02</div>
-              <h3 class="font-serif text-lg font-semibold text-[#3A1F34] mb-2">Técnica guiada</h3>
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-[#B376A8] tracking-wider mb-1">
+                <span>02</span>
+                <span class="text-[10px]">👁️</span>
+              </div>
+              <h3 class="font-serif text-lg font-semibold text-[#5B3151] mb-2">Técnica guiada</h3>
               <p class="text-xs text-stone-600 leading-relaxed">
-                Aprende cada técnica con acompañamiento personalizado.
+                Dominio de Spider Gel y Ojo de Dragón con acompañamiento personalizado.
               </p>
             </div>
 
-            <!-- 03 Diseño y práctica -->
-            <div class="bg-white/80 backdrop-blur-xs border border-[#854E79]/10 rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full border border-[#854E79]/20 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#854E79]">
-                <!-- Icono Destellos / Práctica -->
+            <!-- 03 Diseño y práctica (Entrada izquierda) -->
+            <div
+              data-reveal="left"
+              class="bg-white/85 backdrop-blur-xs border border-[#A36395]/15 border-l-3 border-l-[#A36395] rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center hover:shadow-md transition-shadow"
+            >
+              <div class="w-12 h-12 rounded-full border border-[#A36395]/25 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#A36395]">
+                <!-- Icono Caldero / Blooming Mágico -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2L14.5 9.5L22 12L14.5 14.5L12 22L9.5 14.5L2 12L9.5 9.5L12 2Z" stroke-width="1.8" />
+                  <path d="M5 9h14M7 9a5 5 0 0 0 10 0M4 19c0 1.1.9 2 2 2h12a2 2 0 0 0 2-2l-1-7H5l-1 7z" stroke-width="1.8" />
+                  <circle cx="12" cy="5" r="1.5" stroke-width="1.5" />
                 </svg>
               </div>
-              <div class="text-xs font-semibold text-[#9D6092] tracking-wider mb-1">03</div>
-              <h3 class="font-serif text-lg font-semibold text-[#3A1F34] mb-2">Diseño y práctica</h3>
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-[#B376A8] tracking-wider mb-1">
+                <span>03</span>
+                <span class="text-[10px]">🎃</span>
+              </div>
+              <h3 class="font-serif text-lg font-semibold text-[#5B3151] mb-2">Diseño y práctica</h3>
               <p class="text-xs text-stone-600 leading-relaxed">
-                Crea tus propios sets con los diseños de Halloween.
+                Aplica difuminados blooming y relieves 3D en tus propias uñas de Halloween chic.
               </p>
             </div>
 
-            <!-- 04 Finaliza y lleva -->
-            <div class="bg-white/80 backdrop-blur-xs border border-[#854E79]/10 rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center">
-              <div class="w-12 h-12 rounded-full border border-[#854E79]/20 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#854E79]">
-                <!-- Icono Corazón / Regalo -->
+            <!-- 04 Finaliza y lleva (Entrada derecha) -->
+            <div
+              data-reveal="right"
+              class="bg-white/85 backdrop-blur-xs border border-[#A36395]/15 border-r-3 border-r-[#B376A8] rounded-2xl p-5 sm:p-6 text-center shadow-xs flex flex-col items-center hover:shadow-md transition-shadow"
+            >
+              <div class="w-12 h-12 rounded-full border border-[#A36395]/25 bg-[#FBF8F5] flex items-center justify-center mb-3 text-[#A36395]">
+                <!-- Icono Regalo / Treat chic -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" stroke-width="1.8" />
+                  <rect x="3" y="8" width="18" height="13" rx="2" stroke-width="1.8" />
+                  <path d="M12 8v13M3 13h18" stroke-width="1.8" />
+                  <path d="M7.5 8a2.5 2.5 0 0 1 0-5c2 0 4.5 5 4.5 5s2.5-5 4.5-5a2.5 2.5 0 0 1 0 5" stroke-width="1.8" />
                 </svg>
               </div>
-              <div class="text-xs font-semibold text-[#9D6092] tracking-wider mb-1">04</div>
-              <h3 class="font-serif text-lg font-semibold text-[#3A1F34] mb-2">Finaliza y lleva</h3>
+              <div class="flex items-center gap-1.5 text-xs font-semibold text-[#B376A8] tracking-wider mb-1">
+                <span>04</span>
+                <span class="text-[10px]">🦇</span>
+              </div>
+              <h3 class="font-serif text-lg font-semibold text-[#5B3151] mb-2">Finaliza y lleva</h3>
               <p class="text-xs text-stone-600 leading-relaxed">
-                Te llevas tu set de uñas, una guía digital y mucho más.
+                Te llevas tu set completo en cajita de autor, tu guía digital y un regalo exclusivo.
               </p>
             </div>
 
           </div>
 
-          <!-- Botón de acción adicional (Visible en Mobile como en el mockup) -->
+          <!-- Botón de acción adicional (Visible en Mobile) -->
           <div class="mt-8 text-center sm:hidden">
-            <a href="#reserva-section" class="scroll-to-form inline-flex items-center justify-center gap-2 bg-[#854E79] text-white py-3 px-6 rounded-full font-medium text-xs w-full shadow-md">
+            <a href="#reserva-section" class="scroll-to-form inline-flex items-center justify-center gap-2 bg-[#A36395] hover:bg-[#8F5282] text-white py-3 px-6 rounded-full font-medium text-xs w-full shadow-md active:scale-95 transition-all">
               <span>Quiero reservar mi cupo</span>
               <span>→</span>
             </a>
@@ -480,12 +563,12 @@
       </section>
 
       <!-- SECCIÓN: ¿PARA QUIÉN ES ESTE WORKSHOP? -->
-      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10">
+      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
-            <!-- Columna Video: Demostración en bucle en formato vertical 4:3 (3:4) -->
-            <div class="lg:col-span-5 order-2 lg:order-1 flex flex-col items-center justify-center">
+            <!-- Columna Video: Demostración en bucle en formato vertical 4:3 (3:4) (Entrada izquierda) -->
+            <div data-reveal="left" class="lg:col-span-5 order-2 lg:order-1 flex flex-col items-center justify-center">
               <div class="relative w-full max-w-[320px] sm:max-w-[340px] mx-auto flex flex-col items-center">
                 
                 <!-- Contenedor vertical 4:3 (relación 3:4) que recorta zonas sup/inf para alinear con el texto -->
@@ -503,7 +586,7 @@
                     style="position: absolute; top: 50%; left: 50%; width: 100%; height: 133.33%; transform: translate(-50%, -50%) scale(1.02); border: 0;"
                   ></iframe>
 
-                  <!-- Badge flotante superior: Técnica Ojo de Dragón -->
+                  <!-- Badge flotante superior: Ojo de Dragón -->
                   <div class="absolute top-3.5 left-3.5 bg-black/60 backdrop-blur-md border border-white/20 text-[#FAF5F0] text-[10px] sm:text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none select-none z-10">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#E7C6E1] animate-pulse"></span>
                     <span>Ojo de Dragón</span>
@@ -511,47 +594,48 @@
                 </div>
 
                 <!-- Nota manuscrita decorativa centrada -->
-                <div class="font-script text-2xl sm:text-3xl text-[#B376A8] text-center mt-3 select-none">
-                  Tu set de uñas te espera ♡
+                <div class="font-script text-2xl sm:text-3xl text-[#B376A8] text-center mt-3 select-none flex items-center justify-center gap-2">
+                  <span>Tu set de uñas te espera</span>
+                  <span class="text-[#DDA77B]">♡</span>
                 </div>
               </div>
             </div>
 
-            <!-- Columna Texto y Checklist -->
-            <div class="lg:col-span-7 order-1 lg:order-2 space-y-4 text-left">
+            <!-- Columna Texto y Checklist (Entrada derecha) -->
+            <div data-reveal="right" class="lg:col-span-7 order-1 lg:order-2 space-y-4 text-left">
               <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block">
-                ESTE TALLER ES PARA TI SI...
+                ✦ ESTE TALLER ES PARA TI SI... ✦
               </span>
               <h2 class="text-3xl sm:text-4xl font-light text-[#5B3151] leading-tight">
                 ¿Para quién es este workshop?
               </h2>
 
               <div class="space-y-3 pt-2">
-                <div class="flex items-start gap-3">
-                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
-                  <span class="text-stone-700 text-xs sm:text-sm">Amas el mundo de la belleza y el nail art.</span>
+                <div class="flex items-start gap-3 p-2.5 rounded-xl bg-white/60 border border-[#A36395]/10">
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✦</span>
+                  <span class="text-stone-700 text-xs sm:text-sm">Amas el mundo de la belleza, la estética y el nail art moderno.</span>
                 </div>
-                <div class="flex items-start gap-3">
-                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
-                  <span class="text-stone-700 text-xs sm:text-sm">Quieres aprender una técnica en tendencia.</span>
+                <div class="flex items-start gap-3 p-2.5 rounded-xl bg-white/60 border border-[#A36395]/10">
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✦</span>
+                  <span class="text-stone-700 text-xs sm:text-sm">Quieres aprender técnicas profesionales en tendencia para tu propio uso o emprender.</span>
                 </div>
-                <div class="flex items-start gap-3">
-                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
-                  <span class="text-stone-700 text-xs sm:text-sm">Buscas una experiencia diferente y creativa.</span>
+                <div class="flex items-start gap-3 p-2.5 rounded-xl bg-white/60 border border-[#A36395]/10">
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✦</span>
+                  <span class="text-stone-700 text-xs sm:text-sm">Buscas una tarde diferente, creativa y de autocuidado en un ambiente cálido.</span>
                 </div>
-                <div class="flex items-start gap-3">
-                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✓</span>
-                  <span class="text-stone-700 text-xs sm:text-sm">Deseas consentirte y compartir con otras Mery girls.</span>
+                <div class="flex items-start gap-3 p-2.5 rounded-xl bg-white/60 border border-[#A36395]/10">
+                  <span class="text-[#A36395] font-bold text-sm mt-0.5">✦</span>
+                  <span class="text-stone-700 text-xs sm:text-sm">Deseas consentirte y compartir café, postres y risas con otras Mery girls.</span>
                 </div>
               </div>
 
-              <!-- Frase Manuscrita destacada con luna y murciélago -->
-              <div class="pt-4 flex items-center justify-between border-t border-[#A36395]/10 max-w-md">
+              <!-- Frase Manuscrita destacada con luna y murciélago sutiles -->
+              <div class="pt-4 flex items-center justify-between border-t border-[#A36395]/15 max-w-md">
                 <div class="font-script text-2xl sm:text-3xl text-[#A36395]">
                   No necesitas experiencia previa ♡
                 </div>
-                <div class="text-base select-none">
-                  🌙 🦇
+                <div class="text-base select-none opacity-80" title="Magia de Halloween">
+                  🌙 🦇 🎃
                 </div>
               </div>
             </div>
@@ -560,8 +644,8 @@
         </div>
       </section>
 
-      <!-- SECCIÓN: INVERSIÓN (BARRA PROFUNDA VINO) -->
-      <section class="bg-[#67355C] text-white py-10 sm:py-14 border-b border-[#A36395]/20">
+      <!-- SECCIÓN: INVERSIÓN (BARRA PROFUNDA VINO SUAVE) -->
+      <section class="bg-gradient-to-r from-[#5B3151] via-[#6B3B60] to-[#5B3151] text-white py-10 sm:py-14 border-b border-[#A36395]/20 shadow-inner">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 sm:gap-4 items-center text-center sm:text-left">
             
@@ -570,7 +654,7 @@
               <h3 class="font-serif text-2xl sm:text-3xl font-normal text-[#FAF5F0] mb-1">
                 Inversión
               </h3>
-              <p class="text-xs text-stone-300 leading-relaxed font-light">
+              <p class="text-xs text-stone-200 leading-relaxed font-light">
                 Todo lo que necesitas para vivir esta experiencia está incluido.
               </p>
             </div>
@@ -610,16 +694,16 @@
       </section>
 
       <!-- SECCIÓN: RESERVA TU CUPO (FORMULARIO INTERACTIVO) -->
-      <section id="reserva-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative">
+      <section id="reserva-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative overflow-hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           
           <!-- Contenedor Card Formulario + Foto decorativa -->
-          <div class="bg-[#F7EFE9] border border-[#854E79]/15 rounded-3xl p-6 sm:p-10 shadow-lg">
+          <div class="bg-[#F7EFE9] border border-[#A36395]/20 rounded-3xl p-6 sm:p-10 shadow-lg">
             <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
               
-              <!-- Foto Lateral izquierda -->
-              <div class="md:col-span-5 relative hidden md:block">
-                <div class="overflow-hidden rounded-2xl border border-[#854E79]/10 shadow-sm">
+              <!-- Foto Lateral izquierda (Entrada izquierda) -->
+              <div data-reveal="left" class="md:col-span-5 relative hidden md:block">
+                <div class="overflow-hidden rounded-2xl border border-[#A36395]/15 shadow-sm">
                   <img
                     src="/assets/workshop/reserva-pumpkin.png"
                     alt="Calabaza, velas y uñas de Halloween preparadas para el taller"
@@ -628,22 +712,26 @@
                     height="390"
                   />
                 </div>
-                <div class="font-script text-2xl text-[#9D6092] text-center mt-2 select-none">
-                  Tu set de uñas te espera ♡
+                <div class="font-script text-2xl text-[#B376A8] text-center mt-2 select-none flex items-center justify-center gap-1.5">
+                  <span>Tu set de uñas te espera</span>
+                  <span class="text-[#DDA77B]">♡</span>
                 </div>
               </div>
 
-              <!-- Formulario Derecho -->
-              <div class="md:col-span-7">
+              <!-- Formulario Derecho (Entrada derecha) -->
+              <div data-reveal="right" class="md:col-span-7">
                 <div class="mb-6 text-left relative">
-                  <h3 class="font-serif text-2xl sm:text-3xl text-[#3A1F34] font-medium mb-1">
+                  <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block mb-1">
+                    ✦ RITUAL DE APARTADO ✦
+                  </span>
+                  <h3 class="font-serif text-2xl sm:text-3xl text-[#5B3151] font-medium mb-1">
                     Reserva tu cupo
                   </h3>
                   <p class="text-xs sm:text-sm text-stone-600">
-                    Completa el formulario y asegura tu lugar. <span class="text-[#9D6092] font-semibold">(Los cupos son limitados)</span>
+                    Completa el formulario y asegura tu lugar. <span class="text-[#A36395] font-semibold">(Los cupos son limitados)</span>
                   </p>
                   <!-- Murciélago sutil decorativo -->
-                  <div class="absolute top-0 right-0 text-stone-400 opacity-40 select-none">🦇</div>
+                  <div class="absolute top-0 right-0 text-stone-400 opacity-40 select-none text-lg">🦇</div>
                 </div>
 
                 <form id="workshop-booking-form" class="space-y-4">
@@ -654,7 +742,7 @@
                       id="booking-name"
                       required
                       placeholder="Nombre completo"
-                      class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#854E79] focus:border-transparent transition-all shadow-2xs"
+                      class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#A36395] focus:border-transparent transition-all shadow-2xs"
                     />
                   </div>
 
@@ -669,7 +757,7 @@
                         id="booking-phone"
                         required
                         placeholder="Número de WhatsApp"
-                        class="w-full px-4 py-3 bg-white border border-stone-300 rounded-r-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#854E79] focus:border-transparent transition-all shadow-2xs"
+                        class="w-full px-4 py-3 bg-white border border-stone-300 rounded-r-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#A36395] focus:border-transparent transition-all shadow-2xs"
                       />
                     </div>
                   </div>
@@ -680,12 +768,12 @@
                       type="email"
                       id="booking-email"
                       placeholder="Correo electrónico (opcional)"
-                      class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#854E79] focus:border-transparent transition-all shadow-2xs"
+                      class="w-full px-4 py-3 bg-white border border-stone-300 rounded-xl text-stone-900 text-xs sm:text-sm placeholder-stone-400 focus:outline-none focus:ring-2 focus:ring-[#A36395] focus:border-transparent transition-all shadow-2xs"
                     />
                   </div>
 
                   <!-- Aviso informativo sobre la confirmación -->
-                  <div class="bg-[#854E79]/5 border border-[#854E79]/15 rounded-xl p-3 text-left">
+                  <div class="bg-[#A36395]/8 border border-[#A36395]/20 rounded-xl p-3 text-left">
                     <p class="text-[11px] text-stone-700 leading-snug">
                       ⚠️ <strong>Aviso importante:</strong> Al presionar el botón recibirás tu código de pre-reserva y los datos de Yape. Recuerda que el cupo se confirma únicamente al enviar tu comprobante del adelanto (S/ 50) por WhatsApp.
                     </p>
@@ -696,7 +784,7 @@
                     <button
                       type="submit"
                       id="submit-booking-btn"
-                      class="w-full bg-[#854E79] hover:bg-[#723E67] active:scale-[0.99] text-white font-medium text-sm sm:text-base py-3.5 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer"
+                      class="w-full bg-[#A36395] hover:bg-[#8F5282] active:scale-[0.99] text-white font-medium text-sm sm:text-base py-3.5 px-6 rounded-2xl shadow-md transition-all flex items-center justify-center gap-2.5 cursor-pointer"
                     >
                       <!-- Icono WhatsApp -->
                       <svg class="w-5 h-5 fill-current text-white" viewBox="0 0 24 24">
@@ -709,7 +797,7 @@
                   <!-- Seguridad / Garantía -->
                   <div class="pt-2 text-center flex items-center justify-center gap-1.5 text-[11px] text-stone-500">
                     <span>🔒</span>
-                    <span>Tu información está segura. Conoce nuestra <a href="/privacy" target="_blank" class="underline hover:text-[#854E79] transition-colors">política de privacidad</a>.</span>
+                    <span>Tu información está segura. Conoce nuestra <a href="/privacy" target="_blank" class="underline hover:text-[#A36395] transition-colors">política de privacidad</a>.</span>
                   </div>
                 </form>
               </div>
@@ -721,13 +809,13 @@
       </section>
 
       <!-- SECCIÓN: UBICACIÓN (NOS VEMOS EN JESÚS MARÍA) -->
-      <section class="py-16 bg-[#FAF5F9] border-b border-[#854E79]/15">
+      <section class="py-16 bg-[#FAF5F9] border-b border-[#A36395]/15 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             
-            <!-- Mapa interactivo de Google Maps con coordenadas exactas -->
-            <div class="md:col-span-6 relative">
-              <div class="relative overflow-hidden rounded-3xl border border-[#854E79]/20 shadow-md bg-stone-100 h-64 sm:h-72 group">
+            <!-- Mapa interactivo de Google Maps con coordenadas exactas (Entrada izquierda) -->
+            <div data-reveal="left" class="md:col-span-6 relative">
+              <div class="relative overflow-hidden rounded-3xl border border-[#A36395]/20 shadow-md bg-stone-100 h-64 sm:h-72 group">
                 <!-- Google Maps Embed interactivo centrado exactamente en Jirón Santo Domingo 153, Jesús María -->
                 <iframe
                   title="Ubicación del Workshop en Jirón Santo Domingo 153, Jesús María, Lima"
@@ -740,7 +828,7 @@
 
                 <!-- Overlay con botón Cómo llegar y chip de ubicación -->
                 <div class="absolute bottom-3 left-3 right-3 flex items-center justify-between pointer-events-none z-10">
-                  <div class="bg-white/95 backdrop-blur-xs text-[#3A1F34] text-[11px] font-semibold py-1.5 px-3 rounded-xl shadow-md flex items-center gap-1.5 pointer-events-auto border border-stone-200/80">
+                  <div class="bg-white/95 backdrop-blur-xs text-[#5B3151] text-[11px] font-semibold py-1.5 px-3 rounded-xl shadow-md flex items-center gap-1.5 pointer-events-auto border border-stone-200/80">
                     <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
                     <span>Jesús María, Lima</span>
                   </div>
@@ -748,7 +836,7 @@
                     href="https://www.google.com/maps/search/?api=1&query=-12.088877,-77.057752"
                     target="_blank"
                     rel="noopener noreferrer"
-                    class="bg-[#854E79] hover:bg-[#723E67] active:scale-95 text-white text-xs font-semibold py-2 px-3.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 pointer-events-auto cursor-pointer"
+                    class="bg-[#A36395] hover:bg-[#8F5282] active:scale-95 text-white text-xs font-semibold py-2 px-3.5 rounded-xl shadow-lg transition-all flex items-center gap-1.5 pointer-events-auto cursor-pointer"
                     title="Abrir en Google Maps"
                   >
                     <span>Cómo llegar</span>
@@ -758,12 +846,12 @@
               </div>
             </div>
 
-            <!-- Detalles del lugar -->
-            <div class="md:col-span-6 text-left space-y-3">
-              <span class="text-xs uppercase tracking-[0.25em] text-[#9D6092] font-semibold block">
-                UBICACIÓN
+            <!-- Detalles del lugar (Entrada derecha) -->
+            <div data-reveal="right" class="md:col-span-6 text-left space-y-3">
+              <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block">
+                ✦ UBICACIÓN ✦
               </span>
-              <h3 class="font-serif text-3xl text-[#3A1F34] font-normal">
+              <h3 class="font-serif text-3xl text-[#5B3151] font-normal">
                 Nos vemos en Jesús María
               </h3>
               <p class="text-stone-700 text-xs sm:text-sm leading-relaxed">
@@ -778,7 +866,7 @@
                   href="https://www.google.com/maps/search/?api=1&query=-12.088877,-77.057752"
                   target="_blank"
                   rel="noopener noreferrer"
-                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#854E79] hover:text-[#723E67] transition-colors"
+                  class="inline-flex items-center gap-1.5 text-xs font-semibold text-[#A36395] hover:text-[#8F5282] transition-colors"
                 >
                   <span>Ver en Google Maps</span>
                   <span>→</span>
@@ -791,14 +879,14 @@
       </section>
 
       <!-- SECCIÓN: PREGUNTAS FRECUENTES (¿TIENES DUDAS?) -->
-      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#854E79]/10">
+      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           
           <div class="text-center max-w-xl mx-auto mb-10">
-            <span class="text-xs uppercase tracking-[0.25em] text-[#9D6092] font-semibold block mb-2">
-              PREGUNTAS FRECUENTES
+            <span class="text-xs uppercase tracking-[0.25em] text-[#B376A8] font-semibold block mb-2">
+              ✦ PREGUNTAS FRECUENTES ✦
             </span>
-            <h3 class="text-3xl sm:text-4xl font-light text-[#3A1F34]">
+            <h3 class="text-3xl sm:text-4xl font-light text-[#5B3151]">
               ¿Tienes dudas?
             </h3>
             <p class="text-xs sm:text-sm text-stone-600 mt-2">
@@ -806,63 +894,63 @@
             </p>
           </div>
 
-          <!-- Acordeón interactivo -->
+          <!-- Acordeón interactivo con alternancia izquierda/derecha -->
           <div class="space-y-3 max-w-2xl mx-auto">
             
-            <!-- FAQ 1 -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- FAQ 1 (Entrada izquierda) -->
+            <div data-reveal="left" class="bg-white border border-[#A36395]/15 rounded-2xl overflow-hidden shadow-2xs">
               <button
                 type="button"
-                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#3A1F34] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#5B3151] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
                 aria-expanded="false"
               >
                 <span>¿Necesito tener experiencia previa?</span>
-                <span class="faq-icon text-[#9D6092] text-lg font-light transition-transform duration-200">+</span>
+                <span class="faq-icon text-[#A36395] text-lg font-light transition-transform duration-200">+</span>
               </button>
               <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-4 text-xs text-stone-600 leading-relaxed border-t border-transparent">
-                ¡Para nada! El taller empieza desde cero: desde cómo medir tu uña natural y prepararla correctamente, hasta el uso de geles y efectos.
+                ¡Para nada! El taller empieza desde cero: desde cómo medir tu uña natural y prepararla correctamente, hasta el uso de geles y efectos mágicos.
               </div>
             </div>
 
-            <!-- FAQ 2 -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- FAQ 2 (Entrada derecha) -->
+            <div data-reveal="right" class="bg-white border border-[#A36395]/15 rounded-2xl overflow-hidden shadow-2xs">
               <button
                 type="button"
-                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#3A1F34] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#5B3151] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
                 aria-expanded="false"
               >
                 <span>¿Qué materiales están incluidos?</span>
-                <span class="faq-icon text-[#9D6092] text-lg font-light transition-transform duration-200">+</span>
+                <span class="faq-icon text-[#A36395] text-lg font-light transition-transform duration-200">+</span>
               </button>
               <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-4 text-xs text-stone-600 leading-relaxed border-t border-transparent">
                 Todos los insumos para trabajar en clase están incluidos: tips de calidad, lámparas UV, geles de color, spider gel, pigmentos chrome, charms 3D y adhesivos. Además, te llevas tu set terminado a casa.
               </div>
             </div>
 
-            <!-- FAQ 3 -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- FAQ 3 (Entrada izquierda) -->
+            <div data-reveal="left" class="bg-white border border-[#A36395]/15 rounded-2xl overflow-hidden shadow-2xs">
               <button
                 type="button"
-                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#3A1F34] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#5B3151] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
                 aria-expanded="false"
               >
                 <span>¿Puedo llevar mis propios diseños o ideas?</span>
-                <span class="faq-icon text-[#9D6092] text-lg font-light transition-transform duration-200">+</span>
+                <span class="faq-icon text-[#A36395] text-lg font-light transition-transform duration-200">+</span>
               </button>
               <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-4 text-xs text-stone-600 leading-relaxed border-t border-transparent">
                 ¡Claro que sí! Contaremos con propuestas temáticas de Halloween guiadas paso a paso, pero tendrás total libertad creativa para adaptar colores y elementos a tu gusto personal.
               </div>
             </div>
 
-            <!-- FAQ 4 -->
-            <div class="bg-white border border-[#854E79]/10 rounded-2xl overflow-hidden shadow-2xs">
+            <!-- FAQ 4 (Entrada derecha) -->
+            <div data-reveal="right" class="bg-white border border-[#A36395]/15 rounded-2xl overflow-hidden shadow-2xs">
               <button
                 type="button"
-                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#3A1F34] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
+                class="faq-accordion-btn w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4 font-medium text-[#5B3151] text-xs sm:text-sm cursor-pointer hover:bg-stone-50 transition-colors"
                 aria-expanded="false"
               >
                 <span>¿Qué pasa si no puedo asistir?</span>
-                <span class="faq-icon text-[#9D6092] text-lg font-light transition-transform duration-200">+</span>
+                <span class="faq-icon text-[#A36395] text-lg font-light transition-transform duration-200">+</span>
               </button>
               <div class="max-h-0 overflow-hidden opacity-0 transition-all duration-300 px-4 sm:px-5 pb-4 text-xs text-stone-600 leading-relaxed border-t border-transparent">
                 Dado que los cupos son estrictamente limitados, el adelanto de S/ 50 no es reembolsable. Sin embargo, puedes transferir tu cupo a una amiga o familiar avisándonos con al menos 48 horas de anticipación.
@@ -871,8 +959,8 @@
 
           </div>
 
-          <!-- Tarjeta Móvil Decorativa con Frase de Autocuidado (como en el mockup móvil) -->
-          <div class="mt-8 max-w-sm mx-auto bg-[#45243E] text-[#FAF5F0] rounded-3xl p-6 text-center shadow-md">
+          <!-- Tarjeta Móvil Decorativa con Frase de Autocuidado -->
+          <div class="mt-8 max-w-sm mx-auto bg-gradient-to-br from-[#5B3151] to-[#3D1E36] text-[#FAF5F0] rounded-3xl p-6 text-center shadow-md border border-white/10">
             <div class="text-[#E8A5C2] text-sm mb-2">♡</div>
             <p class="font-script text-2xl text-[#F8E7D8] leading-relaxed">
               La creatividad también es una forma de autocuidado.
