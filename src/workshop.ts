@@ -146,8 +146,8 @@ function buildWhatsAppUrl(data: BookingData): string {
 Hola Ana María / Meraki Spa, deseo apartar mi cupo para el taller presencial:
 
 🎃 *Taller:* Meraki Press On Nails · Halloween Edition
-📅 *Fecha:* Sábado 26 de Octubre (10:30 a. m. – 2:30 p. m.)
-📍 *Lugar:* Jesús María (Cerca de la Municipalidad, Lima)
+📅 *Fecha:* Sábado 3 de Octubre (10:30 a. m. – 2:30 p. m.)
+📍 *Lugar:* Jirón Santo Domingo 153, Jesús María, Lima
 
 📋 *DATOS DE LA RESERVA:*
 • *Código:* ${data.id}
