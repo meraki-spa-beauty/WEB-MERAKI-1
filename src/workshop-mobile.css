@@ -42,7 +42,7 @@
   .mobile-edition::after { content: '✦'; margin-left: 10px; letter-spacing: 0; }
   .mobile-hero-description { max-width: 420px; margin: 0 0 27px; color: #5e545e; font-size: 14px; line-height: 1.65; }
 
-  .mobile-editorial-stage { display: grid; grid-template-columns: minmax(66px, 24%) minmax(0, 1fr); gap: 14px; align-items: start; }
+  .mobile-editorial-stage { display: grid; grid-template-columns: minmax(66px, 24%) minmax(0, 1fr); gap: 14px; align-items: stretch; }
   .mobile-date-rail { display: flex; flex-direction: column; align-items: flex-start; padding-top: 15px; color: var(--workshop-plum); }
   .mobile-date-day { color: var(--workshop-mauve); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
   .mobile-date-rail strong { margin: 2px 0 5px; font: 500 clamp(48px, 13vw, 72px)/.82 'Cormorant Garamond', Georgia, serif; letter-spacing: -.08em; }
@@ -50,9 +50,17 @@
   .mobile-date-rule { width: 100%; height: 1px; margin: 20px 0 16px; background: var(--workshop-line); }
   .mobile-date-time, .mobile-date-place { color: #5b505a; font-size: 11px; line-height: 1.55; }
   .mobile-date-place { margin-top: 25px; }
+
+  /* Indicador animado en bucle para incentivar el scroll */
+  .mobile-scroll-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; margin-top: auto; padding-top: 24px; padding-bottom: 4px; text-decoration: none; color: var(--workshop-plum); }
+  .mobile-scroll-cue-symbol { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid var(--workshop-line); background: rgba(255, 255, 255, 0.75); color: var(--workshop-plum); box-shadow: 0 4px 12px rgba(91, 49, 81, 0.08); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: mobileScrollBounce 1.9s ease-in-out infinite; }
+  .mobile-scroll-arrow { width: 14px; height: 14px; color: var(--workshop-plum); }
+  .mobile-scroll-cue-text { font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #a16a56; }
+  @keyframes mobileScrollBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
   .mobile-video-wrap { position: relative; min-width: 0; padding: 0 11px 11px 0; }
   .mobile-video-wrap::after { content: ''; position: absolute; inset: 12px 0 0 12px; border: 1px solid #c999a8; border-radius: 150px 150px 15px 15px; pointer-events: none; }
-  .mobile-video-frame { position: relative; z-index: 1; width: 100%; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 150px 150px 14px 14px; background: #221f29 url('/assets/workshop/hero-tray.png') center / cover no-repeat; box-shadow: 0 18px 30px #35253622; }
+  .mobile-video-frame { position: relative; z-index: 1; width: 100%; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 150px 150px 14px 14px; background: #221f29 url('/assets/workshop/instructora-flyer.webp') center / cover no-repeat; box-shadow: 0 18px 30px #35253622; }
   .mobile-video-frame::after { display: none; }
   .mobile-video-frame video, .mobile-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
   .mobile-hero-bottom { margin-top: 17px; border-top: 1px solid var(--workshop-line); }
@@ -169,4 +177,5 @@
 
 @media (prefers-reduced-motion: reduce) {
   #mobile-sticky-cta { transition: none; }
+  .mobile-scroll-cue-symbol { animation: none; }
 }
