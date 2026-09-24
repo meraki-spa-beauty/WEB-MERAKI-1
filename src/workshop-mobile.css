@@ -1,0 +1,180 @@
+/* The editorial layout belongs only to the workshop's small-screen view. */
+@media (max-width: 767px) {
+  .workshop-page {
+    --workshop-paper: #fbf8f5;
+    --workshop-ink: #352837;
+    --workshop-plum: #5b3151;
+    --workshop-mauve: #a36395;
+    --workshop-copper: #c48562;
+    --workshop-line: #decfd5;
+    color: var(--workshop-ink);
+    background: var(--workshop-paper);
+    overflow-x: clip;
+  }
+
+  .workshop-page :focus-visible {
+    outline: 3px solid var(--workshop-copper);
+    outline-offset: 3px;
+  }
+
+  .workshop-page header > div {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 6px;
+    height: 62px;
+    padding-inline: clamp(14px, 5vw, 30px);
+  }
+
+  .workshop-page header > div > a:first-child { justify-self: start; padding-inline: 0; white-space: nowrap; font-size: 11px; }
+  .workshop-page header > div > a:first-child svg { flex: none; }
+  .workshop-page header img { width: 49px; height: 43px; object-fit: contain; }
+  .workshop-page header > div > div:last-child { justify-self: end; }
+  .workshop-page header .scroll-to-form { min-height: 44px; padding: 8px 12px; border: 1px solid var(--workshop-plum); background: transparent; box-shadow: none; color: var(--workshop-plum); font-size: 10px; font-weight: 700; white-space: nowrap; }
+
+  .mobile-workshop-hero { padding: 30px 0 35px; background: radial-gradient(circle at 82% 25%, #f6eaf0 0, var(--workshop-paper) 44%); }
+  .mobile-workshop-shell { width: min(100%, 540px); margin: auto; padding-inline: clamp(16px, 5vw, 30px); }
+  .mobile-kicker { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; color: var(--workshop-plum); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .mobile-kicker::before { content: ''; flex: none; width: 21px; height: 1px; margin-right: 3px; background: var(--workshop-copper); }
+  .mobile-workshop-hero h1 { margin: 0; color: var(--workshop-plum); font: 500 clamp(46px, 13vw, 74px)/.87 'Cormorant Garamond', Georgia, serif; letter-spacing: -.055em; }
+  .mobile-workshop-hero h1 em { display: block; padding-left: 19%; color: var(--workshop-ink); font-weight: 400; }
+  .mobile-edition { margin: 23px 0 13px; color: #a16a56; font-size: 10px; font-weight: 700; letter-spacing: .27em; text-transform: uppercase; }
+  .mobile-edition::after { content: '✦'; margin-left: 10px; letter-spacing: 0; }
+  .mobile-hero-description { max-width: 420px; margin: 0 0 27px; color: #5e545e; font-size: 14px; line-height: 1.65; }
+
+  .mobile-editorial-stage { display: grid; grid-template-columns: minmax(66px, 24%) minmax(0, 1fr); gap: 14px; align-items: start; }
+  .mobile-date-rail { display: flex; flex-direction: column; align-items: flex-start; padding-top: 15px; color: var(--workshop-plum); }
+  .mobile-date-day { color: var(--workshop-mauve); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+  .mobile-date-rail strong { margin: 2px 0 5px; font: 500 clamp(48px, 13vw, 72px)/.82 'Cormorant Garamond', Georgia, serif; letter-spacing: -.08em; }
+  .mobile-date-month { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+  .mobile-date-rule { width: 100%; height: 1px; margin: 20px 0 16px; background: var(--workshop-line); }
+  .mobile-date-time, .mobile-date-place { color: #5b505a; font-size: 11px; line-height: 1.55; }
+  .mobile-date-place { margin-top: 25px; }
+  .mobile-video-wrap { position: relative; min-width: 0; padding: 0 11px 11px 0; }
+  .mobile-video-wrap::after { content: ''; position: absolute; inset: 12px 0 17px 12px; border: 1px solid #c999a8; border-radius: 150px 150px 15px 15px; pointer-events: none; }
+  .mobile-video-frame { position: relative; z-index: 1; width: 100%; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 150px 150px 14px 14px; background: #221f29 url('/assets/workshop/hero-tray.png') center / cover no-repeat; box-shadow: 0 18px 30px #35253622; }
+  .mobile-video-frame::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 60%, #21192390); pointer-events: none; }
+  .mobile-video-frame.is-playing::after { display: none; }
+  .mobile-video-frame img { width: 100%; height: 100%; object-fit: cover; }
+  .mobile-video-caption { position: absolute; z-index: 2; right: 15px; bottom: 20px; left: 17px; color: white; font: italic 500 clamp(20px, 6vw, 31px)/.95 'Cormorant Garamond', Georgia, serif; text-shadow: 0 1px 5px #0008; pointer-events: none; }
+  .mobile-video-play { position: absolute; z-index: 3; top: 50%; left: 50%; display: grid; place-items: center; width: 64px; height: 64px; transform: translate(-50%, -50%); border: 1px solid #fff9; border-radius: 50%; background: #fffdf5ed; color: var(--workshop-plum); box-shadow: 0 5px 18px #0003; cursor: pointer; }
+  .mobile-video-play svg { width: 21px; height: 21px; margin-left: 3px; }
+  .mobile-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+  .mobile-youtube-link { display: block; min-height: 35px; padding-top: 9px; color: #766a73; font-size: 11px; text-align: right; text-decoration: underline; text-underline-offset: 3px; }
+  .mobile-hero-bottom { margin-top: 17px; border-top: 1px solid var(--workshop-line); }
+  .mobile-hero-bottom p { margin: 0; padding: 16px 0; border-bottom: 1px solid var(--workshop-line); }
+  .mobile-hero-bottom strong { display: block; color: var(--workshop-plum); font: 500 27px/.95 'Cormorant Garamond', Georgia, serif; }
+  .mobile-hero-bottom p span { display: block; margin-top: 6px; color: #766a73; font-size: 11px; line-height: 1.4; }
+  .mobile-text-cta { display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 7px; color: var(--workshop-plum); font-size: 12px; font-weight: 700; }
+  .mobile-text-cta span { font-size: 21px; }
+
+  .workshop-page main > section:not(.mobile-workshop-hero), .workshop-page .mobile-workshop-interlude { padding-block: 55px; }
+  .workshop-page main > section:not(.mobile-workshop-hero) > div { max-width: 540px; padding-inline: clamp(20px, 6vw, 34px); }
+  .workshop-page main > section:not(.mobile-workshop-hero) h2, .workshop-page .workshop-faq h3, .workshop-page .workshop-reservation h3 { color: var(--workshop-plum); font: 500 clamp(38px, 10vw, 56px)/.92 'Cormorant Garamond', Georgia, serif; letter-spacing: -.045em; }
+  .workshop-page main > section:not(.mobile-workshop-hero) [class*="tracking-[0.25em]"] { color: var(--workshop-copper); font-size: 10px; line-height: 1.5; }
+  .workshop-page main > section:not(.mobile-workshop-hero) .text-center { text-align: left; }
+  .workshop-page main > section:not(.mobile-workshop-hero) p { font-size: 14px; line-height: 1.65; }
+  .workshop-page [data-reveal] { opacity: 1; transform: none; transition: none; will-change: auto; }
+  .workshop-page section { scroll-margin-top: 76px; }
+
+  .workshop-techniques > div > div:first-child { margin-bottom: 27px; }
+  .workshop-techniques > div > div:first-child .opacity-40 { display: none; }
+  .workshop-techniques > div > .grid { display: block; max-width: none; margin-top: 0; }
+  .workshop-techniques > div > .grid:nth-child(2) { border-top: 1px solid var(--workshop-line); }
+  .workshop-techniques { counter-reset: technique; }
+  .workshop-techniques .grid > [data-reveal] { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 8px; align-items: start; padding: 16px 0; border: 0; border-bottom: 1px solid var(--workshop-line); border-radius: 0; background: transparent; box-shadow: none; text-align: left; }
+  .workshop-techniques .grid > [data-reveal]::before { counter-increment: technique; content: counter(technique, decimal-leading-zero); color: var(--workshop-copper); font: italic 23px 'Cormorant Garamond', Georgia, serif; }
+  .workshop-techniques .grid > [data-reveal] > div:first-child { display: none; }
+  .workshop-techniques .grid > [data-reveal] h3 { color: var(--workshop-plum); font: 500 26px/.95 'Cormorant Garamond', Georgia, serif; }
+  .workshop-techniques .grid > [data-reveal] span { margin-top: 3px; color: #766a73; font-size: 11px; }
+  .workshop-techniques .grid > [data-reveal] p { display: block; margin-top: 8px; color: #5e545e; font-size: 12px !important; }
+
+  .workshop-method { background: #f9f2f8; }
+  .workshop-method > div > div:first-child { margin-bottom: 28px; }
+  .workshop-method > div > .grid { display: block; }
+  .workshop-method .grid > [data-reveal] { display: grid; grid-template-columns: 44px minmax(0, 1fr); column-gap: 13px; align-items: start; padding: 18px 0; border: 0; border-top: 1px solid var(--workshop-line); border-radius: 0; background: transparent; box-shadow: none; text-align: left; }
+  .workshop-method .grid > [data-reveal]:last-child { border-bottom: 1px solid var(--workshop-line); }
+  .workshop-method .grid > [data-reveal] > div:first-child { display: none; }
+  .workshop-method .grid > [data-reveal] > div:nth-child(2) { grid-column: 1; grid-row: 1 / span 2; color: var(--workshop-mauve); font: italic 27px 'Cormorant Garamond', Georgia, serif; }
+  .workshop-method .grid > [data-reveal] > div:nth-child(2) span:last-child { display: none; }
+  .workshop-method .grid > [data-reveal] h3 { grid-column: 2; color: var(--workshop-plum); font: 500 26px/.95 'Cormorant Garamond', Georgia, serif; }
+  .workshop-method .grid > [data-reveal] p { grid-column: 2; margin: 4px 0 0; color: #5e545e; font-size: 13px !important; }
+  .workshop-method .sm\:hidden { display: none; }
+
+  .mobile-workshop-interlude { background: #ece1e8; }
+  .mobile-workshop-interlude > a { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 17px; align-items: center; width: min(100%, 540px); margin: auto; padding-inline: clamp(20px, 6vw, 34px); }
+  .mobile-workshop-interlude img { width: 86px; height: 106px; border-radius: 65px 65px 5px 5px; object-fit: cover; }
+  .mobile-interlude-copy small { display: block; margin-bottom: 7px; color: var(--workshop-mauve); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+  .mobile-interlude-copy strong { display: block; color: var(--workshop-plum); font: 500 29px/.95 'Cormorant Garamond', Georgia, serif; }
+  .mobile-interlude-copy > span { display: block; margin-top: 8px; color: #5e545e; font-size: 11px; text-decoration: underline; text-underline-offset: 3px; }
+
+  .workshop-audience [data-reveal="left"] { display: none; }
+  .workshop-audience [data-reveal="right"] > .space-y-3 { margin-top: 20px; }
+  .workshop-audience [data-reveal="right"] > .space-y-3 > div { padding: 13px 0; border: 0; border-bottom: 1px solid var(--workshop-line); border-radius: 0; background: transparent; }
+  .workshop-audience [data-reveal="right"] > .space-y-3 > div span:first-child { color: var(--workshop-copper); }
+  .workshop-audience [data-reveal="right"] > .space-y-3 > div span:last-child { color: #514a52; font-size: 13px; line-height: 1.55; }
+  .workshop-audience [data-reveal="right"] > div:last-child > div:last-child { display: none; }
+
+  .workshop-investment { background: var(--workshop-plum); box-shadow: none; }
+  .workshop-investment > div > div { display: grid; grid-template-columns: 1fr 1fr; gap: 0 18px; text-align: left; }
+  .workshop-investment > div > div > div:first-child { grid-column: 1 / -1; padding: 0 0 15px; border: 0; }
+  .workshop-investment h3 { font-size: 40px; }
+  .workshop-investment > div > div > div:nth-child(2) { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 12px; margin: 12px 0 19px; padding: 21px 0; border-top: 1px solid #ffffff58; border-bottom: 1px solid #ffffff58; }
+  .workshop-investment > div > div > div:nth-child(2) > div:first-child { font: 400 clamp(65px, 18vw, 84px)/.8 'Cormorant Garamond', Georgia, serif; }
+  .workshop-investment > div > div > div:nth-child(2) > div:last-child { max-width: 110px; color: #f5dce9; font-size: 10px; }
+  .workshop-investment > div > div > div:nth-child(n+3) { padding: 0; border: 0; }
+  .workshop-investment > div > div > div:nth-child(n+3) > div:first-child { font: 500 31px/.95 'Cormorant Garamond', Georgia, serif; }
+  .workshop-investment > div > div > div:nth-child(n+3) > div:last-child { color: #f5dce9; font-size: 10px; line-height: 1.5; }
+
+  .workshop-reservation { background: #fffdfa; }
+  .workshop-reservation > div > div { padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  .workshop-reservation [data-reveal="right"] > div:first-child { margin-bottom: 25px; }
+  .workshop-reservation [data-reveal="right"] > div:first-child > div:last-child { display: none; }
+  .workshop-reservation form { display: grid; gap: 15px; }
+  .mobile-field-label { display: block; margin-bottom: 7px; color: var(--workshop-plum); font-size: 11px; font-weight: 700; }
+  .mobile-field-label span { color: #766a73; font-weight: 400; }
+  .workshop-reservation input { min-height: 52px; border-color: #d8c8d0; border-radius: 7px; background: white; color: var(--workshop-ink); font-size: 16px; }
+  .workshop-reservation input:focus-visible { border-color: var(--workshop-mauve); box-shadow: 0 0 0 3px #a363952c; }
+  .workshop-reservation form > div:nth-child(4) { border-radius: 7px; }
+  .workshop-reservation form > div:nth-child(4) p { font-size: 12px !important; }
+  .workshop-reservation #submit-booking-btn { min-height: 52px; border-radius: 99px; background: var(--workshop-plum); font-size: 13px; }
+  .workshop-reservation form > div:last-child { font-size: 11px; }
+
+  .workshop-location { background: #f3e9ef; }
+  .workshop-location > div > .grid { gap: 23px; }
+  .workshop-location [data-reveal="right"] { order: -1; }
+  .workshop-location [data-reveal="right"] h3 { color: var(--workshop-plum); font-size: 36px; line-height: .95; }
+  .workshop-location [data-reveal="right"] p, .workshop-location [data-reveal="right"] > div { color: #5e545e; font-size: 13px; }
+  .workshop-location [data-reveal="left"] > div { border-radius: 10px; box-shadow: none; }
+  .workshop-location iframe { border-radius: 10px; }
+  .workshop-location [data-reveal="left"] a { min-height: 44px; }
+
+  .workshop-faq > div > div:first-child { margin-bottom: 26px; }
+  .workshop-faq > div > .space-y-3 { margin: 0; border-top: 1px solid var(--workshop-line); }
+  .workshop-faq > div > .space-y-3 > div { margin: 0; border: 0; border-bottom: 1px solid var(--workshop-line); border-radius: 0; background: transparent; box-shadow: none; }
+  .workshop-faq .faq-accordion-btn { min-height: 58px; padding: 15px 0; background: transparent; color: var(--workshop-plum); font-size: 13px; line-height: 1.4; }
+  .workshop-faq .faq-accordion-btn + div { padding-inline: 0; color: #5e545e; font-size: 13px; line-height: 1.65; }
+  .workshop-faq > div > div:last-child { border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+  .workshop-faq > div > div:last-child p { color: var(--workshop-plum); font: italic 28px 'Cormorant Garamond', Georgia, serif; }
+  .workshop-footer { padding-bottom: 105px; background: #37263a; }
+  .workshop-footer > div { max-width: 540px; padding-inline: clamp(20px, 6vw, 34px); }
+
+  #mobile-sticky-cta { position: fixed; z-index: 39; right: 0; bottom: 0; left: 0; display: flex; align-items: center; justify-content: space-between; max-width: 540px; min-height: 52px; margin: 0 auto; padding: 13px 20px calc(13px + env(safe-area-inset-bottom)); border: 9px solid var(--workshop-paper); border-bottom: 0; border-radius: 35px 35px 0 0; background: var(--workshop-plum); box-shadow: 0 -3px 18px #35253622; color: #fffaf6; font-size: 12px; font-weight: 700; opacity: 0; pointer-events: none; transform: translateY(110%); transition: opacity .2s ease, transform .2s ease; }
+  #mobile-sticky-cta.is-visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  #mobile-sticky-cta span { font-size: 20px; }
+}
+
+@media (max-width: 359px) {
+  .mobile-editorial-stage { grid-template-columns: 66px minmax(0, 1fr); gap: 10px; }
+  .mobile-video-wrap { padding-right: 8px; }
+  .mobile-video-wrap::after { left: 8px; }
+  .mobile-video-caption { right: 12px; bottom: 15px; left: 12px; font-size: 20px; }
+}
+
+@media (min-width: 768px) {
+  #mobile-sticky-cta { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mobile-sticky-cta { transition: none; }
+}

@@ -47,16 +47,6 @@
         font-family: 'Alex Brush', cursive;
       }
 
-      /* Animación de salida lateral para el video de bienvenida en mobile */
-      #hero-mobile-reel-card {
-        transition: transform 0.65s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.5s ease;
-      }
-      #hero-mobile-reel-card.is-scrolled-hidden {
-        transform: translateX(115%) scale(0.92);
-        opacity: 0;
-        pointer-events: none;
-      }
-
       /* Animaciones responsive de revelado alternado izquierda / derecha */
       [data-reveal="left"] {
         opacity: 0;
@@ -76,7 +66,6 @@
       }
 
       @media (prefers-reduced-motion: reduce) {
-        #hero-mobile-reel-card,
         [data-reveal="left"],
         [data-reveal="right"] {
           transition: none !important;
@@ -89,7 +78,7 @@
     <!-- Vite script entry -->
     <script type="module" src="/src/workshop.ts"></script>
   </head>
-  <body class="bg-[#FBF8F5] text-[#3A1F34] antialiased selection:bg-[#854E79] selection:text-white">
+  <body class="workshop-page bg-[#FBF8F5] text-[#3A1F34] antialiased selection:bg-[#854E79] selection:text-white">
 
     <!-- TOP NAVIGATION BAR -->
     <header class="sticky top-0 z-40 bg-[#FBF8F5]/90 backdrop-blur-md border-b border-[#854E79]/10 transition-all">
@@ -118,9 +107,44 @@
     </header>
 
     <main id="main-content">
+      <!-- Mobile-only editorial opening. The booking flow below remains shared. -->
+      <section class="mobile-workshop-hero md:hidden" aria-labelledby="mobile-workshop-title">
+        <div class="mobile-workshop-shell">
+          <p class="mobile-kicker">Taller presencial <span aria-hidden="true">·</span> Jesús María, Lima</p>
+          <h1 id="mobile-workshop-title">Meraki Press On <em>Workshop</em></h1>
+          <p class="mobile-edition">Halloween edition</p>
+          <p class="mobile-hero-description">Crea, diseña y lleva contigo un set de uñas press on únicas. Aprende técnicas profesionales y dale un toque especial a tu estilo en esta edición de Halloween.</p>
+
+          <div class="mobile-editorial-stage">
+            <div class="mobile-date-rail" aria-label="Sábado 3 de octubre, de 10:30 am a 2:30 pm en Jesús María, Lima">
+              <span class="mobile-date-day">Sábado</span>
+              <strong>03</strong>
+              <span class="mobile-date-month">Oct</span>
+              <span class="mobile-date-rule" aria-hidden="true"></span>
+              <span class="mobile-date-time">10:30 am<br>— 2:30 pm</span>
+              <span class="mobile-date-place">Jesús María<br>Lima, Perú</span>
+            </div>
+            <div class="mobile-video-wrap">
+              <div class="mobile-video-frame" id="mobile-video-frame">
+                <img src="https://img.youtube.com/vi/1D0XcqXNhpU/hqdefault.jpg" alt="Vista previa del video del workshop Meraki Press On" width="480" height="360" fetchpriority="high">
+                <span class="mobile-video-caption" aria-hidden="true">El arte está en tus manos</span>
+                <button type="button" id="mobile-video-play" class="mobile-video-play" aria-label="Reproducir video del workshop">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 11 7-11 7V5Z" fill="currentColor"/></svg>
+                </button>
+              </div>
+              <a class="mobile-youtube-link" href="https://www.youtube.com/shorts/1D0XcqXNhpU" target="_blank" rel="noopener noreferrer">Abrir en YouTube <span aria-hidden="true">↗</span></a>
+            </div>
+          </div>
+
+          <div class="mobile-hero-bottom">
+            <p><strong>S/50 para reservar</strong><span>Inversión total S/180 · saldo S/130 el día del taller</span></p>
+            <a href="#reserva-section" class="scroll-to-form mobile-text-cta">Quiero crear mi set press on <span aria-hidden="true">↗</span></a>
+          </div>
+        </div>
+      </section>
       
       <!-- HERO SECTION (EDICIÓN HALLOWEEN) -->
-      <section class="relative bg-gradient-to-b from-[#522948] via-[#67355C] to-[#562D4B] text-white pt-10 pb-6 sm:pt-16 sm:pb-14 overflow-hidden border-b border-[#A36395]/20">
+      <section class="hidden md:block relative bg-gradient-to-b from-[#522948] via-[#67355C] to-[#562D4B] text-white pt-10 pb-6 sm:pt-16 sm:pb-14 overflow-hidden border-b border-[#A36395]/20">
         
         <!-- FOTOGRAFÍA OFICIAL DE FONDO (SPAN COMPLETO) -->
         <div class="absolute inset-0 w-full h-full pointer-events-none overflow-hidden hidden md:block select-none z-0">
@@ -217,45 +241,12 @@
               </div>
             </div>
 
-            <!-- En Mobile: Video de Bienvenida "MANO OLLA" en el Hold con Ocultamiento Lateral al Scroll -->
-            <div class="lg:col-span-5 block md:hidden pt-4 pb-2 overflow-hidden">
-              <div
-                id="hero-mobile-reel-card"
-                class="relative ml-auto mr-1 max-w-[250px] w-[80%]"
-              >
-                <!-- Marco Reel estilo joya con resplandor suave y bordes curvos tipo smartphone -->
-                <div class="relative w-full aspect-[3/4] overflow-hidden rounded-[2.2rem] border-2 border-[#E7C6E1]/30 shadow-2xl bg-stone-950" style="isolation: isolate; transform: translateZ(0);">
-                  <iframe
-                    id="mobile-hold-video"
-                    src="https://www.youtube-nocookie.com/embed/1D0XcqXNhpU?autoplay=1&mute=1&loop=1&playlist=1D0XcqXNhpU&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&cc_load_policy=0"
-                    title="Mano Olla - Meraki Press On Nails Halloween Edition"
-                    class="object-cover"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen
-                    loading="eager"
-                    style="position: absolute; top: 50%; left: 50%; width: 100%; height: 133.33%; transform: translate(-50%, -50%) scale(1.02); border: 0;"
-                  ></iframe>
-
-                  <!-- Badge chic de Halloween -->
-                  <div class="absolute top-3 left-3 bg-black/70 backdrop-blur-md border border-white/20 text-[#FAF5F0] text-[10px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none select-none z-10">
-                    <span class="w-1.5 h-1.5 rounded-full bg-[#DDA77B] animate-pulse"></span>
-                    <span>🎃 Ritual de Temporada</span>
-                  </div>
-                </div>
-
-                <!-- Nota manuscrita decorativa alineada a la derecha -->
-                <div class="font-script text-xl text-[#F5D8EE] text-right pr-2 mt-2.5 select-none drop-shadow-xs">
-                  Tu creatividad también es un ritual ♡
-                </div>
-              </div>
-            </div>
-
           </div>
         </div>
       </section>
 
       <!-- SECCIÓN: ¿QUÉ VAS A APRENDER? (CON ISOTIPOS VECTORIALES) -->
-      <section id="tecnicas-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative border-b border-[#A36395]/15">
+      <section id="tecnicas-section" class="workshop-techniques py-16 sm:py-24 bg-[#FBF8F5] relative border-b border-[#A36395]/15">
         <div class="max-w-6xl mx-auto px-4 sm:px-6">
           
           <!-- Encabezado de la sección -->
@@ -441,7 +432,7 @@
       </section>
 
       <!-- SECCIÓN: METODOLOGÍA (Y LO MÁS IMPORTANTE...) -->
-      <section class="py-16 sm:py-24 bg-[#F7EFE9] border-b border-[#A36395]/10 overflow-hidden">
+      <section class="workshop-method py-16 sm:py-24 bg-[#F7EFE9] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           
           <div class="text-center max-w-2xl mx-auto mb-12 sm:mb-16">
@@ -562,8 +553,15 @@
         </div>
       </section>
 
+      <div class="mobile-workshop-interlude md:hidden">
+        <a href="https://www.youtube.com/shorts/3Neet7VSojM" target="_blank" rel="noopener noreferrer" aria-label="Ver demostración de Ojo de Dragón en YouTube">
+          <img src="https://img.youtube.com/vi/3Neet7VSojM/hqdefault.jpg" alt="Vista previa de la técnica Ojo de Dragón" width="480" height="360" loading="lazy">
+          <span class="mobile-interlude-copy"><small>Una técnica en acción</small><strong>Ojo de Dragón</strong><span>Ver demostración ↗</span></span>
+        </a>
+      </div>
+
       <!-- SECCIÓN: ¿PARA QUIÉN ES ESTE WORKSHOP? -->
-      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
+      <section class="workshop-audience py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
             
@@ -645,7 +643,7 @@
       </section>
 
       <!-- SECCIÓN: INVERSIÓN (BARRA PROFUNDA VINO SUAVE) -->
-      <section class="bg-gradient-to-r from-[#5B3151] via-[#6B3B60] to-[#5B3151] text-white py-10 sm:py-14 border-b border-[#A36395]/20 shadow-inner">
+      <section class="workshop-investment bg-gradient-to-r from-[#5B3151] via-[#6B3B60] to-[#5B3151] text-white py-10 sm:py-14 border-b border-[#A36395]/20 shadow-inner">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 sm:grid-cols-4 gap-6 sm:gap-4 items-center text-center sm:text-left">
             
@@ -694,7 +692,7 @@
       </section>
 
       <!-- SECCIÓN: RESERVA TU CUPO (FORMULARIO INTERACTIVO) -->
-      <section id="reserva-section" class="py-16 sm:py-24 bg-[#FBF8F5] relative overflow-hidden">
+      <section id="reserva-section" class="workshop-reservation py-16 sm:py-24 bg-[#FBF8F5] relative overflow-hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           
           <!-- Contenedor Card Formulario + Foto decorativa -->
@@ -737,6 +735,7 @@
                 <form id="workshop-booking-form" class="space-y-4">
                   <!-- Nombre completo -->
                   <div>
+                    <label class="mobile-field-label md:hidden" for="booking-name">Nombre completo</label>
                     <input
                       type="text"
                       id="booking-name"
@@ -748,6 +747,7 @@
 
                   <!-- Número de WhatsApp -->
                   <div>
+                    <label class="mobile-field-label md:hidden" for="booking-phone">WhatsApp</label>
                     <div class="relative flex">
                       <span class="inline-flex items-center px-3.5 rounded-l-xl border border-r-0 border-stone-300 bg-stone-100 text-stone-600 text-xs font-medium">
                         +51
@@ -764,6 +764,7 @@
 
                   <!-- Correo electrónico (opcional) -->
                   <div>
+                    <label class="mobile-field-label md:hidden" for="booking-email">Correo electrónico <span>(opcional)</span></label>
                     <input
                       type="email"
                       id="booking-email"
@@ -809,7 +810,7 @@
       </section>
 
       <!-- SECCIÓN: UBICACIÓN (NOS VEMOS EN JESÚS MARÍA) -->
-      <section class="py-16 bg-[#FAF5F9] border-b border-[#A36395]/15 overflow-hidden">
+      <section class="workshop-location py-16 bg-[#FAF5F9] border-b border-[#A36395]/15 overflow-hidden">
         <div class="max-w-5xl mx-auto px-4 sm:px-6">
           <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
             
@@ -879,7 +880,7 @@
       </section>
 
       <!-- SECCIÓN: PREGUNTAS FRECUENTES (¿TIENES DUDAS?) -->
-      <section class="py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
+      <section class="workshop-faq py-16 sm:py-24 bg-[#FBF8F5] border-b border-[#A36395]/10 overflow-hidden">
         <div class="max-w-4xl mx-auto px-4 sm:px-6">
           
           <div class="text-center max-w-xl mx-auto mb-10">
@@ -972,8 +973,10 @@
 
     </main>
 
+    <a id="mobile-sticky-cta" class="scroll-to-form" href="#reserva-section">Apartar cupo · S/50 <span aria-hidden="true">↗</span></a>
+
     <!-- FOOTER ESTILO MOCKUP -->
-    <footer class="bg-[#562D4B] text-[#F5D8EE] py-12 border-t border-[#A36395]">
+    <footer class="workshop-footer bg-[#562D4B] text-[#F5D8EE] py-12 border-t border-[#A36395]">
       <div class="max-w-5xl mx-auto px-4 sm:px-6 text-center space-y-6">
         
         <!-- Logo Blanco Oficial -->
