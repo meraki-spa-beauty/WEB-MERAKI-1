@@ -368,32 +368,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Mount the vertical Short only after the visitor asks to play it.
-  const mobileVideoFrame = document.getElementById('mobile-video-frame');
-  const mobileVideoPlay = document.getElementById('mobile-video-play');
-  const mobileVideoPoster = mobileVideoFrame?.querySelector('img');
-
-  // The local workshop art remains visible if YouTube's thumbnail is unavailable.
-  mobileVideoPoster?.addEventListener('error', () => mobileVideoPoster.remove());
-
+  // 6. Fallback poster for technique interlude if thumbnail is unavailable
   const techniquePoster = document.querySelector<HTMLImageElement>('.mobile-workshop-interlude img');
+
   techniquePoster?.addEventListener('error', () => {
     techniquePoster.src = '/assets/workshop/para-quien-manos.png';
   }, { once: true });
-
-  if (mobileVideoFrame instanceof HTMLElement && mobileVideoPlay instanceof HTMLButtonElement) {
-    mobileVideoPlay.addEventListener('click', () => {
-      if (mobileVideoFrame.classList.contains('is-playing')) return;
-
-      const iframe = document.createElement('iframe');
-      iframe.src = 'https://www.youtube-nocookie.com/embed/1D0XcqXNhpU?autoplay=1&playsinline=1&controls=1&rel=0';
-      iframe.title = 'Video del workshop Meraki Press On';
-      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
-      iframe.allowFullscreen = true;
-      mobileVideoFrame.replaceChildren(iframe);
-      mobileVideoFrame.classList.add('is-playing');
-    });
-  }
 
   const mobileStickyCta = document.getElementById('mobile-sticky-cta');
   const mobileHero = document.querySelector('.mobile-workshop-hero');
@@ -447,13 +427,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. Preserve the existing desktop reel behavior.
+  // 8. YouTube Shorts Reel Loop Controllers (desktop reel and mobile hold reel)
   const reelIframe = document.getElementById('workshop-reel-video');
+
+  const mobileHoldIframe = document.getElementById('mobile-hold-video');
 
   const activeIframes: HTMLIFrameElement[] = [];
 
   if (reelIframe instanceof HTMLIFrameElement) {
     activeIframes.push(reelIframe);
+  }
+
+  if (mobileHoldIframe instanceof HTMLIFrameElement) {
+    activeIframes.push(mobileHoldIframe);
   }
 
   interface YouTubeEventMessage {
@@ -516,6 +502,20 @@ document.addEventListener('DOMContentLoaded', () => {
         observer.observe(iframe);
       });
     }
+
+    // Touch gesture kickstart fallback for strict mobile browser autoplay policies
+    window.addEventListener(
+      'touchstart',
+      () => {
+        activeIframes.forEach((iframe) => {
+          iframe.contentWindow?.postMessage(
+            JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
+            '*'
+          );
+        });
+      },
+      { once: true, passive: true }
+    );
   }
 });
 
