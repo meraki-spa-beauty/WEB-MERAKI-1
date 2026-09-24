@@ -478,5 +478,64 @@ document.addEventListener('DOMContentLoaded', () => {
       videoObserver.observe(video);
     });
   }
+
+  // 9. Mobile Scroll Indicator: Fixed to bottom until it docks into its natural date rail baseline
+  const cueAnchor = document.getElementById('mobile-scroll-cue-anchor');
+
+  const scrollCue = document.getElementById('mobile-scroll-cue');
+
+  if (cueAnchor && scrollCue) {
+    let cueTicking = false;
+
+    const updateCuePosition = () => {
+      cueTicking = false;
+
+      // In desktop view (>= 768px), the editorial hero is hidden
+      if (window.innerWidth >= 768) {
+        scrollCue.classList.remove('is-floating');
+
+        scrollCue.style.left = '';
+
+        scrollCue.style.width = '';
+
+        return;
+      }
+
+      const anchorRect = cueAnchor.getBoundingClientRect();
+
+      const bottomThreshold = window.innerHeight - 16;
+
+      // If the anchor baseline is still below the bottom edge of the screen, keep it fixed to the bottom
+      if (anchorRect.bottom > bottomThreshold) {
+        scrollCue.classList.add('is-floating');
+
+        scrollCue.style.left = `${anchorRect.left}px`;
+
+        scrollCue.style.width = `${anchorRect.width}px`;
+      } else {
+        // Once the user scrolls enough that the anchor line reaches the bottom, dock in the date rail
+        scrollCue.classList.remove('is-floating');
+
+        scrollCue.style.left = '';
+
+        scrollCue.style.width = '';
+      }
+    };
+
+    const scheduleCueUpdate = () => {
+      if (!cueTicking) {
+        cueTicking = true;
+
+        window.requestAnimationFrame(updateCuePosition);
+      }
+    };
+
+    window.addEventListener('scroll', scheduleCueUpdate, { passive: true });
+
+    window.addEventListener('resize', scheduleCueUpdate);
+
+    scheduleCueUpdate();
+  }
 });
+
 

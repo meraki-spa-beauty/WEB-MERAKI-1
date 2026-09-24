@@ -51,9 +51,13 @@
   .mobile-date-time, .mobile-date-place { color: #5b505a; font-size: 11px; line-height: 1.55; }
   .mobile-date-place { margin-top: 25px; }
 
+  /* Contenedor de anclaje para el indicador de scroll */
+  .mobile-scroll-cue-anchor { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; min-height: 56px; margin-top: auto; padding-top: 20px; padding-bottom: 2px; }
+
   /* Indicador animado en bucle para incentivar el scroll */
-  .mobile-scroll-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; margin-top: auto; padding-top: 24px; padding-bottom: 4px; text-decoration: none; color: var(--workshop-plum); }
-  .mobile-scroll-cue-symbol { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid var(--workshop-line); background: rgba(255, 255, 255, 0.75); color: var(--workshop-plum); box-shadow: 0 4px 12px rgba(91, 49, 81, 0.08); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); animation: mobileScrollBounce 1.9s ease-in-out infinite; }
+  .mobile-scroll-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: var(--workshop-plum); z-index: 25; transition: opacity 0.2s ease; }
+  .mobile-scroll-cue.is-floating { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 35; pointer-events: auto; }
+  .mobile-scroll-cue-symbol { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid var(--workshop-line); background: rgba(251, 248, 245, 0.9); color: var(--workshop-plum); box-shadow: 0 4px 14px rgba(91, 49, 81, 0.12); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: mobileScrollBounce 1.9s ease-in-out infinite; }
   .mobile-scroll-arrow { width: 14px; height: 14px; color: var(--workshop-plum); }
   .mobile-scroll-cue-text { font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #a16a56; }
   @keyframes mobileScrollBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }

@@ -124,16 +124,18 @@
               <span class="mobile-date-time">10:30 am<br>— 2:30 pm</span>
               <span class="mobile-date-place">Jesús María<br>Lima, Perú</span>
 
-              <!-- Indicador animado en bucle para incentivar el scroll -->
-              <a href="#tecnicas-section" class="mobile-scroll-cue" aria-label="Desliza para ver más detalles del taller">
-                <span class="mobile-scroll-cue-symbol" aria-hidden="true">
-                  <svg class="mobile-scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 5v14" />
-                    <path d="M19 12l-7 7-7-7" />
-                  </svg>
-                </span>
-                <span class="mobile-scroll-cue-text">Desliza</span>
-              </a>
+              <!-- Espacio de anclaje donde descansa el indicador al llegar a su línea -->
+              <div class="mobile-scroll-cue-anchor" id="mobile-scroll-cue-anchor">
+                <a href="#tecnicas-section" class="mobile-scroll-cue" id="mobile-scroll-cue" aria-label="Desliza para ver más detalles del taller">
+                  <span class="mobile-scroll-cue-symbol" aria-hidden="true">
+                    <svg class="mobile-scroll-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M12 5v14" />
+                      <path d="M19 12l-7 7-7-7" />
+                    </svg>
+                  </span>
+                  <span class="mobile-scroll-cue-text">Desliza</span>
+                </a>
+              </div>
             </div>
             <div class="mobile-video-wrap">
               <div class="mobile-video-frame" id="mobile-video-frame">
