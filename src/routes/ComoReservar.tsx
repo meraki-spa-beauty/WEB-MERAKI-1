@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import { TopBar } from '../components/layout/TopBar';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
@@ -42,7 +41,6 @@ export function ComoReservar() {
 
   return (
     <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
-      <TopBar />
       <Header />
 
       <main className="flex-1">

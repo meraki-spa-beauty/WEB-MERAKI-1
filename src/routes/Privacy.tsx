@@ -1,6 +1,5 @@
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
-import { TopBar } from '../components/layout/TopBar';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import { SPA_INFO } from '../data/spaData';
 import {
@@ -210,7 +209,6 @@ function SectionNumber({ index }: { index: number }) {
 export function Privacy() {
   return (
     <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
-      <TopBar />
       <Header />
       <main className="flex-1">
         {/* Hero Section */}
