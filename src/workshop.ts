@@ -1,4 +1,5 @@
 import './index.css';
+import './workshop-mobile.css';
 
 // WhatsApp configuration
 const WHATSAPP_NUMBER = '51993067291';
@@ -367,31 +368,61 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 6. Mobile Hold Reel lateral slide exit on scroll
-  const heroMobileCard = document.getElementById('hero-mobile-reel-card');
+  // 6. Mount the vertical Short only after the visitor asks to play it.
+  const mobileVideoFrame = document.getElementById('mobile-video-frame');
+  const mobileVideoPlay = document.getElementById('mobile-video-play');
+  const mobileVideoPoster = mobileVideoFrame?.querySelector('img');
 
-  if (heroMobileCard instanceof HTMLElement) {
+  // The local workshop art remains visible if YouTube's thumbnail is unavailable.
+  mobileVideoPoster?.addEventListener('error', () => mobileVideoPoster.remove());
+
+  const techniquePoster = document.querySelector<HTMLImageElement>('.mobile-workshop-interlude img');
+  techniquePoster?.addEventListener('error', () => {
+    techniquePoster.src = '/assets/workshop/para-quien-manos.png';
+  }, { once: true });
+
+  if (mobileVideoFrame instanceof HTMLElement && mobileVideoPlay instanceof HTMLButtonElement) {
+    mobileVideoPlay.addEventListener('click', () => {
+      if (mobileVideoFrame.classList.contains('is-playing')) return;
+
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/1D0XcqXNhpU?autoplay=1&playsinline=1&controls=1&rel=0';
+      iframe.title = 'Video del workshop Meraki Press On';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      mobileVideoFrame.replaceChildren(iframe);
+      mobileVideoFrame.classList.add('is-playing');
+    });
+  }
+
+  const mobileStickyCta = document.getElementById('mobile-sticky-cta');
+  const mobileHero = document.querySelector('.mobile-workshop-hero');
+  const reservationSection = document.getElementById('reserva-section');
+
+  if (mobileStickyCta instanceof HTMLElement && mobileHero instanceof HTMLElement && reservationSection instanceof HTMLElement) {
     let ticking = false;
 
-    window.addEventListener(
-      'scroll',
-      () => {
-        if (!ticking) {
-          window.requestAnimationFrame(() => {
-            if (window.scrollY > 45) {
-              heroMobileCard.classList.add('is-scrolled-hidden');
-            } else {
-              heroMobileCard.classList.remove('is-scrolled-hidden');
-            }
+    const updateStickyCta = () => {
+      const heroEnd = mobileHero.getBoundingClientRect().bottom;
+      const formTop = reservationSection.getBoundingClientRect().top;
+      const formBottom = reservationSection.getBoundingClientRect().bottom;
+      const formVisible = formTop < window.innerHeight * 0.65 && formBottom > 0;
+      const modalOpen = document.getElementById('confirmation-modal')?.classList.contains('flex') ?? false;
+      const shouldShow = window.matchMedia('(max-width: 767px)').matches && heroEnd < 65 && !formVisible && window.innerHeight >= 420 && !modalOpen;
 
-            ticking = false;
-          });
+      mobileStickyCta.classList.toggle('is-visible', shouldShow);
+      ticking = false;
+    };
 
-          ticking = true;
-        }
-      },
-      { passive: true }
-    );
+    const scheduleStickyCta = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(updateStickyCta);
+    };
+
+    window.addEventListener('scroll', scheduleStickyCta, { passive: true });
+    window.addEventListener('resize', scheduleStickyCta);
+    scheduleStickyCta();
   }
 
   // 7. Responsive Alternating Left/Right Scroll Reveal
@@ -416,19 +447,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. YouTube Shorts Reel Loop Controller (Dual for desktop reel & mobile hold reel)
+  // 8. Preserve the existing desktop reel behavior.
   const reelIframe = document.getElementById('workshop-reel-video');
-
-  const mobileHoldIframe = document.getElementById('mobile-hold-video');
 
   const activeIframes: HTMLIFrameElement[] = [];
 
   if (reelIframe instanceof HTMLIFrameElement) {
     activeIframes.push(reelIframe);
-  }
-
-  if (mobileHoldIframe instanceof HTMLIFrameElement) {
-    activeIframes.push(mobileHoldIframe);
   }
 
   interface YouTubeEventMessage {
@@ -456,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (activeIframes.length > 0) {
     // Auto-replay on end guarantee via postMessage for all active video iframes
     window.addEventListener('message', (event) => {
-      if (isEndedYouTubeEvent(event)) {
+      if (activeIframes.some((iframe) => event.source === iframe.contentWindow) && isEndedYouTubeEvent(event)) {
         activeIframes.forEach((iframe) => {
           iframe.contentWindow?.postMessage(
             JSON.stringify({ event: 'command', func: 'seekTo', args: [0, true] }),
