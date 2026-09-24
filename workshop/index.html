@@ -126,16 +126,19 @@
             </div>
             <div class="mobile-video-wrap">
               <div class="mobile-video-frame" id="mobile-video-frame">
-                <iframe
+                <video
                   id="mobile-hold-video"
-                  src="https://www.youtube-nocookie.com/embed/1D0XcqXNhpU?autoplay=1&mute=1&loop=1&playlist=1D0XcqXNhpU&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&cc_load_policy=0&fs=0"
-                  title="Demostración Meraki Press On Nails"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="auto"
+                  aria-label="Demostración Meraki Press On Nails"
                   class="w-full h-full object-cover"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                  allowfullscreen
-                  loading="eager"
-                  style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; transform: scale(1.04); transform-origin: center center;"
-                ></iframe>
+                  style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+                >
+                  <source src="/assets/workshop/videos/mano-olla.mp4" type="video/mp4" />
+                </video>
               </div>
             </div>
           </div>
@@ -558,10 +561,22 @@
       </section>
 
       <div class="mobile-workshop-interlude md:hidden">
-        <a href="https://www.youtube.com/shorts/3Neet7VSojM" target="_blank" rel="noopener noreferrer" aria-label="Ver demostración de Ojo de Dragón en YouTube">
-          <img src="https://img.youtube.com/vi/3Neet7VSojM/hqdefault.jpg" alt="Vista previa de la técnica Ojo de Dragón" width="480" height="360" loading="lazy">
-          <span class="mobile-interlude-copy"><small>Una técnica en acción</small><strong>Ojo de Dragón</strong><span>Ver demostración ↗</span></span>
-        </a>
+        <div class="mobile-workshop-interlude-card">
+          <video
+            autoplay
+            muted
+            loop
+            playsinline
+            preload="auto"
+            aria-label="Demostración técnica Ojo de Dragón"
+          >
+            <source src="/assets/workshop/videos/ojo-dragon.mp4" type="video/mp4" />
+          </video>
+          <div class="mobile-interlude-copy">
+            <small>Una técnica en acción</small>
+            <strong>Ojo de Dragón</strong>
+          </div>
+        </div>
       </div>
 
       <!-- SECCIÓN: ¿PARA QUIÉN ES ESTE WORKSHOP? -->
@@ -573,20 +588,22 @@
             <div data-reveal="left" class="lg:col-span-5 order-2 lg:order-1 flex flex-col items-center justify-center">
               <div class="relative w-full max-w-[320px] sm:max-w-[340px] mx-auto flex flex-col items-center">
                 
-                <!-- Contenedor vertical 4:3 (relación 3:4) que recorta zonas sup/inf para alinear con el texto -->
+                <!-- Contenedor vertical 4:3 (relación 3:4) -->
                 <div class="relative w-full aspect-[3/4] overflow-hidden rounded-[2.2rem] border-2 border-[#A36395]/25 shadow-2xl bg-stone-900 group" style="isolation: isolate; transform: translateZ(0);">
                   
-                  <!-- Iframe de YouTube Short con cc_load_policy=0 (subtítulos desactivados) y escalado para centrar el diseño -->
-                  <iframe
+                  <video
                     id="workshop-reel-video"
-                    src="https://www.youtube-nocookie.com/embed/3Neet7VSojM?autoplay=1&mute=1&loop=1&playlist=3Neet7VSojM&controls=0&playsinline=1&rel=0&modestbranding=1&enablejsapi=1&iv_load_policy=3&disablekb=1&cc_load_policy=0"
-                    title="Demostración de Técnica Meraki Press On Nails"
-                    class="object-cover"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    allowfullscreen
-                    loading="lazy"
-                    style="position: absolute; top: 50%; left: 50%; width: 100%; height: 133.33%; transform: translate(-50%, -50%) scale(1.02); border: 0;"
-                  ></iframe>
+                    autoplay
+                    muted
+                    loop
+                    playsinline
+                    preload="auto"
+                    aria-label="Demostración de Técnica Ojo de Dragón"
+                    class="w-full h-full object-cover"
+                    style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover;"
+                  >
+                    <source src="/assets/workshop/videos/ojo-dragon.mp4" type="video/mp4" />
+                  </video>
 
                   <!-- Badge flotante superior: Ojo de Dragón -->
                   <div class="absolute top-3.5 left-3.5 bg-black/60 backdrop-blur-md border border-white/20 text-[#FAF5F0] text-[10px] sm:text-[11px] font-medium px-2.5 py-1 rounded-full flex items-center gap-1.5 shadow-sm pointer-events-none select-none z-10">

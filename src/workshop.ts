@@ -427,95 +427,56 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. YouTube Shorts Reel Loop Controllers (desktop reel and mobile hold reel)
-  const reelIframe = document.getElementById('workshop-reel-video');
+  // 8. HTML5 Video Autoplay & Loop Manager (Desktop Reel & Mobile Hold Video)
+  const workshopVideos = document.querySelectorAll<HTMLVideoElement>('video');
 
-  const mobileHoldIframe = document.getElementById('mobile-hold-video');
+  workshopVideos.forEach((video) => {
+    video.muted = true;
 
-  const activeIframes: HTMLIFrameElement[] = [];
+    video.defaultMuted = true;
 
-  if (reelIframe instanceof HTMLIFrameElement) {
-    activeIframes.push(reelIframe);
-  }
+    video.setAttribute('playsinline', '');
 
-  if (mobileHoldIframe instanceof HTMLIFrameElement) {
-    activeIframes.push(mobileHoldIframe);
-  }
+    video.setAttribute('webkit-playsinline', '');
 
-  interface YouTubeEventMessage {
-    event?: string;
-    info?: number;
-  }
+    const playPromise = video.play();
 
-  function isEndedYouTubeEvent(event: MessageEvent): boolean {
-    try {
-      const raw = String(event.data);
-
-      if (!raw.startsWith('{')) {
-        return false;
-      }
-
-      // SAFETY: Verified raw payload is valid JSON object text from iframe postMessage
-      const parsed = JSON.parse(raw) as YouTubeEventMessage;
-
-      return parsed.event === 'onStateChange' && parsed.info === 0;
-    } catch {
-      return false;
-    }
-  }
-
-  if (activeIframes.length > 0) {
-    // Auto-replay on end guarantee via postMessage for all active video iframes
-    window.addEventListener('message', (event) => {
-      if (activeIframes.some((iframe) => event.source === iframe.contentWindow) && isEndedYouTubeEvent(event)) {
-        activeIframes.forEach((iframe) => {
-          iframe.contentWindow?.postMessage(
-            JSON.stringify({ event: 'command', func: 'seekTo', args: [0, true] }),
-            '*'
-          );
-
-          iframe.contentWindow?.postMessage(
-            JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
-            '*'
-          );
-        });
-      }
-    });
-
-    // Ensure video is playing when scrolled into view
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting && entry.target instanceof HTMLIFrameElement) {
-              entry.target.contentWindow?.postMessage(
-                JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
-                '*'
-              );
-            }
-          });
-        },
-        { threshold: 0.25 }
-      );
-
-      activeIframes.forEach((iframe) => {
-        observer.observe(iframe);
+    if (playPromise !== undefined) {
+      playPromise.catch(() => {
+        // Autoplay may wait for user interaction on some mobile devices
       });
     }
+  });
 
-    // Touch gesture kickstart fallback for strict mobile browser autoplay policies
-    window.addEventListener(
-      'touchstart',
-      () => {
-        activeIframes.forEach((iframe) => {
-          iframe.contentWindow?.postMessage(
-            JSON.stringify({ event: 'command', func: 'playVideo', args: '' }),
-            '*'
-          );
+  // Touch gesture kickstart fallback for strict mobile browser autoplay policies
+  window.addEventListener(
+    'touchstart',
+    () => {
+      workshopVideos.forEach((video) => {
+        if (video.paused) {
+          video.play().catch(() => {});
+        }
+      });
+    },
+    { once: true, passive: true }
+  );
+
+  // Ensure video is actively playing when scrolled into view
+  if ('IntersectionObserver' in window && workshopVideos.length > 0) {
+    const videoObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.target instanceof HTMLVideoElement) {
+            entry.target.play().catch(() => {});
+          }
         });
       },
-      { once: true, passive: true }
+      { threshold: 0.15 }
     );
+
+    workshopVideos.forEach((video) => {
+      videoObserver.observe(video);
+    });
   }
 });
 
