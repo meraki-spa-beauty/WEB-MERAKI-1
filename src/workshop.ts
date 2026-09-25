@@ -182,13 +182,13 @@ function trackWorkshopConversion(): void {
   trackMetaLead({
     content_name: 'Workshop Press On Nails Halloween',
     content_category: 'Workshop Presencial',
-    value: 139.0,
+    value: PRICE_PER_SPOT,
     currency: 'PEN',
   });
 
   trackMetaCompleteRegistration({
     content_name: 'Workshop Press On Nails Halloween',
-    value: 139.0,
+    value: PRICE_PER_SPOT,
     currency: 'PEN',
   });
 }

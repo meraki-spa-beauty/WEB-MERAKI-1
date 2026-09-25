@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { SPA_INFO } from '../../data/spaData';
 import type { CatalogService, ServicePriceOption } from '../../types';
@@ -208,9 +208,41 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     return lines.join('\n');
   };
 
+  const leadTrackedRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      leadTrackedRef.current = false;
+    }
+  }, [isOpen, selectedServiceId]);
+
+  const triggerBookingConversion = () => {
+    if (leadTrackedRef.current) {
+      return;
+    }
+
+    leadTrackedRef.current = true;
+
+    const serviceTitle = `${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`;
+
+    trackMetaLead({
+      content_name: `Cita Spa - ${serviceTitle}`,
+      content_category: 'Cita Spa',
+      value: priceCalculation.basePrice,
+      currency: 'PEN',
+    });
+
+    trackMetaSchedule({
+      content_name: `Cita Spa - ${serviceTitle}`,
+      value: priceCalculation.basePrice,
+      currency: 'PEN',
+    });
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitted(true);
+    triggerBookingConversion();
   };
 
   const handleCopySummary = async () => {
@@ -374,17 +406,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => {
-                    trackMetaLead({
-                      content_name: `Cita Spa - ${bookingState.service?.title || 'Servicio General'}`,
-                      content_category: 'Cita Spa',
-                      value: priceCalculation.total,
-                      currency: 'PEN',
-                    });
-                    trackMetaSchedule({
-                      content_name: `Cita Spa - ${bookingState.service?.title || 'Servicio General'}`,
-                      value: priceCalculation.total,
-                      currency: 'PEN',
-                    });
+                    triggerBookingConversion();
                   }}
                   className="w-full sm:flex-1 inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-6 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
                 >
