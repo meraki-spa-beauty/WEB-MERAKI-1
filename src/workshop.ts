@@ -1,5 +1,10 @@
 import './index.css';
 import './workshop-mobile.css';
+import {
+  trackMetaLead,
+  trackMetaCompleteRegistration,
+  trackMetaContact,
+} from './utils/metaPixel';
 
 // WhatsApp configuration
 const WHATSAPP_NUMBER = '51993067291';
@@ -165,6 +170,29 @@ ${data.email ? `• *Email:* ${data.email}\n` : ''}
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }
 
+let workshopLeadTracked = false;
+
+function trackWorkshopConversion(): void {
+  if (workshopLeadTracked) {
+    return;
+  }
+
+  workshopLeadTracked = true;
+
+  trackMetaLead({
+    content_name: 'Workshop Press On Nails Halloween',
+    content_category: 'Workshop Presencial',
+    value: 139.0,
+    currency: 'PEN',
+  });
+
+  trackMetaCompleteRegistration({
+    content_name: 'Workshop Press On Nails Halloween',
+    value: 139.0,
+    currency: 'PEN',
+  });
+}
+
 function showModal(data: BookingData, waUrl: string) {
   const modal = document.getElementById('confirmation-modal');
 
@@ -188,6 +216,9 @@ function showModal(data: BookingData, waUrl: string) {
 
   if (waBtn) {
     waBtn.href = waUrl;
+    waBtn.onclick = () => {
+      trackWorkshopConversion();
+    };
   }
 
   modal.classList.remove('hidden');
@@ -286,6 +317,9 @@ document.addEventListener('DOMContentLoaded', () => {
       syncLeadToGoogleSheets(bookingData);
 
       const waUrl = buildWhatsAppUrl(bookingData);
+
+      // Registrar conversión en Meta Pixel (Lead + CompleteRegistration)
+      trackWorkshopConversion();
 
       showModal(bookingData, waUrl);
     });
@@ -536,6 +570,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
     scheduleCueUpdate();
   }
+
+  // 7. General WhatsApp links tracking
+  const generalWaLinks = document.querySelectorAll('a[href*="wa.me"], a[href*="wa.link"]');
+
+  generalWaLinks.forEach((link) => {
+    if (link.id !== 'modal-whatsapp-btn') {
+      link.addEventListener('click', () => {
+        trackMetaContact({
+          content_name: 'WhatsApp General Workshop',
+        });
+      });
+    }
+  });
 });
 
 

@@ -4,6 +4,7 @@ import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import { SPA_INFO } from '../data/spaData';
 import { CATALOG_SERVICES } from '../data/catalog';
+import { trackMetaLead } from '../utils/metaPixel';
 import {
   Phone,
   Instagram,
@@ -68,6 +69,12 @@ ${!isStudio ? `• *Distrito:* ${district}\n` : ''}• *Fecha y Hora tentativa:*
 ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudio de Pueblo Libre? Muchas gracias.' : '¿Me podrían confirmar disponibilidad y el costo de movilidad para mi distrito? Muchas gracias.'}`;
 
     const encoded = encodeURIComponent(message);
+    trackMetaLead({
+      content_name: `Consulta Contacto - ${selectedService.name}`,
+      content_category: 'Cita Spa',
+      value: selectedService.price,
+      currency: 'PEN',
+    });
     window.open(`https://wa.me/${SPA_INFO.whatsappNumber}?text=${encoded}`, '_blank');
   };
 

@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { SPA_INFO } from '../../data/spaData';
 import type { CatalogService, ServicePriceOption } from '../../types';
+import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
 import {
   X,
   CheckCircle2,
@@ -372,6 +373,19 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => {
+                    trackMetaLead({
+                      content_name: `Cita Spa - ${bookingState.service?.title || 'Servicio General'}`,
+                      content_category: 'Cita Spa',
+                      value: priceCalculation.total,
+                      currency: 'PEN',
+                    });
+                    trackMetaSchedule({
+                      content_name: `Cita Spa - ${bookingState.service?.title || 'Servicio General'}`,
+                      value: priceCalculation.total,
+                      currency: 'PEN',
+                    });
+                  }}
                   className="w-full sm:flex-1 inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-6 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
                 >
                   <MessageCircle className="w-4 h-4 fill-white" />
