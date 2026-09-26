@@ -3,6 +3,7 @@ import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { SPA_INFO } from '../../data/spaData';
 import type { CatalogService, ServicePriceOption } from '../../types';
 import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
+import { trackTikTokSubmitForm, trackTikTokCompleteRegistration } from '../../utils/tiktokPixel';
 import {
   X,
   CheckCircle2,
@@ -234,6 +235,20 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
     trackMetaSchedule({
       content_name: `Cita Spa - ${serviceTitle}`,
+      value: priceCalculation.basePrice,
+      currency: 'PEN',
+    });
+
+    trackTikTokSubmitForm({
+      content_name: `Cita Spa - ${serviceTitle}`,
+      content_category: 'Cita Spa',
+      value: priceCalculation.basePrice,
+      currency: 'PEN',
+    });
+
+    trackTikTokCompleteRegistration({
+      content_name: `Cita Spa - ${serviceTitle}`,
+      content_category: 'Cita Spa',
       value: priceCalculation.basePrice,
       currency: 'PEN',
     });

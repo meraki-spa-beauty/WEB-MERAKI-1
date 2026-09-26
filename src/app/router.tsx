@@ -8,6 +8,7 @@ import { Contacto } from '../routes/Contacto';
 import { Privacy } from '../routes/Privacy';
 import { NotFound } from '../routes/NotFound';
 import { trackMetaPageView } from '../utils/metaPixel';
+import { trackTikTokPageView } from '../utils/tiktokPixel';
 
 function WorkshopRedirect() {
   if (typeof window !== 'undefined') {
@@ -30,6 +31,7 @@ function RootLayout() {
     }
 
     trackMetaPageView();
+    trackTikTokPageView();
   }, [location.pathname]);
 
   return <Outlet />;

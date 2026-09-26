@@ -5,6 +5,7 @@ import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppBut
 import { SPA_INFO } from '../data/spaData';
 import { CATALOG_SERVICES } from '../data/catalog';
 import { trackMetaLead } from '../utils/metaPixel';
+import { trackTikTokSubmitForm } from '../utils/tiktokPixel';
 import {
   Phone,
   Instagram,
@@ -70,6 +71,12 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
 
     const encoded = encodeURIComponent(message);
     trackMetaLead({
+      content_name: `Consulta Contacto - ${selectedService.name}`,
+      content_category: 'Cita Spa',
+      value: selectedService.price,
+      currency: 'PEN',
+    });
+    trackTikTokSubmitForm({
       content_name: `Consulta Contacto - ${selectedService.name}`,
       content_category: 'Cita Spa',
       value: selectedService.price,

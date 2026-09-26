@@ -5,6 +5,11 @@ import {
   trackMetaCompleteRegistration,
   trackMetaContact,
 } from './utils/metaPixel';
+import {
+  trackTikTokSubmitForm,
+  trackTikTokCompleteRegistration,
+  trackTikTokContact,
+} from './utils/tiktokPixel';
 
 // WhatsApp configuration
 const WHATSAPP_NUMBER = '51993067291';
@@ -187,6 +192,19 @@ function trackWorkshopConversion(): void {
   });
 
   trackMetaCompleteRegistration({
+    content_name: 'Workshop Press On Nails Halloween',
+    value: PRICE_PER_SPOT,
+    currency: 'PEN',
+  });
+
+  trackTikTokSubmitForm({
+    content_name: 'Workshop Press On Nails Halloween',
+    content_category: 'Workshop Presencial',
+    value: PRICE_PER_SPOT,
+    currency: 'PEN',
+  });
+
+  trackTikTokCompleteRegistration({
     content_name: 'Workshop Press On Nails Halloween',
     value: PRICE_PER_SPOT,
     currency: 'PEN',
@@ -578,6 +596,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (link.id !== 'modal-whatsapp-btn') {
       link.addEventListener('click', () => {
         trackMetaContact({
+          content_name: 'WhatsApp General Workshop',
+        });
+        trackTikTokContact({
           content_name: 'WhatsApp General Workshop',
         });
       });
