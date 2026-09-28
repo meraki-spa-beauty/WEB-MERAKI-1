@@ -34,7 +34,7 @@
 
   .mobile-workshop-hero { padding: 30px 0 35px; background: radial-gradient(circle at 82% 25%, #f6eaf0 0, var(--workshop-paper) 44%); }
   .mobile-workshop-shell { width: min(100%, 540px); margin: auto; padding-inline: clamp(16px, 5vw, 30px); }
-  .mobile-kicker { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; color: var(--workshop-plum); font-size: 9px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .mobile-kicker { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; color: var(--workshop-plum); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
   .mobile-kicker::before { content: ''; flex: none; width: 21px; height: 1px; margin-right: 3px; background: var(--workshop-copper); }
   .mobile-workshop-hero h1 { margin: 0; color: var(--workshop-plum); font: 500 clamp(46px, 13vw, 74px)/.87 'Cormorant Garamond', Georgia, serif; letter-spacing: -.055em; }
   .mobile-workshop-hero h1 em { display: block; padding-left: 19%; color: var(--workshop-ink); font-weight: 400; }
