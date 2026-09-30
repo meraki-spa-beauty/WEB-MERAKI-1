@@ -32,46 +32,164 @@
   .workshop-page header > div > div:last-child { justify-self: end; }
   .workshop-page header .scroll-to-form { min-height: 44px; padding: 8px 12px; border: 1px solid var(--workshop-plum); background: transparent; box-shadow: none; color: var(--workshop-plum); font-size: 10px; font-weight: 700; white-space: nowrap; }
 
-  .mobile-workshop-hero { padding: 30px 0 35px; background: radial-gradient(circle at 82% 25%, #f6eaf0 0, var(--workshop-paper) 44%); }
-  .mobile-workshop-shell { width: min(100%, 540px); margin: auto; padding-inline: clamp(16px, 5vw, 30px); }
-  .mobile-kicker { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; color: var(--workshop-plum); font-size: 10px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
-  .mobile-kicker::before { content: ''; flex: none; width: 21px; height: 1px; margin-right: 3px; background: var(--workshop-copper); }
-  .mobile-workshop-hero h1 { margin: 0; color: var(--workshop-plum); font: 500 clamp(46px, 13vw, 74px)/.87 'Cormorant Garamond', Georgia, serif; letter-spacing: -.055em; }
-  .mobile-workshop-hero h1 em { display: block; padding-left: 19%; color: var(--workshop-ink); font-weight: 400; }
-  .mobile-edition { margin: 23px 0 13px; color: #a16a56; font-size: 10px; font-weight: 700; letter-spacing: .27em; text-transform: uppercase; }
+  .workshop-page header {
+    background: rgba(116, 54, 103, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid rgba(248, 226, 243, 0.18);
+  }
+  .workshop-page header > div > a:first-child {
+    color: #F8E2F3 !important;
+  }
+  .workshop-page header > div > a:first-child svg {
+    color: #F8E2F3 !important;
+  }
+  .workshop-page header img {
+    filter: brightness(0) invert(1);
+  }
+  .workshop-page header .scroll-to-form {
+    border: 1px solid #DDA77B !important;
+    color: #DDA77B !important;
+    background: rgba(221, 167, 123, 0.15) !important;
+  }
+
+  .mobile-workshop-hero {
+    position: relative;
+    padding: 26px 0 35px;
+    background:
+      /* Sombras volumétricas sutiles en esquinas superiores (mucho más claras y etéreas) */
+      radial-gradient(ellipse 65% 45% at 0% 0%, rgba(68, 25, 60, 0.22) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(68, 25, 60, 0.18) 0%, transparent 60%),
+      /* Sombra ambiental muy tenue bajo la cabecera */
+      linear-gradient(180deg, rgba(60, 20, 52, 0.14) 0%, transparent 28px),
+      /* Aura central de luz cálida detrás del título principal */
+      radial-gradient(ellipse 85% 44% at 50% 20%, rgba(220, 140, 200, 0.42) 0%, rgba(221, 167, 123, 0.25) 42%, transparent 74%),
+      /* Resplandor oro-rosa alrededor del arco fotográfico */
+      radial-gradient(circle at 86% 54%, rgba(221, 167, 123, 0.32) 0%, rgba(188, 120, 172, 0.24) 45%, transparent 68%),
+      /* Luz clara ambiental en la base que conecta con el color claro */
+      radial-gradient(circle at 50% 90%, rgba(251, 248, 245, 0.9) 0%, transparent 65%),
+      /* Degradado vertical base (+50% más claro: ciruela sedoso hacia malva pastel y blanco papel) */
+      linear-gradient(180deg, #743667 0%, #8c457d 18%, #a75995 36%, #bd79ab 54%, #d2a1c4 70%, #e6cadc 84%, #f4e7ef 94%, #fbf8f5 100%);
+    overflow: hidden;
+    border-bottom: 1px solid rgba(133, 78, 121, 0.15);
+    color: #ffffff;
+  }
+
+  .mobile-hero-glow {
+    position: absolute;
+    border-radius: 9999px;
+    pointer-events: none;
+    user-select: none;
+    filter: blur(48px);
+    z-index: 0;
+  }
+  .mobile-hero-glow-1 {
+    top: -40px;
+    right: -30px;
+    width: 260px;
+    height: 260px;
+    background: radial-gradient(circle, rgba(215, 140, 200, 0.35) 0%, transparent 70%);
+    animation: mobileAmbientFloat 8s ease-in-out infinite alternate;
+  }
+  .mobile-hero-glow-2 {
+    bottom: 50px;
+    left: -40px;
+    width: 240px;
+    height: 240px;
+    background: radial-gradient(circle, rgba(221, 167, 123, 0.24) 0%, rgba(251, 248, 245, 0.18) 55%, transparent 75%);
+    animation: mobileAmbientFloat 10s ease-in-out infinite alternate-reverse;
+  }
+  @keyframes mobileAmbientFloat {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(12px, 14px) scale(1.08); }
+  }
+
+  .mobile-hero-sparkle {
+    position: absolute;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+    line-height: 1;
+  }
+  /* Destello sutil superior izquierdo, por encima del kicker */
+  .mobile-hero-sparkle-1 {
+    top: 10px;
+    left: 20px;
+    color: #ffffff;
+    font-size: 11px;
+    opacity: 0.4;
+  }
+  /* Estrella dorada en el cielo superior derecho (acompaña a la luna) */
+  .mobile-hero-sparkle-2 {
+    top: 22px;
+    right: 44px;
+    color: #fde68a;
+    font-size: 9px;
+    opacity: 0.6;
+  }
+  /* Luna en la esquina superior derecha, con espacio exclusivo despejado */
+  .mobile-hero-sparkle-3 {
+    top: 8px;
+    right: 18px;
+    font-size: 16px;
+    opacity: 0.75;
+    filter: drop-shadow(0 0 10px rgba(253, 230, 138, 0.65));
+  }
+  /* Destello cálido en el espacio negativo a la derecha del título */
+  .mobile-hero-sparkle-4 {
+    top: 145px;
+    right: 26px;
+    color: #dda77b;
+    font-size: 12px;
+    opacity: 0.45;
+    filter: drop-shadow(0 0 6px rgba(221, 167, 123, 0.5));
+  }
+
+  .mobile-workshop-shell {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 540px);
+    margin: auto;
+    padding-inline: clamp(16px, 5vw, 30px);
+  }
+  .mobile-kicker { display: flex; align-items: center; gap: 7px; margin: 0 0 15px; padding-right: 50px; color: #F8E2F3; font-size: 10px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+  .mobile-kicker::before { content: ''; flex: none; width: 21px; height: 1px; margin-right: 3px; background: rgba(248, 226, 243, 0.65); }
+  .mobile-workshop-hero h1 { margin: 0; color: #ffffff; font: 500 clamp(46px, 13vw, 74px)/.87 'Cormorant Garamond', Georgia, serif; letter-spacing: -.055em; text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(50, 15, 42, 0.55); }
+  .mobile-workshop-hero h1 em { display: block; padding-left: 19%; color: #F8E2F3; font-weight: 400; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.35); }
+  .mobile-edition { margin: 23px 0 13px; color: #DDA77B; font-size: 10.5px; font-weight: 700; letter-spacing: .3em; text-transform: uppercase; text-shadow: 0 0 10px rgba(221, 167, 123, 0.35); }
   .mobile-edition::after { content: '✦'; margin-left: 10px; letter-spacing: 0; }
-  .mobile-hero-description { max-width: 420px; margin: 0 0 27px; color: #5e545e; font-size: 14px; line-height: 1.65; }
+  .mobile-hero-description { max-width: 420px; margin: 0 0 27px; color: #ffffff; font-size: 14.5px; line-height: 1.65; font-weight: 380; text-shadow: 0 1px 3px rgba(45, 15, 38, 0.45); }
 
   .mobile-editorial-stage { display: grid; grid-template-columns: minmax(66px, 24%) minmax(0, 1fr); gap: 14px; align-items: stretch; }
-  .mobile-date-rail { display: flex; flex-direction: column; align-items: flex-start; padding-top: 15px; color: var(--workshop-plum); }
-  .mobile-date-day { color: var(--workshop-mauve); font-size: 9px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
-  .mobile-date-rail strong { margin: 2px 0 5px; font: 500 clamp(48px, 13vw, 72px)/.82 'Cormorant Garamond', Georgia, serif; letter-spacing: -.08em; }
-  .mobile-date-month { font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
-  .mobile-date-rule { width: 100%; height: 1px; margin: 20px 0 16px; background: var(--workshop-line); }
-  .mobile-date-time, .mobile-date-place { color: #5b505a; font-size: 11px; line-height: 1.55; }
+  .mobile-date-rail { display: flex; flex-direction: column; align-items: flex-start; padding-top: 15px; color: #ffffff; }
+  .mobile-date-day { color: #DDA77B; font-size: 9.5px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; }
+  .mobile-date-rail strong { margin: 2px 0 5px; color: #ffffff; font: 500 clamp(48px, 13vw, 72px)/.82 'Cormorant Garamond', Georgia, serif; letter-spacing: -.08em; text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35); }
+  .mobile-date-month { color: #F8E2F3; font-size: 11px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; }
+  .mobile-date-rule { width: 100%; height: 1px; margin: 20px 0 16px; background: rgba(248, 226, 243, 0.4); }
+  .mobile-date-time, .mobile-date-place { color: #ffffff; font-size: 11px; line-height: 1.55; font-weight: 500; text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4); }
   .mobile-date-place { margin-top: 25px; }
 
   /* Contenedor de anclaje para el indicador de scroll */
-  .mobile-scroll-cue-anchor { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; min-height: 56px; margin-top: auto; padding-top: 20px; padding-bottom: 2px; }
+  .mobile-scroll-cue-anchor { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; width: 100%; min-height: 64px; margin-top: auto; padding-top: 18px; padding-bottom: 2px; }
 
   /* Indicador animado en bucle para incentivar el scroll */
-  .mobile-scroll-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 5px; text-decoration: none; color: var(--workshop-plum); z-index: 25; transition: opacity 0.2s ease; }
+  .mobile-scroll-cue { display: inline-flex; flex-direction: column; align-items: center; gap: 6px; text-decoration: none; color: #ffffff; z-index: 25; transition: opacity 0.2s ease, transform 0.2s ease; }
   .mobile-scroll-cue.is-floating { position: fixed; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 35; pointer-events: auto; }
-  .mobile-scroll-cue-symbol { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 9999px; border: 1px solid var(--workshop-line); background: rgba(251, 248, 245, 0.9); color: var(--workshop-plum); box-shadow: 0 4px 14px rgba(91, 49, 81, 0.12); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); animation: mobileScrollBounce 1.9s ease-in-out infinite; }
-  .mobile-scroll-arrow { width: 14px; height: 14px; color: var(--workshop-plum); }
-  .mobile-scroll-cue-text { font-size: 8px; font-weight: 700; letter-spacing: .2em; text-transform: uppercase; color: #a16a56; }
-  @keyframes mobileScrollBounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+  .mobile-scroll-cue-symbol { position: relative; display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 9999px; border: 2px solid #ffffff; background: linear-gradient(135deg, #DDA77B 0%, #C48562 100%); color: #351930; box-shadow: 0 6px 20px rgba(77, 33, 68, 0.35), 0 0 0 0 rgba(221, 167, 123, 0.65); animation: mobileScrollBounce 2s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+  .mobile-scroll-arrow { width: 18px; height: 18px; color: #351930; filter: drop-shadow(0 1px 1px rgba(255, 255, 255, 0.4)); }
+  .mobile-scroll-cue-text { display: inline-flex; align-items: center; justify-content: center; padding: 3.5px 9px; border-radius: 99px; background: rgba(255, 255, 255, 0.95); color: #4d2144; font-size: 9px; font-weight: 850; letter-spacing: .22em; text-transform: uppercase; border: 1px solid rgba(133, 78, 121, 0.28); box-shadow: 0 4px 12px rgba(77, 33, 68, 0.15); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+  @keyframes mobileScrollBounce { 0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 6px 18px rgba(77, 33, 68, 0.35), 0 0 0 0 rgba(221, 167, 123, 0.65); } 50% { transform: translateY(6px) scale(1.06); box-shadow: 0 10px 24px rgba(77, 33, 68, 0.45), 0 0 0 8px rgba(221, 167, 123, 0); } }
 
   .mobile-video-wrap { position: relative; min-width: 0; padding: 0 11px 11px 0; }
-  .mobile-video-wrap::after { content: ''; position: absolute; inset: 12px 0 0 12px; border: 1px solid #c999a8; border-radius: 150px 150px 15px 15px; pointer-events: none; }
-  .mobile-video-frame { position: relative; z-index: 1; width: 100%; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 150px 150px 14px 14px; background: #221f29 url('/assets/workshop/instructora-flyer.webp') center / cover no-repeat; box-shadow: 0 18px 30px #35253622; }
+  .mobile-video-wrap::after { content: ''; position: absolute; inset: 12px 0 0 12px; border: 1.5px solid rgba(221, 167, 123, 0.55); border-radius: 150px 150px 15px 15px; pointer-events: none; }
+  .mobile-video-frame { position: relative; z-index: 1; width: 100%; aspect-ratio: 9 / 16; overflow: hidden; border-radius: 150px 150px 14px 14px; background: #221f29 url('/assets/workshop/instructora-flyer.webp') center / cover no-repeat; box-shadow: 0 20px 35px rgba(0, 0, 0, 0.38); }
   .mobile-video-frame::after { display: none; }
   .mobile-video-frame video, .mobile-video-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; object-fit: cover; }
-  .mobile-hero-bottom { margin-top: 17px; border-top: 1px solid var(--workshop-line); }
-  .mobile-hero-bottom p { margin: 0; padding: 16px 0; border-bottom: 1px solid var(--workshop-line); }
-  .mobile-hero-bottom strong { display: block; color: var(--workshop-plum); font: 500 27px/.95 'Cormorant Garamond', Georgia, serif; }
-  .mobile-hero-bottom p span { display: block; margin-top: 6px; color: #766a73; font-size: 11px; line-height: 1.4; }
-  .mobile-text-cta { display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 7px; color: var(--workshop-plum); font-size: 12px; font-weight: 700; }
+  .mobile-hero-bottom { margin-top: 17px; border-top: 1px solid rgba(82, 41, 72, 0.22); }
+  .mobile-hero-bottom p { margin: 0; padding: 16px 0; border-bottom: 1px solid rgba(82, 41, 72, 0.18); }
+  .mobile-hero-bottom strong { display: block; color: #4a2141; font: 600 27px/.95 'Cormorant Garamond', Georgia, serif; }
+  .mobile-hero-bottom p span { display: block; margin-top: 6px; color: #633357; font-size: 11.5px; font-weight: 500; line-height: 1.4; }
+  .mobile-text-cta { display: flex; align-items: center; justify-content: space-between; min-height: 48px; margin-top: 7px; color: #4a2141; font-size: 12.5px; font-weight: 800; letter-spacing: .02em; }
   .mobile-text-cta span { font-size: 21px; }
 
   .workshop-page main > section:not(.mobile-workshop-hero), .workshop-page .mobile-workshop-interlude { padding-block: 55px; }
@@ -182,4 +300,6 @@
 @media (prefers-reduced-motion: reduce) {
   #mobile-sticky-cta { transition: none; }
   .mobile-scroll-cue-symbol { animation: none; }
+  .mobile-hero-glow-1,
+  .mobile-hero-glow-2 { animation: none; }
 }
