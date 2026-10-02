@@ -10,6 +10,11 @@ import {
   trackTikTokCompleteRegistration,
   trackTikTokContact,
 } from './utils/tiktokPixel';
+import { initTrafficSource } from './utils/trafficSource';
+import { syncLeadToGoogleSheets } from './utils/googleSheetsSync';
+
+// Initialize traffic source detection on workshop load
+initTrafficSource();
 
 // WhatsApp configuration
 const WHATSAPP_NUMBER = '51993067291';
@@ -19,8 +24,6 @@ const YAPE_NUMBER = '993067291';
 const PRICE_PER_SPOT = 180;
 
 const DEPOSIT_PER_SPOT = 50;
-
-const GOOGLE_SHEETS_WEBHOOK_URL = import.meta.env.VITE_WORKSHOP_SHEETS_URL || '';
 
 interface BookingData {
   id: string;
@@ -100,49 +103,6 @@ function fallbackCopy(text: string, callback: () => void) {
   }
 
   document.body.removeChild(textarea);
-}
-
-// Envío en simultáneo a Google Sheets y almacenamiento local de respaldo
-async function syncLeadToGoogleSheets(data: BookingData) {
-  const leadRecord = {
-    fecha: new Date().toLocaleString('es-PE', { timeZone: 'America/Lima' }),
-    codigo: data.id,
-    nombre: data.name,
-    whatsapp: data.phone,
-    email: data.email || 'No proporcionado',
-    adelanto: `S/ ${DEPOSIT_PER_SPOT}`,
-    total: `S/ ${PRICE_PER_SPOT}`,
-    estado: 'Pre-reserva (Pendiente WhatsApp)',
-  };
-
-  // 1. Respaldo inmediato en localStorage
-  try {
-    const existing = JSON.parse(localStorage.getItem('meraki_workshop_leads') || '[]');
-
-    existing.push(leadRecord);
-
-    localStorage.setItem('meraki_workshop_leads', JSON.stringify(existing));
-  } catch (err) {
-    console.warn('No se pudo guardar localmente:', err);
-  }
-
-  // 2. Envío a Google Sheets (si la URL está configurada)
-  if (GOOGLE_SHEETS_WEBHOOK_URL) {
-    try {
-      await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(leadRecord),
-      });
-
-      console.log('Lead sincronizado con Google Sheets con éxito');
-    } catch (err) {
-      console.error('Error al sincronizar con Google Sheets:', err);
-    }
-  }
 }
 
 function buildWhatsAppUrl(data: BookingData): string {
@@ -331,8 +291,19 @@ document.addEventListener('DOMContentLoaded', () => {
         spots: 1,
       };
 
-      // Sincronizar en simultáneo con Google Sheets & almacenamiento local
-      syncLeadToGoogleSheets(bookingData);
+      // Sincronizar en simultáneo con Google Sheets & almacenamiento local con atribución de origen
+      syncLeadToGoogleSheets({
+        formulario: 'Workshop Press On',
+        cliente: name,
+        whatsapp: phone,
+        email: email || undefined,
+        servicio_detalle: 'Meraki Press On Nails · Halloween Edition',
+        modalidad: 'Presencial (Jesús María, Lima)',
+        fecha_preferida: 'Sábado 3 de Octubre (10:30 am - 2:30 pm)',
+        monto_adelanto: `S/ ${DEPOSIT_PER_SPOT}`,
+        monto_total: `S/ ${PRICE_PER_SPOT}`,
+        codigo_reserva: bookingId,
+      });
 
       const waUrl = buildWhatsAppUrl(bookingData);
 

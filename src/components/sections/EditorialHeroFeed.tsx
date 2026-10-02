@@ -1,21 +1,16 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { 
-  Calendar, 
-  ArrowRight, 
-  MessageSquare, 
   ShieldCheck, 
   Clock, 
   Sparkles, 
   MapPin 
 } from 'lucide-react';
-import { SPA_INFO } from '../../data/spaData';
 
 interface EditorialHeroFeedProps {
-  onOpenBooking: () => void;
+  onOpenBooking?: () => void;
 }
 
-export function EditorialHeroFeed({ onOpenBooking }: EditorialHeroFeedProps) {
+export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHeroFeedProps) {
   const [customDesktopBg, setCustomDesktopBg] = useState<string | null>(null);
   const [customMobileBg, setCustomMobileBg] = useState<string | null>(null);
 
@@ -108,72 +103,32 @@ export function EditorialHeroFeed({ onOpenBooking }: EditorialHeroFeedProps) {
           <source media="(max-width: 767px)" srcSet={mobileBgSrc} />
           {/* Desktop background (>= 768px) */}
           <source media="(min-width: 768px)" srcSet={desktopBgSrc} />
-          {/* Fallback image - Warm, natural, crystal clear */}
+          {/* Fallback image - Natural on mobile, subdued on desktop */}
           <img
             src={desktopBgSrc}
             alt="Meraki Spa & Beauty"
-            className="w-full h-full object-cover object-center scale-100 transition-transform duration-1000 ease-out"
+            className="w-full h-full object-cover object-center scale-100 transition-transform duration-1000 ease-out brightness-100 contrast-100 md:brightness-[0.82] md:contrast-[0.95]"
             referrerPolicy="no-referrer"
           />
         </picture>
 
-        {/* Clean, elegant scrim preserving natural warm wood and spa lighting while maintaining WCAG text contrast */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/35 to-black/45 pointer-events-none" />
+        {/* Mobile scrim (Current production: natural warm lighting) */}
+        <div className="block md:hidden absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/30 pointer-events-none" />
+
+        {/* Desktop scrim (Deeper, richer scrim for seamless desktop header integration) */}
+        <div className="hidden md:block absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/65 pointer-events-none" />
       </div>
 
-      {/* Main Hero Content: Clean, Sophisticated Editorial Layout */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 sm:pt-24 sm:pb-16 flex flex-col items-center text-center">
-        
-        {/* Eyebrow Pill */}
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/20 text-[#FFF2DE] text-[11px] sm:text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.22em] mb-6 shadow-sm">
-          <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-          <span>Atención en Estudio &amp; a Domicilio • Lima</span>
+      {/* Main Hero Content: Original padding on mobile, extended on desktop */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-36 flex flex-col items-center justify-center text-center flex-1">
+        <div className="flex flex-col items-center justify-center">
+          <img
+            src="/assets/brand/meraki-logo-official-white.png"
+            alt="Meraki Spa & Beauty"
+            className="w-52 sm:w-64 md:w-72 lg:w-80 max-w-[72vw] h-auto object-contain select-none pointer-events-none drop-shadow-md opacity-55 filter brightness-75 contrast-90 md:opacity-60 md:brightness-90 md:contrast-95"
+            referrerPolicy="no-referrer"
+          />
         </div>
-
-        {/* Refined Headline */}
-        <h1 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-5xl md:text-6xl lg:text-[64px] font-light text-white leading-[1.1] tracking-tight max-w-3xl mx-auto mb-6 drop-shadow-md">
-          Santuario de Calma &amp;{' '}
-          <span className="italic font-normal text-[#FFF2DE]">
-            Bienestar Consciente
-          </span>
-        </h1>
-
-        {/* Clear, refined subtitle */}
-        <p className="font-['Montserrat',sans-serif] text-sm sm:text-base md:text-lg text-white/90 font-light leading-relaxed max-w-2xl mx-auto mb-10 drop-shadow-sm">
-          Rituales de belleza de autor en nuestro estudio de Pueblo Libre o en la comodidad de tu hogar u oficina. Manicura, pedicura spa, masajes y cuidado facial profesional.
-        </p>
-
-        {/* Action CTAs */}
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 w-full sm:w-auto">
-          <button
-            id="btn-hero-agendar"
-            type="button"
-            onClick={onOpenBooking}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#FFF2DE] hover:bg-white text-[#111111] px-8 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] transition-all duration-200 shadow-xl hover:shadow-2xl hover:-translate-y-0.5 cursor-pointer"
-          >
-            <Calendar className="w-4 h-4 text-[#5E765E]" />
-            <span>Agendar Cita Online</span>
-          </button>
-
-          <Link
-            to="/catalogo"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-black/40 hover:bg-black/60 backdrop-blur-md border border-white/30 hover:border-white/70 text-white text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.16em] transition-all duration-200 shadow-md hover:-translate-y-0.5"
-          >
-            <span>Ver Catálogo</span>
-            <ArrowRight className="w-4 h-4 text-[#D5A688]" />
-          </Link>
-
-          <a
-            href={SPA_INFO.whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 text-white/90 hover:text-white text-xs font-['Montserrat',sans-serif] tracking-wider py-2.5 px-4 transition-colors"
-          >
-            <MessageSquare className="w-4 h-4 text-[#25D366]" />
-            <span>WhatsApp Directo</span>
-          </a>
-        </div>
-
       </div>
 
       {/* Trust Badges Bar */}

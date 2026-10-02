@@ -21,7 +21,7 @@ export function Nosotros() {
 
       <main className="flex-1">
         {/* Banner Hero */}
-        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-14 pb-12 border-b border-[#5E765E]/15 text-left">
+        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-14 lg:pt-28 pb-12 border-b border-[#5E765E]/15 text-left">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               

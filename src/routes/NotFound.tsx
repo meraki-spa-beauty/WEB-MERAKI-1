@@ -7,7 +7,7 @@ export function NotFound() {
   return (
     <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
       <Header />
-      <main className="flex-1 flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
+      <main className="flex-1 flex items-center justify-center py-20 lg:pt-28 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full text-center bg-[#FFFFFF] p-8 sm:p-10 rounded-3xl border border-[#5E765E]/15 shadow-sm">
           <div className="w-14 h-14 mx-auto rounded-full bg-[#5E765E]/10 flex items-center justify-center text-[#5E765E] mb-6">
             <Compass className="w-7 h-7" />

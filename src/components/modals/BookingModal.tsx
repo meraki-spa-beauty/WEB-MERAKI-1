@@ -4,6 +4,7 @@ import { SPA_INFO } from '../../data/spaData';
 import type { CatalogService, ServicePriceOption } from '../../types';
 import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
 import { trackTikTokSubmitForm, trackTikTokCompleteRegistration } from '../../utils/tiktokPixel';
+import { syncLeadToGoogleSheets } from '../../utils/googleSheetsSync';
 import {
   X,
   CheckCircle2,
@@ -258,6 +259,24 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     e.preventDefault();
     setIsSubmitted(true);
     triggerBookingConversion();
+
+    const serviceTitle = `${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`;
+
+    syncLeadToGoogleSheets({
+      formulario: 'Cita Spa',
+      cliente: clientName,
+      whatsapp: clientPhone,
+      servicio_detalle: serviceTitle,
+      modalidad: locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : 'A Domicilio',
+      distrito: locationType === 'domicilio' ? district : 'Pueblo Libre',
+      direccion: locationType === 'domicilio' ? address : SPA_INFO.address,
+      fecha_preferida: date || 'A coordinar',
+      hora_preferida: timeSlot || 'A coordinar',
+      monto_total: `S/ ${priceCalculation.basePrice}`,
+      monto_adelanto: `S/ ${Math.round(priceCalculation.basePrice * 0.4)} (40%)`,
+      codigo_reserva: `MRK-SPA-${Math.floor(1000 + Math.random() * 9000)}`,
+      mensaje_notas: notes || undefined,
+    });
   };
 
   const handleCopySummary = async () => {

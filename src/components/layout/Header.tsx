@@ -123,9 +123,10 @@ export function Header() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 25);
+      setIsScrolled(window.scrollY > 20);
     };
 
+    handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
 
     return () => window.removeEventListener('scroll', handleScroll);
@@ -175,24 +176,44 @@ export function Header() {
     return false;
   };
 
+  const isHome = location.pathname === '/';
+  const isDarkHero = isHome && !isScrolled;
+
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-300 ${
+      className={`sticky top-0 z-50 lg:fixed lg:top-0 lg:left-0 lg:right-0 transition-all duration-300 ${
         isScrolled
-          ? 'bg-[#FFFFFF]/95 backdrop-blur-md shadow-sm border-b border-[#5E765E]/15 py-3'
-          : 'bg-[#FFF2DE]/90 backdrop-blur-sm py-4 border-b border-[#5E765E]/10'
+          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-[#5E765E]/15 py-3'
+          : 'bg-[#FFF2DE]/90 backdrop-blur-sm py-4 border-b border-[#5E765E]/10 lg:bg-transparent lg:border-transparent lg:shadow-none'
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
-        {/* Brand Logo */}
-        <Logo variant="horizontal" color="dark" />
+        {/* Mobile Logo: Always dark as currently in production */}
+        <div className="lg:hidden">
+          <Logo variant="horizontal" color="dark" />
+        </div>
+
+        {/* Desktop Logo: Transparent integration with dark hero before scroll */}
+        <div className="hidden lg:block">
+          <Logo variant="horizontal" color={isDarkHero ? 'light' : 'dark'} />
+        </div>
 
         {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center gap-7 text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.14em] text-[#111111]/85 font-medium">
+        <nav
+          className={`hidden lg:flex items-center gap-7 text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.14em] font-medium transition-colors ${
+            isDarkHero ? 'text-white/85' : 'text-[#111111]/85'
+          }`}
+        >
           <Link
             to="/"
-            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
-              isActive('/') ? 'text-[#5E765E] font-semibold' : ''
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
             }`}
           >
             Inicio
@@ -207,14 +228,26 @@ export function Header() {
           >
             <Link
               to="/catalogo"
-              className={`inline-flex items-center gap-1.5 py-1 transition-colors relative cursor-pointer hover:text-[#5E765E] ${
-                isActive('/catalogo') ? 'text-[#5E765E] font-semibold' : ''
+              className={`inline-flex items-center gap-1.5 py-1 transition-colors relative cursor-pointer ${
+                isDarkHero
+                  ? isActive('/catalogo')
+                    ? 'text-white font-semibold'
+                    : 'hover:text-white'
+                  : isActive('/catalogo')
+                    ? 'text-[#5E765E] font-semibold'
+                    : 'hover:text-[#5E765E]'
               }`}
             >
               <span>Catálogo</span>
               <ChevronDown
                 className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                  catalogDropdownOpen ? 'rotate-180 text-[#5E765E]' : 'text-[#111111]/50'
+                  catalogDropdownOpen
+                    ? isDarkHero
+                      ? 'rotate-180 text-white'
+                      : 'rotate-180 text-[#5E765E]'
+                    : isDarkHero
+                      ? 'text-white/60'
+                      : 'text-[#111111]/50'
                 }`}
               />
             </Link>
@@ -224,7 +257,7 @@ export function Header() {
               <div
                 id="menu-catalog-dropdown"
                 role="menu"
-                className="absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-left"
+                className="absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 animate-in fade-in slide-in-from-top-2 duration-200 text-left text-[#111111]"
               >
                 <div className="px-3 py-2 border-b border-[#5E765E]/10 mb-2 flex items-center justify-between">
                   <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
@@ -284,8 +317,14 @@ export function Header() {
 
           <Link
             to="/como-reservar"
-            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
-              isActive('/como-reservar') ? 'text-[#5E765E] font-semibold' : ''
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/como-reservar')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/como-reservar')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
             }`}
           >
             Cómo Reservar
@@ -293,8 +332,14 @@ export function Header() {
 
           <Link
             to="/nosotros"
-            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
-              isActive('/nosotros') ? 'text-[#5E765E] font-semibold' : ''
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/nosotros')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/nosotros')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
             }`}
           >
             Nosotros
@@ -302,8 +347,14 @@ export function Header() {
 
           <Link
             to="/contacto"
-            className={`py-1 transition-colors relative hover:text-[#5E765E] ${
-              isActive('/contacto') ? 'text-[#5E765E] font-semibold' : ''
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/contacto')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/contacto')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
             }`}
           >
             Contacto
@@ -311,7 +362,11 @@ export function Header() {
 
           <a
             href="/workshop/"
-            className="inline-flex items-center gap-1.5 py-1 px-3 rounded-full bg-[#5E765E]/10 hover:bg-[#5E765E]/20 text-[#5E765E] font-semibold transition-all border border-[#5E765E]/20"
+            className={`inline-flex items-center gap-1.5 py-1 px-3 rounded-full font-semibold transition-all border ${
+              isDarkHero
+                ? 'bg-white/15 hover:bg-white/25 text-white border-white/30 backdrop-blur-sm'
+                : 'bg-[#5E765E]/10 hover:bg-[#5E765E]/20 text-[#5E765E] border border-[#5E765E]/20'
+            }`}
           >
             <span>Workshop</span>
             <span className="text-xs">🎃</span>
@@ -336,7 +391,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => openBooking()}
-            className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs cursor-pointer"
+            className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs cursor-pointer shadow-sm hover:bg-[#4d634d] transition-colors"
             aria-label="Agendar Cita"
           >
             <Calendar className="w-4 h-4 text-[#D5A688]" />
@@ -345,7 +400,7 @@ export function Header() {
             id="btn-mobile-nav-toggle"
             type="button"
             onClick={() => setIsOpen(!isOpen)}
-            className="p-2 text-[#111111] hover:text-[#5E765E] focus:outline-none"
+            className="p-2 text-[#111111] hover:text-[#5E765E] focus:outline-none transition-colors"
             aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
             aria-expanded={isOpen}
           >

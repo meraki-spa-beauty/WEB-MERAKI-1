@@ -6,6 +6,7 @@ import { SPA_INFO } from '../data/spaData';
 import { CATALOG_SERVICES } from '../data/catalog';
 import { trackMetaLead } from '../utils/metaPixel';
 import { trackTikTokSubmitForm } from '../utils/tiktokPixel';
+import { syncLeadToGoogleSheets } from '../utils/googleSheetsSync';
 import {
   Phone,
   Instagram,
@@ -76,12 +77,28 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
       value: selectedService.price,
       currency: 'PEN',
     });
+
     trackTikTokSubmitForm({
       content_name: `Consulta Contacto - ${selectedService.name}`,
       content_category: 'Cita Spa',
       value: selectedService.price,
       currency: 'PEN',
     });
+
+    syncLeadToGoogleSheets({
+      formulario: 'Contacto Web',
+      cliente: name || 'Cliente Web',
+      whatsapp: phone,
+      servicio_detalle: `${selectedService.name} (${selectedService.categoryLabel})`,
+      modalidad: isStudio ? 'Estudio (Pueblo Libre)' : `A Domicilio / Oficina (${district})`,
+      distrito: isStudio ? 'Pueblo Libre' : district,
+      fecha_preferida: date || 'A coordinar',
+      hora_preferida: time || 'A coordinar',
+      monto_total: `S/ ${selectedService.price}`,
+      mensaje_notas: note || undefined,
+      codigo_reserva: `MRK-CONT-${Math.floor(1000 + Math.random() * 9000)}`,
+    });
+
     window.open(`https://wa.me/${SPA_INFO.whatsappNumber}?text=${encoded}`, '_blank');
   };
 
@@ -91,7 +108,7 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
 
       <main className="flex-1">
         {/* Banner Hero */}
-        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-14 pb-12 border-b border-[#5E765E]/15 text-center">
+        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-14 lg:pt-28 pb-12 border-b border-[#5E765E]/15 text-center">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
               <Phone className="w-3.5 h-3.5 text-[#D5A688]" />
