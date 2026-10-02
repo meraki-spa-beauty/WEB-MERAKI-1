@@ -112,8 +112,8 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
           />
         </picture>
 
-        {/* Mobile scrim (Current production: natural warm lighting) */}
-        <div className="block md:hidden absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-black/30 pointer-events-none" />
+        {/* Mobile scrim (Warm natural lighting with subtle central contrast for logo readability) */}
+        <div className="block md:hidden absolute inset-0 bg-gradient-to-b from-black/45 via-black/25 to-black/65 pointer-events-none" />
 
         {/* Desktop scrim (Deeper, richer scrim for seamless desktop header integration) */}
         <div className="hidden md:block absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/65 pointer-events-none" />
@@ -121,11 +121,13 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
 
       {/* Main Hero Content: Original padding on mobile, extended on desktop */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-36 flex flex-col items-center justify-center text-center flex-1">
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center relative">
+          {/* Soft ambient halo behind logo so it reads crisply against light towels & ceramics */}
+          <div className="absolute inset-0 -inset-x-12 -inset-y-8 bg-black/40 rounded-full blur-2xl pointer-events-none md:bg-black/30" />
           <img
             src="/assets/brand/meraki-logo-official-white.png"
             alt="Meraki Spa & Beauty"
-            className="w-52 sm:w-64 md:w-72 lg:w-80 max-w-[72vw] h-auto object-contain select-none pointer-events-none drop-shadow-md opacity-55 filter brightness-75 contrast-90 md:opacity-60 md:brightness-90 md:contrast-95"
+            className="relative z-10 w-56 sm:w-64 md:w-72 lg:w-80 max-w-[76vw] h-auto object-contain select-none pointer-events-none drop-shadow-[0_4px_22px_rgba(0,0,0,0.85)] drop-shadow-[0_2px_6px_rgba(0,0,0,0.95)] opacity-95 filter brightness-100 contrast-105 md:opacity-90 md:brightness-100 md:contrast-100"
             referrerPolicy="no-referrer"
           />
         </div>
