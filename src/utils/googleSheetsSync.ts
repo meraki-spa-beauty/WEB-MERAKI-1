@@ -50,10 +50,13 @@ export interface StoredLeadRecord {
   estado: string;
 }
 
+const DEFAULT_WEBHOOK_URL =
+  'https://script.google.com/macros/s/AKfycbyH7mg08giiH3BSnWwyS1ma8uqHzw73rZFfJRBI_Wt6Rax5rWxUfXl8Z7FT9J2Cga-jwQ/exec';
+
 const GOOGLE_SHEETS_WEBHOOK_URL =
   import.meta.env.VITE_LEADS_SHEETS_URL ||
   import.meta.env.VITE_WORKSHOP_SHEETS_URL ||
-  '';
+  DEFAULT_WEBHOOK_URL;
 
 /**
  * Envia el lead a Google Sheets y lo respalda en localStorage de inmediato
@@ -138,7 +141,7 @@ export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<
         method: 'POST',
         mode: 'no-cors',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain;charset=utf-8',
         },
         body: JSON.stringify(record),
       });
