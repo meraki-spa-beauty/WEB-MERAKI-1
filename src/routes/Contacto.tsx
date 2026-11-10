@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
+import { SkeletonBlock } from '../components/ui/Skeleton';
 import { SPA_INFO } from '../data/spaData';
 import { CATALOG_SERVICES } from '../data/catalog';
 import { trackMetaLead } from '../utils/metaPixel';
@@ -45,8 +46,18 @@ export function Contacto() {
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
   const [customNote, setCustomNote] = useState('');
+  const [isUpdatingService, setIsUpdatingService] = useState(false);
 
   const selectedService = CATALOG_SERVICES.find((s) => s.id === selectedServiceId) || CATALOG_SERVICES[0];
+  const servicePricePEN = selectedService.pricePEN || selectedService.priceOptions?.[0]?.pricePEN || 0;
+
+  const handleSelectService = (newId: string) => {
+    setSelectedServiceId(newId);
+    setIsUpdatingService(true);
+    window.setTimeout(() => {
+      setIsUpdatingService(false);
+    }, 200);
+  };
 
   const handleSendWhatsApp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,28 +85,28 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
     trackMetaLead({
       content_name: `Consulta Contacto - ${selectedService.name}`,
       content_category: 'Cita Spa',
-      value: selectedService.price,
+      value: servicePricePEN,
       currency: 'PEN',
     });
 
     trackTikTokSubmitForm({
       content_name: `Consulta Contacto - ${selectedService.name}`,
       content_category: 'Cita Spa',
-      value: selectedService.price,
+      value: servicePricePEN,
       currency: 'PEN',
     });
 
     syncLeadToGoogleSheets({
       formulario: 'Contacto Web',
-      cliente: name || 'Cliente Web',
-      whatsapp: phone,
+      cliente: clientName || 'Cliente Web',
+      whatsapp: SPA_INFO.whatsappDisplay,
       servicio_detalle: `${selectedService.name} (${selectedService.categoryLabel})`,
       modalidad: isStudio ? 'Estudio (Pueblo Libre)' : `A Domicilio / Oficina (${district})`,
       distrito: isStudio ? 'Pueblo Libre' : district,
-      fecha_preferida: date || 'A coordinar',
-      hora_preferida: time || 'A coordinar',
-      monto_total: `S/ ${selectedService.price}`,
-      mensaje_notas: note || undefined,
+      fecha_preferida: preferredDate || 'A coordinar',
+      hora_preferida: preferredTime || 'A coordinar',
+      monto_total: `S/ ${servicePricePEN}`,
+      mensaje_notas: customNote || undefined,
       codigo_reserva: `MRK-CONT-${Math.floor(1000 + Math.random() * 9000)}`,
     });
 
@@ -300,7 +311,7 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
                       </label>
                       <select
                         value={selectedServiceId}
-                        onChange={(e) => setSelectedServiceId(e.target.value)}
+                        onChange={(e) => handleSelectService(e.target.value)}
                         className="w-full px-4 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] focus:outline-none focus:border-[#5E765E] bg-white cursor-pointer"
                       >
                         {CATALOG_SERVICES.map((s) => (
@@ -309,9 +320,13 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
                           </option>
                         ))}
                       </select>
-                      <span className="text-[11px] text-[#5E765E] mt-1 block">
-                        Subcategoría: {selectedService.subcategory}
-                      </span>
+                      {isUpdatingService ? (
+                        <SkeletonBlock className="h-4 w-48 rounded mt-1.5" variant="warm" />
+                      ) : (
+                        <span className="text-[11px] text-[#5E765E] mt-1 block">
+                          Subcategoría: {selectedService.subcategory} • Desde S/ {servicePricePEN}
+                        </span>
+                      )}
                     </div>
 
                     {/* Modalidad de Atención: Estudio vs Casa vs Trabajo */}

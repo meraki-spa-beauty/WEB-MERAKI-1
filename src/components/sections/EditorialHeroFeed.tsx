@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { 
   ShieldCheck, 
   Clock, 
   Sparkles, 
   MapPin 
 } from 'lucide-react';
+import { HomeHeroCenterpieceSkeleton } from '../ui/Skeleton';
 
 interface EditorialHeroFeedProps {
   onOpenBooking?: () => void;
@@ -13,6 +14,20 @@ interface EditorialHeroFeedProps {
 export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHeroFeedProps) {
   const [customDesktopBg, setCustomDesktopBg] = useState<string | null>(null);
   const [customMobileBg, setCustomMobileBg] = useState<string | null>(null);
+  const [isHeroBgLoaded, setIsHeroBgLoaded] = useState<boolean>(false);
+  const [isLogoLoaded, setIsLogoLoaded] = useState<boolean>(false);
+
+  const handleHeroImgRef = useCallback((el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth > 0) {
+      setIsHeroBgLoaded(true);
+    }
+  }, []);
+
+  const handleLogoImgRef = useCallback((el: HTMLImageElement | null) => {
+    if (el && el.complete && el.naturalWidth > 0) {
+      setIsLogoLoaded(true);
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -23,6 +38,9 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
       console.warn('Could not clear test cache:', e);
     }
   }, []);
+
+  const showHeroBg = isHeroBgLoaded;
+  const showLogo = isLogoLoaded;
 
   const desktopBgSrc = customDesktopBg || '/assets/backgrounds/fondo-desktop.webp';
   const mobileBgSrc = customMobileBg || '/assets/backgrounds/fondo-mobile.webp';
@@ -97,7 +115,15 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
       className="relative overflow-hidden min-h-[82vh] lg:min-h-[88vh] flex flex-col justify-between text-white select-none"
     >
       {/* Background with responsive Desktop & Mobile sources */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="absolute inset-0 z-0 overflow-hidden bg-[#232A23]">
+        {!showHeroBg && (
+          <div
+            aria-hidden="true"
+            className="absolute inset-0 z-10 meraki-skeleton-dark"
+          >
+            <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60 pointer-events-none" />
+          </div>
+        )}
         <picture className="w-full h-full block">
           {/* Mobile background (< 768px) */}
           <source media="(max-width: 767px)" srcSet={mobileBgSrc} />
@@ -105,9 +131,16 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
           <source media="(min-width: 768px)" srcSet={desktopBgSrc} />
           {/* Fallback image - Natural on mobile, subdued on desktop */}
           <img
+            ref={handleHeroImgRef}
             src={desktopBgSrc}
             alt="Meraki Spa & Beauty"
-            className="w-full h-full object-cover object-center scale-100 transition-transform duration-1000 ease-out brightness-100 contrast-100 md:brightness-[0.82] md:contrast-[0.95]"
+            fetchPriority="high"
+            loading="eager"
+            onLoad={() => setIsHeroBgLoaded(true)}
+            onError={() => setIsHeroBgLoaded(true)}
+            className={`w-full h-full object-cover object-center scale-100 transition-opacity duration-300 ease-out brightness-100 contrast-100 md:brightness-[0.82] md:contrast-[0.95] ${
+              showHeroBg ? 'opacity-100' : 'opacity-0'
+            }`}
             referrerPolicy="no-referrer"
           />
         </picture>
@@ -121,11 +154,19 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
 
       {/* Main Hero Content: Original padding on mobile, extended on desktop */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-36 flex flex-col items-center justify-center text-center flex-1">
-        <div className="flex flex-col items-center justify-center">
+        <div className="flex flex-col items-center justify-center relative">
+          {!showLogo && <HomeHeroCenterpieceSkeleton />}
           <img
+            ref={handleLogoImgRef}
             src="/assets/brand/meraki-logo-official-white.png"
             alt="Meraki Spa & Beauty"
-            className="w-56 sm:w-64 md:w-72 lg:w-80 max-w-[76vw] h-auto object-contain select-none pointer-events-none opacity-90 md:opacity-90 transition-opacity duration-300"
+            fetchPriority="high"
+            loading="eager"
+            onLoad={() => setIsLogoLoaded(true)}
+            onError={() => setIsLogoLoaded(true)}
+            className={`w-56 sm:w-64 md:w-72 lg:w-80 max-w-[76vw] h-auto object-contain select-none pointer-events-none transition-opacity duration-300 ${
+              showLogo ? 'opacity-90 md:opacity-90' : 'opacity-0 absolute'
+            }`}
             referrerPolicy="no-referrer"
           />
         </div>
@@ -133,7 +174,23 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
 
       {/* Trust Badges Bar */}
       <div className="relative z-10 w-full border-t border-white/15 bg-black/40 backdrop-blur-md py-5 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-left">
+        {!showHeroBg ? (
+          <div
+            aria-hidden="true"
+            className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-left"
+          >
+            {[1, 2, 3, 4].map((badge) => (
+              <div key={badge} className="flex items-center gap-3">
+                <div className="w-8 h-8 rounded-full bg-[#D5A688]/20 border border-[#D5A688]/30 shrink-0 animate-pulse" />
+                <div className="space-y-1.5 flex-1">
+                  <div className="h-3 w-24 max-w-full rounded bg-white/25 animate-pulse" />
+                  <div className="h-2.5 w-32 max-w-full rounded bg-white/12 animate-pulse" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-left">
           
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
@@ -191,7 +248,8 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
             </div>
           </div>
 
-        </div>
+          </div>
+        )}
       </div>
     </section>
   );

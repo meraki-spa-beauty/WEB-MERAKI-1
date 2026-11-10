@@ -17,7 +17,37 @@
     <meta name="twitter:card" content="summary_large_image" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="preload" as="image" href="/assets/brand/meraki-logo-official-white.png" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/backgrounds/fondo-desktop.webp" media="(min-width: 768px)" fetchpriority="high" />
+    <link rel="preload" as="image" href="/assets/backgrounds/fondo-mobile.webp" media="(max-width: 767px)" fetchpriority="high" />
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,400;1,600&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+    <style>
+      body { margin: 0; background-color: #FFF2DE; color: #111111; font-family: 'Montserrat', system-ui, sans-serif; }
+      @keyframes mrk-boot-shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+      @keyframes mrk-boot-spin { to { transform: rotate(360deg); } }
+      .mrk-boot-shell { min-height: 100vh; display: flex; flex-direction: column; background: #FFF2DE; }
+      .mrk-boot-hero { position: relative; min-height: 82vh; background-color: #232A23; background-image: linear-gradient(105deg, rgba(94,118,94,0.16) 20%, rgba(213,166,136,0.22) 50%, rgba(94,118,94,0.16) 80%); background-size: 200% 100%; animation: mrk-boot-shimmer 1.1s ease-in-out infinite; display: flex; flex-direction: column; justify-content: space-between; }
+      .mrk-boot-nav { display: flex; align-items: center; justify-content: space-between; max-width: 80rem; width: 100%; margin: 0 auto; padding: 1rem 1.5rem; box-sizing: border-box; }
+      .mrk-boot-pill { border-radius: 9999px; background: rgba(255,242,222,0.16); }
+      .mrk-boot-center { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1rem; padding: 3rem 1rem; }
+      .mrk-boot-medallion { width: 6.5rem; height: 6.5rem; border-radius: 9999px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: center; }
+      .mrk-boot-ring { width: 1.75rem; height: 1.75rem; border-radius: 9999px; border: 2.5px solid rgba(255,242,222,0.2); border-top-color: #D5A688; animation: mrk-boot-spin 0.9s linear infinite; }
+      .mrk-boot-badges { border-top: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.4); padding: 1.25rem 1.5rem; }
+      .mrk-boot-badges-grid { max-width: 72rem; margin: 0 auto; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+      .mrk-boot-badge-item { display: flex; align-items: center; gap: 0.75rem; }
+      .mrk-boot-section { max-width: 80rem; width: 100%; margin: 0 auto; padding: 3.5rem 1.5rem; box-sizing: border-box; }
+      .mrk-boot-cards { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+      .mrk-boot-card { background: #FFFFFF; border-radius: 1.5rem; padding: 1.75rem; border: 1px solid rgba(94,118,94,0.15); }
+      .mrk-boot-bar { border-radius: 0.5rem; background-color: rgba(94,118,94,0.12); background-image: linear-gradient(105deg, rgba(94,118,94,0.08) 20%, rgba(255,242,222,0.75) 50%, rgba(94,118,94,0.08) 80%); background-size: 200% 100%; animation: mrk-boot-shimmer 1.1s ease-in-out infinite; }
+      @media (min-width: 768px) {
+        .mrk-boot-hero { min-height: 88vh; }
+        .mrk-boot-badges-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .mrk-boot-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .mrk-boot-hero, .mrk-boot-bar, .mrk-boot-ring { animation: none; }
+      }
+    </style>
     <!-- Meta Pixel Code -->
     <script>
       !function(f,b,e,v,n,t,s)
@@ -53,7 +83,38 @@
         alt=""
       />
     </noscript>
-    <div id="root"></div>
+    <div id="root">
+      <div class="mrk-boot-shell" role="status" aria-label="Cargando Meraki Spa">
+        <div class="mrk-boot-hero">
+          <div class="mrk-boot-nav">
+            <div class="mrk-boot-pill" style="width:7.5rem;height:2rem;"></div>
+            <div class="mrk-boot-pill" style="width:8.5rem;height:2.25rem;"></div>
+          </div>
+          <div class="mrk-boot-center">
+            <div class="mrk-boot-medallion"><div class="mrk-boot-ring"></div></div>
+            <div class="mrk-boot-pill" style="width:13rem;height:1.5rem;"></div>
+            <div class="mrk-boot-pill" style="width:8rem;height:0.65rem;background:rgba(213,166,136,0.35);"></div>
+          </div>
+          <div class="mrk-boot-badges">
+            <div class="mrk-boot-badges-grid">
+              <div class="mrk-boot-badge-item"><div class="mrk-boot-pill" style="width:2rem;height:2rem;flex-shrink:0;"></div><div style="flex:1;"><div class="mrk-boot-pill" style="width:5.5rem;height:0.7rem;margin-bottom:0.35rem;"></div><div class="mrk-boot-pill" style="width:7rem;height:0.55rem;opacity:0.6;"></div></div></div>
+              <div class="mrk-boot-badge-item"><div class="mrk-boot-pill" style="width:2rem;height:2rem;flex-shrink:0;"></div><div style="flex:1;"><div class="mrk-boot-pill" style="width:5.5rem;height:0.7rem;margin-bottom:0.35rem;"></div><div class="mrk-boot-pill" style="width:7rem;height:0.55rem;opacity:0.6;"></div></div></div>
+              <div class="mrk-boot-badge-item"><div class="mrk-boot-pill" style="width:2rem;height:2rem;flex-shrink:0;"></div><div style="flex:1;"><div class="mrk-boot-pill" style="width:5.5rem;height:0.7rem;margin-bottom:0.35rem;"></div><div class="mrk-boot-pill" style="width:7rem;height:0.55rem;opacity:0.6;"></div></div></div>
+              <div class="mrk-boot-badge-item"><div class="mrk-boot-pill" style="width:2rem;height:2rem;flex-shrink:0;"></div><div style="flex:1;"><div class="mrk-boot-pill" style="width:5.5rem;height:0.7rem;margin-bottom:0.35rem;"></div><div class="mrk-boot-pill" style="width:7rem;height:0.55rem;opacity:0.6;"></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="mrk-boot-section">
+          <div class="mrk-boot-bar" style="width:9rem;height:0.75rem;margin:0 auto 0.75rem;"></div>
+          <div class="mrk-boot-bar" style="width:22rem;max-width:90%;height:2.25rem;margin:0 auto;"></div>
+          <div class="mrk-boot-cards">
+            <div class="mrk-boot-card"><div class="mrk-boot-bar" style="width:3rem;height:3rem;border-radius:1rem;margin-bottom:1rem;"></div><div class="mrk-boot-bar" style="width:70%;height:1.5rem;margin-bottom:0.75rem;"></div><div class="mrk-boot-bar" style="width:100%;height:0.75rem;margin-bottom:0.5rem;"></div><div class="mrk-boot-bar" style="width:85%;height:0.75rem;"></div></div>
+            <div class="mrk-boot-card"><div class="mrk-boot-bar" style="width:3rem;height:3rem;border-radius:1rem;margin-bottom:1rem;"></div><div class="mrk-boot-bar" style="width:70%;height:1.5rem;margin-bottom:0.75rem;"></div><div class="mrk-boot-bar" style="width:100%;height:0.75rem;margin-bottom:0.5rem;"></div><div class="mrk-boot-bar" style="width:85%;height:0.75rem;"></div></div>
+            <div class="mrk-boot-card"><div class="mrk-boot-bar" style="width:3rem;height:3rem;border-radius:1rem;margin-bottom:1rem;"></div><div class="mrk-boot-bar" style="width:70%;height:1.5rem;margin-bottom:0.75rem;"></div><div class="mrk-boot-bar" style="width:100%;height:0.75rem;margin-bottom:0.5rem;"></div><div class="mrk-boot-bar" style="width:85%;height:0.75rem;"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

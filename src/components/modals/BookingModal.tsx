@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { SPA_INFO } from '../../data/spaData';
 import type { CatalogService, ServicePriceOption } from '../../types';
+import { BookingModalSkeleton, SkeletonBlock } from '../ui/Skeleton';
 import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
 import { trackTikTokSubmitForm, trackTikTokCompleteRegistration } from '../../utils/tiktokPixel';
 import { syncLeadToGoogleSheets } from '../../utils/googleSheetsSync';
@@ -93,6 +94,28 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
   // UI state
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
+  const [isInitializing, setIsInitializing] = useState<boolean>(false);
+  const [isPreparingSummary, setIsPreparingSummary] = useState<boolean>(false);
+  const [wasOpen, setWasOpen] = useState<boolean>(isOpen);
+
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+
+    if (isOpen) {
+      setIsInitializing(true);
+    }
+  }
+
+  // Show skeleton briefly when modal opens
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const timer = window.setTimeout(() => {
+      setIsInitializing(false);
+    }, 95);
+
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
 
   // Sync preselectedServiceId
   useEffect(() => {
@@ -257,7 +280,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitted(true);
+    setIsPreparingSummary(true);
     triggerBookingConversion();
 
     const serviceTitle = `${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`;
@@ -268,15 +291,20 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       whatsapp: clientPhone,
       servicio_detalle: serviceTitle,
       modalidad: locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : 'A Domicilio',
-      distrito: locationType === 'domicilio' ? district : 'Pueblo Libre',
-      direccion: locationType === 'domicilio' ? address : SPA_INFO.address,
+      distrito: locationType !== 'estudio' ? district : 'Pueblo Libre',
+      direccion: locationType !== 'estudio' ? address : SPA_INFO.studioAddress,
       fecha_preferida: date || 'A coordinar',
       hora_preferida: timeSlot || 'A coordinar',
       monto_total: `S/ ${priceCalculation.basePrice}`,
       monto_adelanto: `S/ ${Math.round(priceCalculation.basePrice * 0.4)} (40%)`,
       codigo_reserva: `MRK-SPA-${Math.floor(1000 + Math.random() * 9000)}`,
-      mensaje_notas: notes || undefined,
+      mensaje_notas: specialNotes || undefined,
     });
+
+    window.setTimeout(() => {
+      setIsPreparingSummary(false);
+      setIsSubmitted(true);
+    }, 130);
   };
 
   const handleCopySummary = async () => {
@@ -335,7 +363,34 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
         {/* Scrollable Form Body */}
         <div className="overflow-y-auto p-5 sm:p-7 space-y-6 flex-1">
-          {isSubmitted ? (
+          {isInitializing ? (
+            <BookingModalSkeleton />
+          ) : isPreparingSummary ? (
+            <div
+              role="status"
+              aria-live="polite"
+              aria-busy="true"
+              className="py-6 space-y-5 text-center"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <progress aria-label="Generando consolidado de reserva" className="loading-spinner" />
+                <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#5E765E]">
+                  Preparando resumen de reserva...
+                </span>
+              </div>
+              <div className="bg-white/80 rounded-2xl border border-[#5E765E]/20 p-5 space-y-3.5 max-w-lg mx-auto">
+                <SkeletonBlock className="h-4 w-44 rounded" />
+                <SkeletonBlock className="h-4 w-full rounded" />
+                <SkeletonBlock className="h-4 w-5/6 rounded" />
+                <SkeletonBlock className="h-4 w-3/4 rounded" />
+                <SkeletonBlock className="h-16 w-full rounded-xl" variant="warm" />
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+                <SkeletonBlock className="h-12 flex-1 rounded-full" />
+                <SkeletonBlock className="h-12 w-full sm:w-36 rounded-full" variant="warm" />
+              </div>
+            </div>
+          ) : isSubmitted ? (
             /* =========================================================================
                CONFIRMATION / WHATSAPP CONSOLIDATED VIEW
                ========================================================================= */

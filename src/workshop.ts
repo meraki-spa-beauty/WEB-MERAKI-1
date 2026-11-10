@@ -450,10 +450,37 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 8. HTML5 Video Autoplay & Loop Manager (Desktop Reel & Mobile Hold Video)
+  // 8. HTML5 Video Autoplay & Loop Manager + Loading Skeleton Overlay
   const workshopVideos = document.querySelectorAll<HTMLVideoElement>('video');
 
   workshopVideos.forEach((video) => {
+    const parentFrame = video.parentElement;
+
+    if (parentFrame && video.readyState < 2) {
+      const skeletonOverlay = document.createElement('div');
+
+      skeletonOverlay.setAttribute('aria-hidden', 'true');
+      skeletonOverlay.className = 'workshop-skeleton absolute inset-0 z-10 flex items-center justify-center transition-opacity duration-500 pointer-events-none';
+
+      const spinnerEl = document.createElement('progress');
+
+      spinnerEl.setAttribute('aria-label', 'Cargando video del workshop');
+      spinnerEl.className = 'loading-spinner loading-spinner-light';
+      skeletonOverlay.appendChild(spinnerEl);
+      parentFrame.appendChild(skeletonOverlay);
+
+      const dismissSkeleton = () => {
+        skeletonOverlay.classList.add('opacity-0');
+        window.setTimeout(() => {
+          skeletonOverlay.remove();
+        }, 500);
+      };
+
+      video.addEventListener('loadeddata', dismissSkeleton, { once: true });
+      video.addEventListener('canplay', dismissSkeleton, { once: true });
+      video.addEventListener('error', dismissSkeleton, { once: true });
+    }
+
     video.muted = true;
 
     video.defaultMuted = true;

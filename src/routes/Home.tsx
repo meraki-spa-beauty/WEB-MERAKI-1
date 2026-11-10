@@ -1,8 +1,10 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
 import { EditorialHeroFeed } from '../components/sections/EditorialHeroFeed';
+import { HomeBodySectionsSkeleton } from '../components/ui/Skeleton';
 import { TESTIMONIALS } from '../data/spaData';
 import { CATEGORIES_DATA } from '../data/catalog';
 import { useBooking } from '../context/BookingContext';
@@ -27,6 +29,15 @@ import {
 
 export function Home() {
   const { openBooking } = useBooking();
+  const [isHydratingSections, setIsHydratingSections] = useState<boolean>(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setIsHydratingSections(false);
+    }, 110);
+
+    return () => window.clearTimeout(timer);
+  }, []);
 
   const getCategoryIcon = (id: string) => {
     switch (id) {
@@ -60,6 +71,10 @@ export function Home() {
            ========================================================================= */}
         <EditorialHeroFeed onOpenBooking={() => openBooking()} />
 
+        {isHydratingSections ? (
+          <HomeBodySectionsSkeleton />
+        ) : (
+          <>
         {/* =========================================================================
             2. CÓMO FUNCIONA EL SERVICIO A DOMICILIO (Para quien recién conoce la marca)
            ========================================================================= */}
@@ -436,6 +451,8 @@ export function Home() {
             </div>
           </div>
         </section>
+          </>
+        )}
       </main>
 
       <Footer />

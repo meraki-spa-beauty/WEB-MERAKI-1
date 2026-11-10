@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
+import { CatalogGridSkeleton, SkeletonImage } from '../components/ui/Skeleton';
 import { CATALOG_SERVICES, CATEGORIES_DATA, POLICIES_DATA } from '../data/catalog';
 import { SPA_INFO } from '../data/spaData';
 import { useBooking } from '../context/BookingContext';
@@ -44,18 +45,32 @@ export function Catalogo() {
   const [selectedCategory, setSelectedCategory] = useState<ServiceCategory | 'todos'>(initialCategory);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedVariants, setSelectedVariants] = useState<Record<string, number>>({});
+  const [isLoadingGrid, setIsLoadingGrid] = useState<boolean>(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setIsLoadingGrid(false);
+    }, 110);
+
+    return () => window.clearTimeout(timer);
+  }, [selectedCategory, searchQuery]);
 
   // Sync category with URL parameter
   useEffect(() => {
     const rawCat = searchParams.get('cat');
     const parsed = parseCategory(rawCat);
 
-    if (rawCat && parsed !== 'todos') {
+    if (rawCat && parsed !== 'todos' && parsed !== selectedCategory) {
+      setIsLoadingGrid(true);
       setSelectedCategory(parsed);
     }
-  }, [searchParams]);
+  }, [searchParams, selectedCategory]);
 
   const handleSelectCategory = (cat: ServiceCategory | 'todos') => {
+    if (cat !== selectedCategory) {
+      setIsLoadingGrid(true);
+    }
+
     setSelectedCategory(cat);
 
     if (cat === 'todos') {
@@ -212,7 +227,9 @@ export function Catalogo() {
         {/* Services List / Cards */}
         <section className="py-12">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            {filteredServices.length === 0 ? (
+            {isLoadingGrid ? (
+              <CatalogGridSkeleton count={6} />
+            ) : filteredServices.length === 0 ? (
               <div className="bg-white/80 rounded-3xl p-12 text-center border border-[#5E765E]/20 max-w-lg mx-auto">
                 <AlertCircle className="w-10 h-10 text-[#D5A688] mx-auto mb-3" />
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-semibold text-[#111111]">
@@ -245,15 +262,17 @@ export function Catalogo() {
                     >
                       {/* Image or Colored Header */}
                       {service.image ? (
-                        <div className="relative aspect-[16/9] w-full overflow-hidden bg-[#EAE2D5]">
-                          <img
-                            src={service.image}
-                            alt={service.name}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            referrerPolicy="no-referrer"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                          <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                        <SkeletonImage
+                          src={service.image}
+                          alt={service.name}
+                          width={640}
+                          height={360}
+                          loading="lazy"
+                          containerClassName="aspect-[16/9] w-full bg-[#EAE2D5]"
+                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        >
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+                          <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5">
                             <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-sm text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E]">
                               {service.subcategory}
                             </span>
@@ -263,10 +282,10 @@ export function Catalogo() {
                               </span>
                             )}
                           </div>
-                          <div className="absolute bottom-3 right-3 bg-[#5E765E] text-[#FFF2DE] px-3 py-1 rounded-lg font-['Montserrat',sans-serif] text-sm font-bold shadow-md">
+                          <div className="absolute bottom-3 right-3 z-20 bg-[#5E765E] text-[#FFF2DE] px-3 py-1 rounded-lg font-['Montserrat',sans-serif] text-sm font-bold shadow-md">
                             S/ {priceInfo.pricePEN}
                           </div>
-                        </div>
+                        </SkeletonImage>
                       ) : (
                         <div className="px-6 pt-5 pb-2 flex items-center justify-between border-b border-[#5E765E]/10 bg-[#5E765E]/5">
                           <span className="text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E]">
@@ -289,7 +308,7 @@ export function Catalogo() {
                           </p>
 
                           {/* Variant Options Selector */}
-                          {priceInfo.isVariant && (
+                          {priceInfo.isVariant && priceInfo.options && (
                             <div className="mb-4 p-2.5 rounded-xl bg-[#FFF2DE]/60 border border-[#5E765E]/15">
                               <span className="block text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E] mb-2">
                                 Selecciona Opción / Duración:
