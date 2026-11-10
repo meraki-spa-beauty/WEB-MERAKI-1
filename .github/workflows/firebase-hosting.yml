@@ -33,3 +33,4 @@ jobs:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: web-meraki-14bc4
           channelId: live
+          firebaseToolsVersion: "15.32.1"
