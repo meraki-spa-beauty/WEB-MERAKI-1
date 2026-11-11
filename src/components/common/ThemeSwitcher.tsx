@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Sparkles, Leaf } from 'lucide-react';
-import { BotanicalBackdrop } from './BotanicalBackdrop';
+import { WatercolorCanvas } from './WatercolorCanvas';
 
 export type BackgroundThemeOption = 'editorial' | 'organico';
 
@@ -32,8 +32,8 @@ export function ThemeSwitcher() {
 
   return (
     <>
-      {/* If organic theme is active, mount the botanical background silhouettes */}
-      {theme === 'organico' && <BotanicalBackdrop />}
+      {/* If organic theme is active, mount the watercolor canvas with botanical washes */}
+      {theme === 'organico' && <WatercolorCanvas />}
 
       {/* Floating Theme Switcher Widget */}
       <div
@@ -45,7 +45,7 @@ export function ThemeSwitcher() {
           <div className="bg-white/95 backdrop-blur-md rounded-2xl p-3 border border-[#5E765E]/20 shadow-xl max-w-xs space-y-2.5 animate-fade-in text-left">
             <div className="flex items-center justify-between pb-1.5 border-b border-[#5E765E]/15">
               <span className="text-[10px] font-bold uppercase tracking-wider text-[#5E765E]">
-                Comparar Fondos
+                Comparar Fondos Premium
               </span>
               <button
                 type="button"
@@ -69,9 +69,9 @@ export function ThemeSwitcher() {
               >
                 <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-[#D5A688]" />
                 <div>
-                  <span className="block font-bold">Opción A: Degradado Editorial</span>
+                  <span className="block font-bold">Opción A: Papelería Editorial</span>
                   <span className="block text-[10px] opacity-80 font-light leading-tight">
-                    Luz radial cálida + micro-textura de papel táctil de algodón
+                    Papel algodón 300g con luz cenital de estudio y sombras cálidas
                   </span>
                 </div>
               </button>
@@ -87,9 +87,9 @@ export function ThemeSwitcher() {
               >
                 <Leaf className="w-4 h-4 shrink-0 mt-0.5 text-[#D5A688]" />
                 <div>
-                  <span className="block font-bold">Opción C: Orgánico Botánico</span>
+                  <span className="block font-bold">Opción C: Acuarelas Botánicas</span>
                   <span className="block text-[10px] opacity-80 font-light leading-tight">
-                    Degradado suave + siluetas botánicas tenues en esquinas
+                    Veladuras etéreas en verde salvia y tarjetas en frosted glass
                   </span>
                 </div>
               </button>
@@ -108,7 +108,7 @@ export function ThemeSwitcher() {
               <Leaf className="w-3.5 h-3.5 text-[#5E765E]" />
             )}
             <span className="text-[11px] font-semibold text-[#5E765E]">
-              {theme === 'editorial' ? 'Fondo: Opción A' : 'Fondo: Opción C'}
+              {theme === 'editorial' ? 'Fondo: Papelería Editorial' : 'Fondo: Acuarela Botánica'}
             </span>
           </button>
         )}

@@ -160,7 +160,7 @@ export function Catalogo() {
             </p>
 
             {/* Direct Booking Reminder Bar */}
-            <div className="inline-flex flex-wrap items-center justify-center gap-4 py-2.5 px-6 rounded-2xl bg-white/80 border border-[#5E765E]/20 shadow-sm text-xs text-[#111111]/80 max-w-3xl mx-auto">
+            <div className="theme-card-surface inline-flex flex-wrap items-center justify-center gap-4 py-2.5 px-6 rounded-2xl text-xs text-[#111111]/80 max-w-3xl mx-auto">
               <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
                 <MapPin className="w-4 h-4 text-[#D5A688]" />
                 <span>Estudio en Pueblo Libre &amp; A Domicilio</span>
@@ -264,7 +264,7 @@ export function Catalogo() {
                   return (
                     <article
                       key={service.id}
-                      className="bg-white rounded-2xl border border-[#5E765E]/15 shadow-sm hover:shadow-md transition-all flex flex-col justify-between overflow-hidden group text-left"
+                      className="theme-card-surface rounded-2xl flex flex-col justify-between overflow-hidden group text-left"
                     >
                       {/* Image or Colored Header */}
                       {service.image ? (

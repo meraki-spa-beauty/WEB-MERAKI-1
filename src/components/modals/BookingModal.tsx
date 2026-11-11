@@ -608,7 +608,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
               </div>
 
               {/* Consolidated Summary Card */}
-              <div className="bg-white/90 rounded-2xl border border-[#5E765E]/20 p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3.5 shadow-sm max-w-lg mx-auto">
+              <div className="theme-card-surface rounded-2xl p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3.5 max-w-lg mx-auto">
                 <div className="flex items-center justify-between border-b border-[#5E765E]/15 pb-2.5">
                   <span className="text-[11px] uppercase tracking-wider font-bold text-[#5E765E]">
                     Resumen de Servicios Agendados ({financialTotals.count})
@@ -778,7 +778,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                       return (
                         <div
                           key={item.instanceId}
-                          className="p-4 rounded-2xl bg-white/95 border border-[#5E765E]/20 shadow-xs space-y-3"
+                          className="theme-card-surface p-4 rounded-2xl space-y-3"
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
