@@ -21,12 +21,25 @@ export function Nosotros() {
 
       <main className="flex-1">
         {/* Banner Hero */}
-        <section className="meraki-hero-banner pt-14 lg:pt-28 pb-12 border-b border-[#D5A688]/25 text-left">
+        <section className="meraki-hero-banner pt-10 lg:pt-24 pb-12 border-b border-[#D5A688]/35 text-left">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-0 overflow-hidden"
+          >
+            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
+            <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
+            <img
+              src="/assets/brand/meraki-monogram.svg"
+              alt=""
+              className="absolute -right-14 top-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 opacity-[0.045] -rotate-6"
+            />
+          </div>
+
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
               <div className="lg:col-span-7">
-                <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#D5A688]/40 shadow-sm text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
+                <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[#5E765E] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
                   <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
                   <span>Conoce Nuestra Esencia</span>
                 </div>

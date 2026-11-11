@@ -113,18 +113,38 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
 
       <main className="flex-1">
         {/* Banner Hero */}
-        <section className="meraki-hero-banner pt-14 lg:pt-28 pb-12 border-b border-[#D5A688]/25 text-center">
+        <section className="meraki-hero-banner pt-10 lg:pt-24 pb-10 border-b border-[#D5A688]/35 text-center">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-0 overflow-hidden"
+          >
+            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
+            <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
+            <img
+              src="/assets/brand/meraki-monogram.svg"
+              alt=""
+              className="absolute -right-14 top-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 opacity-[0.045] -rotate-6"
+            />
+          </div>
+
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#D5A688]/40 shadow-sm text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
-              <Phone className="w-3.5 h-3.5 text-[#D5A688]" />
-              <span>Canales Oficiales</span>
+            <div className="relative rounded-t-[130px] sm:rounded-t-[200px] rounded-b-3xl border border-[#D5A688]/40 bg-gradient-to-b from-[#FFFDF9]/90 via-[#FFFDF9]/65 to-[#FFF2DE]/30 backdrop-blur-[2px] px-4 sm:px-10 pt-8 sm:pt-10 pb-7 shadow-[0_16px_40px_-12px_rgba(94,118,94,0.08),inset_0_1px_0_#FFFFFF]">
+              <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[#5E765E] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
+                <Phone className="w-3.5 h-3.5 text-[#D5A688]" />
+                <span>Canales Oficiales</span>
+              </div>
+              <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-3">
+                Ponte en Contacto con Meraki
+              </h1>
+              <div aria-hidden="true" className="flex items-center justify-center gap-3 mb-4">
+                <span className="h-px w-12 sm:w-20 bg-gradient-to-r from-transparent via-[#D5A688]/70 to-[#5E765E]/50" />
+                <span className="w-1.5 h-1.5 rotate-45 bg-[#D5A688]" />
+                <span className="h-px w-12 sm:w-20 bg-gradient-to-l from-transparent via-[#D5A688]/70 to-[#5E765E]/50" />
+              </div>
+              <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-xl mx-auto font-light leading-relaxed mb-2">
+                ¿Deseas consultar disponibilidad, cotizar movilidad según tu distrito o agendar una cita? Escríbenos directamente o utiliza nuestro asistente rápido de WhatsApp.
+              </p>
             </div>
-            <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-4">
-              Ponte en Contacto con Meraki
-            </h1>
-            <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-xl mx-auto font-light leading-relaxed mb-6">
-              ¿Deseas consultar disponibilidad, cotizar movilidad según tu distrito o agendar una cita? Escríbenos directamente o utiliza nuestro asistente rápido de WhatsApp.
-            </p>
           </div>
         </section>
 

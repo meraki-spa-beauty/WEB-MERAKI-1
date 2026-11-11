@@ -10,20 +10,20 @@
   --font-sans: 'Montserrat', system-ui, -apple-system, sans-serif;
 }
 
-@layer base {
+:root {
+  --in-oklab: ;
+  --in-oklch: ;
+  --meraki-linen-svg: url("data:image/svg+xml,%3Csvg width='120' height='120' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mrkPaper'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0.9 0 0 0 0.05  0 0.85 0 0 0.04  0 0 0.8 0 0.03  0 0 0 0.048 0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23mrkPaper)'/%3E%3Cg stroke='%235E765E' stroke-width='0.5' stroke-opacity='0.038' fill='none'%3E%3Cpath d='M0 15h120M0 45h120M0 75h120M0 105h120M15 0v120M45 0v120M75 0v120M105 0v120'/%3E%3C/g%3E%3Cg stroke='%23D5A688' stroke-width='0.5' stroke-opacity='0.042' fill='none'%3E%3Cpath d='M0 30h120M0 60h120M0 90h120M0 120h120M30 0v120M60 0v120M90 0v120M120 0v120'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+@supports (background: linear-gradient(in oklab, white, black)) {
   :root {
-    --in-oklab: ;
-    --in-oklch: ;
-    --meraki-linen-svg: url("data:image/svg+xml,%3Csvg viewBox='0 0 160 160' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='mrkLinen'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.035 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23mrkLinen)'/%3E%3Cpath d='M0 40h160M0 80h160M0 120h160M40 0v160M80 0v160M120 0v160' stroke='%235E765E' stroke-opacity='0.022' stroke-width='0.5' fill='none'/%3E%3C/svg%3E");
+    --in-oklab: in oklab;
+    --in-oklch: in oklch;
   }
+}
 
-  @supports (background: linear-gradient(in oklab, white, black)) {
-    :root {
-      --in-oklab: in oklab;
-      --in-oklch: in oklch;
-    }
-  }
-
+@layer base {
   *, ::before, ::after {
     box-sizing: border-box;
   }
@@ -40,227 +40,15 @@
     background-color: #FFF2DE;
     background-image:
       var(--meraki-linen-svg),
-      radial-gradient(ellipse 85% 55% var(--in-oklab) at 50% 0%, #FFFDF9 0%, rgba(255, 253, 249, 0.45) 55%, rgba(255, 242, 222, 0) 100%),
-      radial-gradient(ellipse 65% 50% var(--in-oklab) at 0% 15%, rgba(213, 166, 136, 0.18) 0%, rgba(255, 242, 222, 0) 72%),
-      radial-gradient(ellipse 65% 50% var(--in-oklab) at 100% 85%, rgba(174, 194, 174, 0.22) 0%, rgba(255, 242, 222, 0) 72%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%;
+      radial-gradient(ellipse 85% 55% at 50% 0%, #FFFDF9 0%, rgba(255, 253, 249, 0.55) 55%, rgba(255, 242, 222, 0) 100%),
+      radial-gradient(ellipse 65% 50% at 0% 15%, rgba(213, 166, 136, 0.34) 0%, rgba(255, 242, 222, 0) 72%),
+      radial-gradient(ellipse 65% 50% at 100% 85%, rgba(150, 178, 150, 0.36) 0%, rgba(255, 242, 222, 0) 72%);
+    background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
     background-repeat: repeat, no-repeat, no-repeat, no-repeat;
     color: #111111;
     font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  .meraki-editorial-canvas {
-    background-color: #FFF2DE;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 8% 12%, rgba(213, 166, 136, 0.16) 0%, transparent 48%),
-      radial-gradient(circle var(--in-oklab) at 92% 38%, rgba(174, 194, 174, 0.2) 0%, transparent 52%),
-      radial-gradient(circle var(--in-oklab) at 12% 78%, rgba(174, 194, 174, 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse 80% 60% var(--in-oklab) at 50% 45%, rgba(255, 253, 249, 0.78) 0%, transparent 75%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  }
-
-  /* Subpage & Hero Header Banner: Radial Light Halos + Linen Texture + 4% Monogram Watermark */
-  .meraki-hero-banner {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background-color: #FFF7EC;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 6% 14%, rgba(213, 166, 136, 0.3) 0%, rgba(213, 166, 136, 0.08) 36%, transparent 65%),
-      radial-gradient(circle var(--in-oklab) at 94% 86%, rgba(174, 194, 174, 0.36) 0%, rgba(94, 118, 94, 0.1) 38%, transparent 68%),
-      radial-gradient(circle var(--in-oklab) at 88% 12%, rgba(94, 118, 94, 0.12) 0%, transparent 45%),
-      radial-gradient(ellipse 72% 68% var(--in-oklab) at 50% 44%, #FFFDF9 0%, rgba(255, 253, 249, 0.86) 48%, rgba(255, 242, 222, 0.35) 100%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  }
-
-  .meraki-hero-banner::before {
-    content: "";
-    position: absolute;
-    right: -4.5rem;
-    top: 50%;
-    transform: translateY(-50%) rotate(-6deg);
-    width: clamp(19rem, 38vw, 31rem);
-    height: clamp(19rem, 38vw, 31rem);
-    background-image: url("/assets/brand/meraki-monogram.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .meraki-hero-banner::after {
-    content: "";
-    position: absolute;
-    left: -5.5rem;
-    bottom: -4.5rem;
-    width: clamp(14rem, 26vw, 22rem);
-    height: clamp(14rem, 26vw, 22rem);
-    background-image: url("/assets/brand/meraki-monogram.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.032;
-    transform: rotate(10deg);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Broad Editorial Sections with Radial Studio Light + Linen + 4% Monogram Filigree */
-  .meraki-section-ivory {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background-color: #FFFDF9;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 4% 18%, rgba(213, 166, 136, 0.2) 0%, transparent 55%),
-      radial-gradient(circle var(--in-oklab) at 96% 84%, rgba(174, 194, 174, 0.24) 0%, transparent 58%),
-      radial-gradient(ellipse 78% 70% var(--in-oklab) at 50% 50%, #FFFDF9 0%, rgba(255, 248, 238, 0.85) 100%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-  }
-
-  .meraki-section-ivory::before {
-    content: "";
-    position: absolute;
-    right: -4rem;
-    bottom: -3rem;
-    width: clamp(18rem, 34vw, 28rem);
-    height: clamp(18rem, 34vw, 28rem);
-    background-image: url("/assets/brand/meraki-monogram.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  .meraki-section-cream {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background-color: #FFF2DE;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 92% 14%, rgba(213, 166, 136, 0.24) 0%, transparent 55%),
-      radial-gradient(circle var(--in-oklab) at 8% 86%, rgba(174, 194, 174, 0.26) 0%, transparent 58%),
-      radial-gradient(ellipse 70% 65% var(--in-oklab) at 50% 48%, rgba(255, 253, 249, 0.88) 0%, rgba(255, 242, 222, 0.35) 100%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-  }
-
-  .meraki-section-cream::before {
-    content: "";
-    position: absolute;
-    left: -4rem;
-    top: 50%;
-    transform: translateY(-50%) rotate(-5deg);
-    width: clamp(18rem, 34vw, 29rem);
-    height: clamp(18rem, 34vw, 29rem);
-    background-image: url("/assets/brand/meraki-monogram.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* Deep Botanical Sage Section with Radial Halos + Linen + White Monogram Watermark */
-  .meraki-section-sage {
-    position: relative;
-    overflow: hidden;
-    isolation: isolate;
-    background-color: #5E765E;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 10% 15%, rgba(213, 166, 136, 0.28) 0%, transparent 55%),
-      radial-gradient(circle var(--in-oklab) at 90% 85%, rgba(174, 194, 174, 0.24) 0%, transparent 58%),
-      radial-gradient(ellipse 75% 70% var(--in-oklab) at 50% 40%, rgba(112, 138, 112, 0.45) 0%, rgba(74, 95, 74, 0.4) 100%);
-    background-size: 160px 160px, 100% 100%, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat, no-repeat;
-  }
-
-  .meraki-section-sage::before {
-    content: "";
-    position: absolute;
-    right: -3.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    width: clamp(19rem, 36vw, 30rem);
-    height: clamp(19rem, 36vw, 30rem);
-    background-image: url("/assets/brand/meraki-monogram-white.svg");
-    background-repeat: no-repeat;
-    background-position: center;
-    background-size: contain;
-    opacity: 0.04;
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* High-Contrast Translucent Ivory Pill Badge with Terracotta Border & Soft Shadow */
-  .meraki-editorial-pill {
-    background-color: rgba(255, 253, 249, 0.88);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(213, 166, 136, 0.45);
-    box-shadow:
-      0 2px 10px -1px rgba(213, 166, 136, 0.22),
-      0 1px 3px rgba(94, 118, 94, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  }
-
-  /* Elevated Warm Cards for Cream & Ivory Sections */
-  .meraki-cream-card {
-    background-color: #FFFDF9;
-    background-image:
-      var(--meraki-linen-svg),
-      radial-gradient(circle var(--in-oklab) at 0% 0%, rgba(213, 166, 136, 0.12) 0%, transparent 60%),
-      radial-gradient(circle var(--in-oklab) at 100% 100%, rgba(174, 194, 174, 0.14) 0%, transparent 60%);
-    background-size: 160px 160px, 100% 100%, 100% 100%;
-    background-repeat: repeat, no-repeat, no-repeat;
-    border: 1px solid rgba(213, 166, 136, 0.32);
-    box-shadow:
-      0 4px 14px -2px rgba(94, 118, 94, 0.07),
-      0 10px 24px -4px rgba(213, 166, 136, 0.12);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .meraki-cream-card:hover {
-    border-color: rgba(213, 166, 136, 0.5);
-    box-shadow:
-      0 8px 22px -2px rgba(94, 118, 94, 0.1),
-      0 18px 36px -4px rgba(213, 166, 136, 0.18);
-    transform: translateY(-2px);
-  }
-
-  .theme-card-surface {
-    background-color: #FFFDF9;
-    background-image:
-      radial-gradient(circle var(--in-oklab) at 100% 0%, rgba(213, 166, 136, 0.09) 0%, transparent 55%),
-      radial-gradient(circle var(--in-oklab) at 0% 100%, rgba(174, 194, 174, 0.1) 0%, transparent 55%);
-    border: 1px solid rgba(213, 166, 136, 0.32);
-    box-shadow: 
-      0 4px 14px -2px rgba(94, 118, 94, 0.07),
-      0 12px 28px -4px rgba(213, 166, 136, 0.12);
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .theme-card-surface:hover {
-    border-color: rgba(94, 118, 94, 0.28);
-    box-shadow: 
-      0 8px 22px -2px rgba(94, 118, 94, 0.11),
-      0 20px 40px -4px rgba(213, 166, 136, 0.18);
-    transform: translateY(-2px);
   }
 
   /* Custom smooth scrollbar */
@@ -278,6 +66,236 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #5E765E;
   }
+}
+
+/* ============================================================================
+   MERAKI EDITORIAL SPA SURFACES (Unlayered so Tailwind v4 always emits them)
+   ============================================================================ */
+
+.meraki-editorial-canvas {
+  background-color: #FAF0E1;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(circle at 6% 10%, rgba(213, 166, 136, 0.32) 0%, transparent 48%),
+    radial-gradient(circle at 94% 36%, rgba(145, 172, 145, 0.34) 0%, transparent 52%),
+    radial-gradient(circle at 10% 80%, rgba(145, 172, 145, 0.28) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 60% at 50% 45%, rgba(255, 253, 249, 0.88) 0%, transparent 75%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+}
+
+/* Subpage & Hero Header Banner: Multi-Point Studio Light + Linen Weave + 4%-5% Monogram Filigree */
+.meraki-hero-banner {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #FAF0E2;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(ellipse 62% 78% at 0% 0%, rgba(213, 166, 136, 0.52) 0%, rgba(213, 166, 136, 0.20) 42%, transparent 74%),
+    radial-gradient(ellipse 64% 80% at 100% 100%, rgba(136, 164, 136, 0.48) 0%, rgba(94, 118, 94, 0.18) 45%, transparent 76%),
+    radial-gradient(circle at 90% 10%, rgba(94, 118, 94, 0.18) 0%, transparent 42%),
+    radial-gradient(circle at 12% 92%, rgba(213, 166, 136, 0.24) 0%, transparent 45%),
+    radial-gradient(ellipse 62% 72% at 50% 46%, #FFFDF9 0%, rgba(255, 253, 249, 0.94) 46%, rgba(255, 242, 222, 0.25) 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  box-shadow: inset 0 -1px 0 rgba(213, 166, 136, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.meraki-hero-banner::before {
+  content: "";
+  position: absolute;
+  right: -3.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-6deg);
+  width: clamp(19rem, 38vw, 31rem);
+  height: clamp(19rem, 38vw, 31rem);
+  background-image: url("/assets/brand/meraki-monogram.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.052;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.meraki-hero-banner::after {
+  content: "";
+  position: absolute;
+  left: -4.5rem;
+  bottom: -4rem;
+  width: clamp(15rem, 28vw, 24rem);
+  height: clamp(15rem, 28vw, 24rem);
+  background-image: url("/assets/brand/meraki-monogram.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.04;
+  transform: rotate(12deg);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Broad Editorial Sections with Radial Studio Light + Linen + 4.5% Monogram Filigree */
+.meraki-section-ivory {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #FFFDF9;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(ellipse 55% 65% at 0% 12%, rgba(213, 166, 136, 0.34) 0%, transparent 62%),
+    radial-gradient(ellipse 58% 68% at 100% 88%, rgba(145, 174, 145, 0.36) 0%, transparent 64%),
+    radial-gradient(ellipse 72% 70% at 50% 50%, #FFFDF9 0%, rgba(255, 247, 235, 0.88) 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.meraki-section-ivory::before {
+  content: "";
+  position: absolute;
+  right: -3.5rem;
+  bottom: -2.5rem;
+  width: clamp(18rem, 34vw, 28rem);
+  height: clamp(18rem, 34vw, 28rem);
+  background-image: url("/assets/brand/meraki-monogram.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.meraki-section-cream {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #FAF0E0;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(ellipse 58% 65% at 96% 10%, rgba(213, 166, 136, 0.42) 0%, rgba(213, 166, 136, 0.14) 42%, transparent 68%),
+    radial-gradient(ellipse 60% 68% at 4% 90%, rgba(138, 166, 138, 0.40) 0%, rgba(94, 118, 94, 0.14) 44%, transparent 70%),
+    radial-gradient(ellipse 64% 62% at 50% 48%, #FFFDF9 0%, rgba(255, 253, 249, 0.86) 48%, rgba(255, 242, 222, 0.35) 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+}
+
+.meraki-section-cream::before {
+  content: "";
+  position: absolute;
+  left: -3.5rem;
+  top: 50%;
+  transform: translateY(-50%) rotate(-5deg);
+  width: clamp(18rem, 34vw, 29rem);
+  height: clamp(18rem, 34vw, 29rem);
+  background-image: url("/assets/brand/meraki-monogram.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.045;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Deep Botanical Sage Section with Radial Halos + Linen + White Monogram Watermark */
+.meraki-section-sage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: #546B54;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(ellipse 58% 68% at 6% 12%, rgba(213, 166, 136, 0.38) 0%, transparent 62%),
+    radial-gradient(ellipse 60% 68% at 94% 88%, rgba(174, 194, 174, 0.34) 0%, transparent 64%),
+    radial-gradient(ellipse 70% 68% at 50% 42%, rgba(108, 134, 108, 0.55) 0%, rgba(68, 88, 68, 0.55) 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+
+.meraki-section-sage::before {
+  content: "";
+  position: absolute;
+  right: -3rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(19rem, 36vw, 30rem);
+  height: clamp(19rem, 36vw, 30rem);
+  background-image: url("/assets/brand/meraki-monogram-white.svg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+  opacity: 0.055;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* High-Contrast Translucent Ivory Pill Badge with Terracotta Border & Soft Shadow */
+.meraki-editorial-pill {
+  background-color: rgba(255, 253, 249, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(213, 166, 136, 0.62);
+  box-shadow:
+    0 0 0 3px rgba(255, 253, 249, 0.65),
+    0 6px 18px -3px rgba(213, 166, 136, 0.32),
+    0 2px 6px rgba(94, 118, 94, 0.10),
+    inset 0 1px 0 #FFFFFF;
+}
+
+/* Elevated Warm Cards for Cream & Ivory Sections */
+.meraki-cream-card {
+  background-color: #FFFDF9;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(circle at 0% 0%, rgba(213, 166, 136, 0.18) 0%, transparent 58%),
+    radial-gradient(circle at 100% 100%, rgba(155, 180, 155, 0.20) 0%, transparent 58%),
+    linear-gradient(180deg, rgba(255, 253, 249, 0.96) 0%, rgba(255, 247, 234, 0.92) 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  border: 1px solid rgba(213, 166, 136, 0.42);
+  box-shadow:
+    0 10px 28px -6px rgba(94, 118, 94, 0.10),
+    0 4px 12px -2px rgba(213, 166, 136, 0.16),
+    inset 0 1px 0 #FFFFFF;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.meraki-cream-card:hover {
+  border-color: rgba(213, 166, 136, 0.65);
+  box-shadow:
+    0 16px 36px -6px rgba(94, 118, 94, 0.14),
+    0 8px 20px -4px rgba(213, 166, 136, 0.24),
+    inset 0 1px 0 #FFFFFF;
+  transform: translateY(-2px);
+}
+
+.theme-card-surface {
+  background-color: #FFFDF9;
+  background-image:
+    var(--meraki-linen-svg),
+    radial-gradient(circle at 100% 0%, rgba(213, 166, 136, 0.16) 0%, transparent 55%),
+    radial-gradient(circle at 0% 100%, rgba(155, 180, 155, 0.18) 0%, transparent 55%),
+    linear-gradient(180deg, #FFFFFF 0%, #FFFBF4 100%);
+  background-size: 120px 120px, 100% 100%, 100% 100%, 100% 100%;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat;
+  border: 1px solid rgba(213, 166, 136, 0.40);
+  box-shadow: 
+    0 12px 32px -6px rgba(94, 118, 94, 0.10),
+    0 4px 14px -2px rgba(213, 166, 136, 0.15),
+    inset 0 1px 0 #FFFFFF;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.theme-card-surface:hover {
+  border-color: rgba(94, 118, 94, 0.35);
+  box-shadow: 
+    0 18px 40px -6px rgba(94, 118, 94, 0.15),
+    0 8px 22px -4px rgba(213, 166, 136, 0.22),
+    inset 0 1px 0 #FFFFFF;
+  transform: translateY(-2px);
 }
 
 @property --arc-start {

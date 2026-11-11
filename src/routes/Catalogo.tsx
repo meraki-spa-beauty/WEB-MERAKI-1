@@ -140,35 +140,65 @@ export function Catalogo() {
 
       <main className="flex-1">
         {/* Subpage Header Banner */}
-        <section className="meraki-hero-banner pt-12 lg:pt-28 pb-10 border-b border-[#D5A688]/25">
-          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#D5A688]/40 shadow-sm text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-              <span>Fuente Oficial de Servicios Meraki</span>
-            </div>
-            <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-4">
-              Catálogo de Servicios &amp; Tarifas
-            </h1>
-            <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-              Atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o en la comodidad de tu casa u oficina, con instrumental esterilizado, cosmética profesional y protocolos de bioseguridad.
-            </p>
+        <section className="meraki-hero-banner pt-10 lg:pt-24 pb-10 border-b border-[#D5A688]/35">
+          {/* Studio Radial Halos & Botanical Monogram Filigree */}
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-0 overflow-hidden"
+          >
+            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
+            <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
+            <img
+              src="/assets/brand/meraki-monogram.svg"
+              alt=""
+              className="absolute -right-14 top-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 opacity-[0.045] -rotate-6"
+            />
+            <img
+              src="/assets/brand/meraki-monogram.svg"
+              alt=""
+              className="absolute -left-16 -bottom-12 w-56 sm:w-72 h-56 sm:h-72 opacity-[0.035] rotate-12"
+            />
+          </div>
 
-            {/* Direct Booking Reminder Bar */}
-            <div className="theme-card-surface inline-flex flex-wrap items-center justify-center gap-4 py-2.5 px-6 rounded-2xl text-xs text-[#111111]/80 max-w-3xl mx-auto">
-              <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
-                <MapPin className="w-4 h-4 text-[#D5A688]" />
-                <span>Estudio en Pueblo Libre &amp; A Domicilio</span>
-              </span>
-              <span className="text-[#5E765E]/30 hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
-                <Clock className="w-4 h-4 text-[#D5A688]" />
-                <span>Reserva previa del 40%</span>
-              </span>
-              <span className="text-[#5E765E]/30 hidden sm:inline">•</span>
-              <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
-                <ShieldCheck className="w-4 h-4 text-[#D5A688]" />
-                <span>Bioseguridad garantizada</span>
-              </span>
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div className="relative rounded-t-[130px] sm:rounded-t-[220px] rounded-b-3xl border border-[#D5A688]/40 bg-gradient-to-b from-[#FFFDF9]/90 via-[#FFFDF9]/65 to-[#FFF2DE]/30 backdrop-blur-[2px] px-4 sm:px-10 pt-8 sm:pt-10 pb-7 shadow-[0_16px_40px_-12px_rgba(94,118,94,0.08),inset_0_1px_0_#FFFFFF]">
+              <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[#5E765E] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
+                <span>Fuente Oficial de Servicios Meraki</span>
+              </div>
+
+              <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-3">
+                Catálogo de Servicios &amp; Tarifas
+              </h1>
+
+              {/* Editorial Ornamental Divider */}
+              <div aria-hidden="true" className="flex items-center justify-center gap-3 mb-4">
+                <span className="h-px w-12 sm:w-20 bg-gradient-to-r from-transparent via-[#D5A688]/70 to-[#5E765E]/50" />
+                <span className="w-1.5 h-1.5 rotate-45 bg-[#D5A688]" />
+                <span className="h-px w-12 sm:w-20 bg-gradient-to-l from-transparent via-[#D5A688]/70 to-[#5E765E]/50" />
+              </div>
+
+              <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-2xl mx-auto font-light leading-relaxed mb-7">
+                Atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o en la comodidad de tu casa u oficina, con instrumental esterilizado, cosmética profesional y protocolos de bioseguridad.
+              </p>
+
+              {/* Direct Booking Reminder Bar */}
+              <div className="theme-card-surface inline-flex flex-wrap items-center justify-center gap-3.5 sm:gap-4 py-3 px-6 rounded-2xl text-xs text-[#111111]/85 max-w-3xl mx-auto">
+                <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
+                  <MapPin className="w-4 h-4 text-[#D5A688]" />
+                  <span>Estudio en Pueblo Libre &amp; A Domicilio</span>
+                </span>
+                <span className="text-[#D5A688]/50 hidden sm:inline">•</span>
+                <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
+                  <Clock className="w-4 h-4 text-[#D5A688]" />
+                  <span>Reserva previa del 40%</span>
+                </span>
+                <span className="text-[#D5A688]/50 hidden sm:inline">•</span>
+                <span className="flex items-center gap-1.5 font-medium text-[#5E765E]">
+                  <ShieldCheck className="w-4 h-4 text-[#D5A688]" />
+                  <span>Bioseguridad garantizada</span>
+                </span>
+              </div>
             </div>
           </div>
         </section>
@@ -177,7 +207,7 @@ export function Catalogo() {
         <section className="sticky top-[69px] z-30 bg-[#FFFDF9]/90 backdrop-blur-md py-4 border-b border-[#D5A688]/25 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              
+
               {/* Category Pills */}
               <div className="flex items-center gap-2 overflow-x-auto w-full md:w-auto pb-1 md:pb-0 scrollbar-none">
                 {CATEGORIES_DATA.map((cat) => (
@@ -185,11 +215,10 @@ export function Catalogo() {
                     key={cat.id}
                     type="button"
                     onClick={() => handleSelectCategory(cat.id)}
-                    className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-['Montserrat',sans-serif] uppercase tracking-wider transition-all cursor-pointer ${
-                      selectedCategory === cat.id
+                    className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-['Montserrat',sans-serif] uppercase tracking-wider transition-all cursor-pointer ${selectedCategory === cat.id
                         ? 'bg-[#5E765E] text-[#FFF2DE] shadow-sm font-semibold'
                         : 'bg-white/85 hover:bg-white text-[#111111]/80 border border-[#D5A688]/30 shadow-xs'
-                    }`}
+                      }`}
                   >
                     {cat.label}
                     <span className="ml-1.5 text-[10px] opacity-75">
@@ -322,11 +351,10 @@ export function Catalogo() {
                                       key={opt.label}
                                       type="button"
                                       onClick={() => handleVariantSelect(service.id, idx)}
-                                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${
-                                        isSelected
+                                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer ${isSelected
                                           ? 'bg-[#5E765E] text-[#FFF2DE] shadow-sm'
                                           : 'bg-white text-[#111111]/80 hover:bg-[#FFF2DE] border border-[#5E765E]/20'
-                                      }`}
+                                        }`}
                                     >
                                       {opt.label}: <strong>S/ {opt.pricePEN}</strong>
                                     </button>
