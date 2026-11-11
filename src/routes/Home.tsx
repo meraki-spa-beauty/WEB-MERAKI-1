@@ -61,7 +61,7 @@ export function Home() {
   const categoriesPreview = CATEGORIES_DATA.filter((c) => c.id !== 'todos');
 
   return (
-    <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
+    <div className="min-h-screen meraki-editorial-canvas text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
       <Header />
 
       <main className="flex-1">
@@ -78,11 +78,12 @@ export function Home() {
         {/* =========================================================================
             2. CÓMO FUNCIONA EL SERVICIO A DOMICILIO (Para quien recién conoce la marca)
            ========================================================================= */}
-        <section className="py-16 md:py-20 bg-white/70 border-b border-[#5E765E]/15 text-left">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 md:py-20 meraki-section-ivory border-b border-[#D5A688]/25 text-left">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
-              <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                Fácil, Cómodo y Seguro
+              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                <span>Fácil, Cómodo y Seguro</span>
               </span>
               <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-2 mb-4">
                 ¿Cómo funciona el servicio de Meraki?
@@ -94,11 +95,11 @@ export function Home() {
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               {/* Step 1 */}
-              <div className="bg-[#FFF2DE] rounded-3xl p-8 border border-[#5E765E]/15 shadow-sm relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   01
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
                   <Sparkles className="w-6 h-6 text-[#D5A688]" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
@@ -119,11 +120,11 @@ export function Home() {
               </div>
 
               {/* Step 2 */}
-              <div className="bg-[#FFF2DE] rounded-3xl p-8 border border-[#5E765E]/15 shadow-sm relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   02
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
                   <MessageSquare className="w-6 h-6 text-[#D5A688]" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
@@ -144,11 +145,11 @@ export function Home() {
               </div>
 
               {/* Step 3 */}
-              <div className="bg-[#FFF2DE] rounded-3xl p-8 border border-[#5E765E]/15 shadow-sm relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   03
                 </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6">
+                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
                   <HomeIcon className="w-6 h-6 text-[#D5A688]" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
@@ -171,12 +172,13 @@ export function Home() {
         {/* =========================================================================
             3. NUESTRAS 6 ESPECIALIDADES (Preview sin saturar la página)
            ========================================================================= */}
-        <section className="py-16 md:py-20 text-left">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 md:py-20 meraki-section-cream text-left">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
               <div>
-                <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                  Catálogo Oficial
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                  <span>Catálogo Oficial</span>
                 </span>
                 <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-1">
                   Nuestras Especialidades
@@ -196,14 +198,14 @@ export function Home() {
                 <Link
                   key={cat.id}
                   to={`/catalogo?cat=${cat.id}`}
-                  className="bg-white rounded-3xl p-6 sm:p-8 border border-[#5E765E]/15 shadow-sm hover:shadow-md hover:border-[#5E765E]/30 transition-all flex flex-col justify-between group cursor-pointer"
+                  className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between group cursor-pointer"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/20 flex items-center justify-center group-hover:bg-[#5E765E] group-hover:text-[#FFF2DE] transition-colors">
+                      <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center group-hover:bg-[#5E765E] group-hover:text-[#FFF2DE] transition-colors">
                         {getCategoryIcon(cat.id)}
                       </div>
-                      <span className="text-xs font-bold text-[#5E765E] px-3 py-1 rounded-full bg-[#5E765E]/10">
+                      <span className="meraki-editorial-pill text-xs font-bold text-[#5E765E] px-3 py-1 rounded-full">
                         {cat.count} servicios
                       </span>
                     </div>
@@ -239,13 +241,13 @@ export function Home() {
         {/* =========================================================================
             4. BIENVENIDA & CONOCE A ANA MARIA DÍAZ
            ========================================================================= */}
-        <section className="py-16 md:py-20 bg-white/70 border-y border-[#5E765E]/15 text-left">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 md:py-20 meraki-section-ivory border-y border-[#D5A688]/25 text-left">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               
               <div className="lg:col-span-5">
-                <div className="bg-[#FFF2DE] rounded-3xl p-8 border border-[#5E765E]/20 shadow-md">
-                  <div className="w-16 h-16 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-2xl font-bold mb-6">
+                <div className="meraki-cream-card rounded-3xl p-8">
+                  <div className="w-16 h-16 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-2xl font-bold mb-6 shadow-sm">
                     AMD
                   </div>
                   <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#D5A688] block">
@@ -270,10 +272,11 @@ export function Home() {
               </div>
 
               <div className="lg:col-span-7">
-                <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                  Propósito de Marca
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
+                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                  <span>Propósito de Marca</span>
                 </span>
-                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-2 mb-6">
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-3 mb-6">
                   “Tenemos como principal objetivo que te sientas feliz y empoderada”
                 </h2>
                 <p className="text-xs sm:text-sm text-[#111111]/80 font-light leading-relaxed mb-4">
@@ -310,13 +313,14 @@ export function Home() {
         {/* =========================================================================
             5. CONDICIONES CLAVE PARA CLIENTES NUEVOS (Transparencia Total)
            ========================================================================= */}
-        <section className="py-16 text-left">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="p-8 sm:p-10 rounded-3xl bg-white border border-[#5E765E]/20 shadow-md">
+        <section className="py-16 meraki-section-cream text-left">
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="p-8 sm:p-10 rounded-3xl theme-card-surface">
               <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
                 <div>
-                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                    Para Clientes Nuevos
+                  <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
+                    <ShieldCheck className="w-3 h-3 text-[#D5A688]" />
+                    <span>Para Clientes Nuevos</span>
                   </span>
                   <h3 className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl font-bold text-[#111111] mt-1">
                     Políticas Clave de Atención
@@ -332,7 +336,7 @@ export function Home() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5 text-xs text-[#111111]/85 font-light">
-                <div className="p-4 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/15 flex items-start gap-3">
+                <div className="p-4 rounded-2xl meraki-cream-card flex items-start gap-3">
                   <Clock className="w-5 h-5 text-[#5E765E] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-semibold block text-[#111111] mb-0.5">Reserva Previa con 40%:</strong>
@@ -340,7 +344,7 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/15 flex items-start gap-3">
+                <div className="p-4 rounded-2xl meraki-cream-card flex items-start gap-3">
                   <Truck className="w-5 h-5 text-[#D5A688] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-semibold block text-[#111111] mb-0.5">Movilidad según Distrito:</strong>
@@ -348,7 +352,7 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/15 flex items-start gap-3">
+                <div className="p-4 rounded-2xl meraki-cream-card flex items-start gap-3">
                   <ShieldCheck className="w-5 h-5 text-[#5E765E] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-semibold block text-[#111111] mb-0.5">Bioseguridad Rigurosa:</strong>
@@ -356,7 +360,7 @@ export function Home() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-[#FFF2DE] border border-[#5E765E]/15 flex items-start gap-3">
+                <div className="p-4 rounded-2xl meraki-cream-card flex items-start gap-3">
                   <CheckCircle2 className="w-5 h-5 text-[#D5A688] shrink-0 mt-0.5" />
                   <div>
                     <strong className="font-semibold block text-[#111111] mb-0.5">Cancelaciones con 24h:</strong>
@@ -371,11 +375,12 @@ export function Home() {
         {/* =========================================================================
             6. TESTIMONIOS REALES A DOMICILIO
            ========================================================================= */}
-        <section className="py-16 bg-white/70 border-t border-[#5E765E]/15 text-left">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 meraki-section-ivory border-t border-[#D5A688]/25 text-left">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-xl mx-auto mb-12">
-              <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
-                Opiniones de Nuestras Clientas
+              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                <Star className="w-3 h-3 text-[#D5A688] fill-current" />
+                <span>Opiniones de Nuestras Clientas</span>
               </span>
               <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
                 La comodidad de cuidarte en casa
@@ -386,7 +391,7 @@ export function Home() {
               {TESTIMONIALS.map((t) => (
                 <div
                   key={t.id}
-                  className="bg-[#FFF2DE] rounded-3xl p-6 sm:p-8 border border-[#5E765E]/15 shadow-sm flex flex-col justify-between"
+                  className="meraki-cream-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
                 >
                   <div>
                     <div className="flex items-center gap-1 text-[#D5A688] mb-4">
@@ -419,10 +424,11 @@ export function Home() {
         {/* =========================================================================
             7. CTA FINAL DIRECTO A WHATSAPP Y CATÁLOGO
            ========================================================================= */}
-        <section className="py-20 bg-[#5E765E] text-[#FFF2DE] text-center">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#D5A688] block mb-3">
-              ¿Lista para tu momento especial?
+        <section className="py-20 meraki-section-sage text-[#FFF2DE] text-center">
+          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-[#D5A688]/45 shadow-sm text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#FFF2DE] mb-4">
+              <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
+              <span>¿Lista para tu momento especial?</span>
             </span>
             <h2 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl font-normal leading-tight mb-6">
               Agenda tu cita hoy y déjanos consentirte donde estés
@@ -435,7 +441,7 @@ export function Home() {
               <button
                 type="button"
                 onClick={() => openBooking()}
-                className="w-full sm:w-auto bg-[#FFF2DE] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full sm:w-auto bg-[#FFFDF9] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar className="w-4 h-4 text-[#D5A688]" />
                 <span>Agendar Cita en el Formulario</span>
@@ -443,7 +449,7 @@ export function Home() {
 
               <Link
                 to="/catalogo"
-                className="w-full sm:w-auto bg-transparent hover:bg-[#FFF2DE]/10 text-[#FFF2DE] border border-[#FFF2DE]/30 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-2"
+                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-sm text-[#FFF2DE] border border-[#D5A688]/45 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-2"
               >
                 <span>Ver Catálogo Completo</span>
                 <ArrowRight className="w-4 h-4" />

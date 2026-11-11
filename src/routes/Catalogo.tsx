@@ -135,20 +135,14 @@ export function Catalogo() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
+    <div className="min-h-screen meraki-editorial-canvas text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
       <Header />
 
       <main className="flex-1">
         {/* Subpage Header Banner */}
-        <section className="relative overflow-hidden bg-gradient-to-b from-[#5E765E]/12 via-white/50 to-transparent pt-12 lg:pt-28 pb-10 border-b border-[#5E765E]/15">
-          {/* Ambient luminous glow */}
-          <div
-            aria-hidden="true"
-            className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] bg-gradient-to-b from-white/90 via-[#FFF2DE]/40 to-transparent blur-3xl pointer-events-none rounded-full"
-          />
-
+        <section className="meraki-hero-banner pt-12 lg:pt-28 pb-10 border-b border-[#D5A688]/25">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
+            <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#D5A688]/40 shadow-sm text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
               <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
               <span>Fuente Oficial de Servicios Meraki</span>
             </div>
@@ -180,7 +174,7 @@ export function Catalogo() {
         </section>
 
         {/* Filters and Search Bar */}
-        <section className="sticky top-[69px] z-30 bg-[#FFF2DE]/95 backdrop-blur-md py-4 border-b border-[#5E765E]/15 shadow-sm">
+        <section className="sticky top-[69px] z-30 bg-[#FFFDF9]/90 backdrop-blur-md py-4 border-b border-[#D5A688]/25 shadow-sm">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
               
@@ -194,7 +188,7 @@ export function Catalogo() {
                     className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-['Montserrat',sans-serif] uppercase tracking-wider transition-all cursor-pointer ${
                       selectedCategory === cat.id
                         ? 'bg-[#5E765E] text-[#FFF2DE] shadow-sm font-semibold'
-                        : 'bg-white/70 hover:bg-white text-[#111111]/80 border border-[#5E765E]/15'
+                        : 'bg-white/85 hover:bg-white text-[#111111]/80 border border-[#D5A688]/30 shadow-xs'
                     }`}
                   >
                     {cat.label}
@@ -231,8 +225,8 @@ export function Catalogo() {
         </section>
 
         {/* Services List / Cards */}
-        <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-12 meraki-section-cream">
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             {isLoadingGrid ? (
               <CatalogGridSkeleton count={6} />
             ) : filteredServices.length === 0 ? (
@@ -397,15 +391,15 @@ export function Catalogo() {
         </section>
 
         {/* Catalog Policies Box */}
-        <section className="py-12 bg-white/70 border-t border-[#5E765E]/15">
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="p-8 rounded-3xl bg-[#FFF2DE] border border-[#5E765E]/20 shadow-sm text-left">
+        <section className="py-12 meraki-section-ivory border-t border-[#D5A688]/25">
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="p-8 rounded-3xl meraki-cream-card text-left">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shadow-sm">
                   <ShieldCheck className="w-5 h-5 text-[#D5A688]" />
                 </div>
                 <div>
-                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
+                  <span className="meraki-editorial-pill inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
                     Fuente de la Verdad
                   </span>
                   <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
@@ -415,22 +409,22 @@ export function Catalogo() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#111111]/85 font-light">
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/80 border border-[#5E765E]/10">
+                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white/90 backdrop-blur-sm border border-[#D5A688]/25 shadow-xs">
                   <CheckCircle2 className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
                   <span><strong>Disponibilidad:</strong> {POLICIES_DATA.availability}</span>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/80 border border-[#5E765E]/10">
+                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white/90 backdrop-blur-sm border border-[#D5A688]/25 shadow-xs">
                   <Truck className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
                   <span><strong>Costo de Movilidad:</strong> {POLICIES_DATA.mobility}</span>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/80 border border-[#5E765E]/10">
+                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white/90 backdrop-blur-sm border border-[#D5A688]/25 shadow-xs">
                   <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
                   <span><strong>Bioseguridad:</strong> {POLICIES_DATA.biosecurity}</span>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/80 border border-[#5E765E]/10">
+                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-white/90 backdrop-blur-sm border border-[#D5A688]/25 shadow-xs">
                   <Clock className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
                   <span><strong>Cancelaciones:</strong> {POLICIES_DATA.cancellation}</span>
                 </div>

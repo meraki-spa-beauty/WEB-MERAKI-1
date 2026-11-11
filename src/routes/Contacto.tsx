@@ -108,14 +108,14 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
   };
 
   return (
-    <div className="min-h-screen bg-[#FFF2DE] text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
+    <div className="min-h-screen meraki-editorial-canvas text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
       <Header />
 
       <main className="flex-1">
         {/* Banner Hero */}
-        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-14 lg:pt-28 pb-12 border-b border-[#5E765E]/15 text-center">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
+        <section className="meraki-hero-banner pt-14 lg:pt-28 pb-12 border-b border-[#D5A688]/25 text-center">
+          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/85 backdrop-blur-md border border-[#D5A688]/40 shadow-sm text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
               <Phone className="w-3.5 h-3.5 text-[#D5A688]" />
               <span>Canales Oficiales</span>
             </div>
@@ -129,13 +129,13 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
         </section>
 
         {/* Contact Info & Interactive Assistant Grid */}
-        <section className="py-16">
-          <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <section className="py-16 meraki-section-cream">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
               
               {/* Left Column: Direct Info Cards */}
               <div className="lg:col-span-5 space-y-6 text-left">
-                <div className="bg-white rounded-3xl p-8 border border-[#5E765E]/15 shadow-sm">
+                <div className="theme-card-surface rounded-3xl p-8">
                   <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-6">
                     Canales Directos
                   </h3>
@@ -244,37 +244,39 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
                 </div>
 
                 {/* Quick note on WhatsApp booking */}
-                <div className="p-6 rounded-3xl bg-[#5E765E] text-[#FFF2DE] shadow-md">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Sparkles className="w-4 h-4 text-[#D5A688]" />
-                    <span className="font-semibold text-xs uppercase tracking-wider">
-                      Reserva Rápida
-                    </span>
+                <div className="p-6 rounded-3xl meraki-section-sage text-[#FFF2DE] shadow-md">
+                  <div className="relative z-10">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Sparkles className="w-4 h-4 text-[#D5A688]" />
+                      <span className="font-semibold text-xs uppercase tracking-wider">
+                        Reserva Rápida
+                      </span>
+                    </div>
+                    <p className="text-xs font-light text-[#FFF2DE]/90 leading-relaxed mb-4">
+                      Para agendar una cita oficial se requiere el 40% de adelanto de la reserva. ¡Nos aseguramos de reservar el bloque horario exclusivamente para ti!
+                    </p>
+                    <a
+                      href={SPA_INFO.whatsappLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-[#FFFDF9] text-[#5E765E] px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider hover:bg-white transition-colors shadow-sm"
+                    >
+                      <span>Abrir Chat de WhatsApp</span>
+                      <Send className="w-3.5 h-3.5" />
+                    </a>
                   </div>
-                  <p className="text-xs font-light text-[#FFF2DE]/90 leading-relaxed mb-4">
-                    Para agendar una cita oficial se requiere el 40% de adelanto de la reserva. ¡Nos aseguramos de reservar el bloque horario exclusivamente para ti!
-                  </p>
-                  <a
-                    href={SPA_INFO.whatsappLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 bg-[#FFF2DE] text-[#5E765E] px-5 py-2.5 rounded-full text-xs font-semibold uppercase tracking-wider hover:bg-white transition-colors"
-                  >
-                    <span>Abrir Chat de WhatsApp</span>
-                    <Send className="w-3.5 h-3.5" />
-                  </a>
                 </div>
               </div>
 
               {/* Right Column: Interactive WhatsApp Booking Message Generator */}
               <div className="lg:col-span-7 text-left">
-                <div className="bg-white rounded-3xl p-8 border border-[#5E765E]/20 shadow-xl">
+                <div className="theme-card-surface rounded-3xl p-8">
                   <div className="flex items-center gap-3 mb-6">
-                    <div className="w-10 h-10 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shadow-sm">
                       <Calendar className="w-5 h-5 text-[#D5A688]" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
+                      <span className="meraki-editorial-pill inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
                         Asistente Rápido
                       </span>
                       <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
