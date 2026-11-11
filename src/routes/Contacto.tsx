@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
-import { SkeletonBlock } from '../components/ui/Skeleton';
 import { SPA_INFO } from '../data/spaData';
 import { CATALOG_SERVICES } from '../data/catalog';
 import { trackMetaLead } from '../utils/metaPixel';
@@ -46,17 +45,12 @@ export function Contacto() {
   const [preferredDate, setPreferredDate] = useState('');
   const [preferredTime, setPreferredTime] = useState('');
   const [customNote, setCustomNote] = useState('');
-  const [isUpdatingService, setIsUpdatingService] = useState(false);
 
   const selectedService = CATALOG_SERVICES.find((s) => s.id === selectedServiceId) || CATALOG_SERVICES[0];
   const servicePricePEN = selectedService.pricePEN || selectedService.priceOptions?.[0]?.pricePEN || 0;
 
   const handleSelectService = (newId: string) => {
     setSelectedServiceId(newId);
-    setIsUpdatingService(true);
-    window.setTimeout(() => {
-      setIsUpdatingService(false);
-    }, 200);
   };
 
   const handleSendWhatsApp = (e: React.FormEvent) => {
@@ -320,13 +314,9 @@ ${isStudio ? '¿Me podrían confirmar disponibilidad para atención en su estudi
                           </option>
                         ))}
                       </select>
-                      {isUpdatingService ? (
-                        <SkeletonBlock className="h-4 w-48 rounded mt-1.5" variant="warm" />
-                      ) : (
-                        <span className="text-[11px] text-[#5E765E] mt-1 block">
-                          Subcategoría: {selectedService.subcategory} • Desde S/ {servicePricePEN}
-                        </span>
-                      )}
+                      <span className="text-[11px] text-[#5E765E] mt-1 block">
+                        Subcategoría: {selectedService.subcategory} • Desde S/ {servicePricePEN}
+                      </span>
                     </div>
 
                     {/* Modalidad de Atención: Estudio vs Casa vs Trabajo */}

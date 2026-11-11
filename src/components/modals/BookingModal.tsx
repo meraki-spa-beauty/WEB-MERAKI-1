@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { SPA_INFO } from '../../data/spaData';
-import type { CatalogService, ServicePriceOption } from '../../types';
-import { BookingModalSkeleton, SkeletonBlock } from '../ui/Skeleton';
+import type { ServicePriceOption } from '../../types';
 import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
 import { trackTikTokSubmitForm, trackTikTokCompleteRegistration } from '../../utils/tiktokPixel';
 import { syncLeadToGoogleSheets } from '../../utils/googleSheetsSync';
@@ -14,16 +13,31 @@ import {
   Copy,
   Check,
   ArrowLeft,
+  ArrowRight,
   ShieldCheck,
   Building,
   Home as HomeIcon,
-  MapPin
+  MapPin,
+  Plus,
+  Trash2,
+  Calendar,
+  Clock,
+  User,
+  Phone,
+  Mail,
+  FileText
 } from 'lucide-react';
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   preselectedServiceId?: string;
+}
+
+export interface SelectedServiceItem {
+  instanceId: string;
+  serviceId: string;
+  optionIndex: number;
 }
 
 const LIMA_DISTRICTS = [
@@ -61,21 +75,33 @@ const TIME_SLOTS = [
 ];
 
 export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingModalProps) {
-  // Service selection state
-  const [selectedCategory, setSelectedCategory] = useState<string>('todos');
+  // Wizard 3-Step State: 1 = Servicios, 2 = Modalidad & Fecha, 3 = Datos & Confirmación
+  const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
-  const [selectedServiceId, setSelectedServiceId] = useState<string>(
-    preselectedServiceId || CATALOG_SERVICES[0]?.id || 'manos-esmalte-gel'
-  );
+  // Multi-Service Cart State
+  const [selectedServices, setSelectedServices] = useState<SelectedServiceItem[]>(() => {
+    const initialId = preselectedServiceId || CATALOG_SERVICES[0]?.id || 'manos-esmalte-gel';
 
-  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number>(0);
+    return [
+      {
+        instanceId: `item-${Date.now()}-1`,
+        serviceId: initialId,
+        optionIndex: 0
+      }
+    ];
+  });
 
-  // Logistics & Location state
+  // Selector state for adding another service
+  const [addCategoryFilter, setAddCategoryFilter] = useState<string>('todos');
+  const [serviceToAddId, setServiceToAddId] = useState<string>(CATALOG_SERVICES[0]?.id || '');
+  const [showAddServiceBox, setShowAddServiceBox] = useState<boolean>(false);
+
+  // Logistics & Location state (Step 2)
   const [locationType, setLocationType] = useState<'estudio' | 'casa' | 'trabajo'>('estudio');
   const [district, setDistrict] = useState<string>('Pueblo Libre');
   const [address, setAddress] = useState<string>('');
 
-  // Date and Time state
+  // Date and Time state (Step 2)
   const [date, setDate] = useState<string>(() => {
     const d = new Date();
     d.setDate(d.getDate() + 1);
@@ -85,50 +111,35 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
   const [timeSlot, setTimeSlot] = useState<string>('15:00');
 
-  // Client Details state
+  // Client Details state (Step 3)
   const [clientName, setClientName] = useState<string>('');
   const [clientPhone, setClientPhone] = useState<string>('');
   const [clientEmail, setClientEmail] = useState<string>('');
   const [specialNotes, setSpecialNotes] = useState<string>('');
 
-  // UI state
+  // Submission & UI feedback state
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isCopied, setIsCopied] = useState<boolean>(false);
-  const [isInitializing, setIsInitializing] = useState<boolean>(false);
-  const [isPreparingSummary, setIsPreparingSummary] = useState<boolean>(false);
-  const [wasOpen, setWasOpen] = useState<boolean>(isOpen);
+  const [stepError, setStepError] = useState<string | null>(null);
 
-  if (isOpen !== wasOpen) {
-    setWasOpen(isOpen);
-
+  // Reset or initialize on open
+  useEffect(() => {
     if (isOpen) {
-      setIsInitializing(true);
-    }
-  }
+      setCurrentStep(1);
+      setIsSubmitted(false);
+      setStepError(null);
 
-  // Show skeleton briefly when modal opens
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const timer = window.setTimeout(() => {
-      setIsInitializing(false);
-    }, 95);
-
-    return () => window.clearTimeout(timer);
-  }, [isOpen]);
-
-  // Sync preselectedServiceId
-  useEffect(() => {
-    if (preselectedServiceId) {
-      const found = CATALOG_SERVICES.find((s) => s.id === preselectedServiceId);
-
-      if (found) {
-        setSelectedServiceId(found.id);
-        setSelectedCategory(found.category);
-        setSelectedOptionIndex(0);
+      if (preselectedServiceId) {
+        setSelectedServices([
+          {
+            instanceId: `item-${Date.now()}-initial`,
+            serviceId: preselectedServiceId,
+            optionIndex: 0
+          }
+        ]);
       }
     }
-  }, [preselectedServiceId]);
+  }, [isOpen, preselectedServiceId]);
 
   // Handle ESC and body scroll lock
   useEffect(() => {
@@ -147,76 +158,168 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     };
   }, [isOpen, onClose]);
 
-  // Current active service
-  const currentService: CatalogService = useMemo(() => {
-    return (
-      CATALOG_SERVICES.find((s) => s.id === selectedServiceId) ||
-      CATALOG_SERVICES[0]
-    );
-  }, [selectedServiceId]);
+  // Calculation helpers for service items
+  const getItemDetails = (item: SelectedServiceItem) => {
+    const service = CATALOG_SERVICES.find((s) => s.id === item.serviceId) || CATALOG_SERVICES[0];
+    let price = service.pricePEN || 0;
+    let optionLabel: string | undefined;
 
-  // Services available for the selected category filter
-  const filteredServices = useMemo(() => {
-    if (selectedCategory === 'todos') return CATALOG_SERVICES;
-
-    return CATALOG_SERVICES.filter((s) => s.category === selectedCategory);
-  }, [selectedCategory]);
-
-  // Price calculations
-  const priceCalculation = useMemo(() => {
-    let basePrice = 0;
-    let optionLabel: string | null = null;
-
-    if (currentService.priceOptions && currentService.priceOptions.length > 0) {
-      const opt = currentService.priceOptions[selectedOptionIndex] || currentService.priceOptions[0];
-      basePrice = opt.pricePEN;
+    if (service.priceOptions && service.priceOptions.length > 0) {
+      const opt = service.priceOptions[item.optionIndex] || service.priceOptions[0];
+      price = opt.pricePEN;
       optionLabel = opt.label;
-    } else if (currentService.pricePEN) {
-      basePrice = currentService.pricePEN;
     }
 
-    const advancePayment = Math.round(basePrice * 0.4);
-    const balanceRemaining = basePrice - advancePayment;
+    return { service, price, optionLabel };
+  };
+
+  // Consolidated financial totals for all selected services
+  const financialTotals = useMemo(() => {
+    let totalPrice = 0;
+
+    const itemsDetailed = selectedServices.map((item) => {
+      const details = getItemDetails(item);
+      totalPrice += details.price;
+
+      return {
+        ...item,
+        ...details
+      };
+    });
+
+    const advancePayment = Math.round(totalPrice * 0.4);
+    const balanceRemaining = totalPrice - advancePayment;
 
     return {
-      basePrice,
-      optionLabel,
+      totalPrice,
       advancePayment,
-      balanceRemaining
+      balanceRemaining,
+      itemsDetailed,
+      count: selectedServices.length
     };
-  }, [currentService, selectedOptionIndex]);
+  }, [selectedServices]);
 
-  if (!isOpen) return null;
-
-  // Handle service change
-  const handleServiceChange = (serviceId: string) => {
-    setSelectedServiceId(serviceId);
-    setSelectedOptionIndex(0);
-    const s = CATALOG_SERVICES.find((srv) => srv.id === serviceId);
-
-    if (s && selectedCategory !== 'todos' && s.category !== selectedCategory) {
-      setSelectedCategory(s.category);
+  // Services available for the "add service" selector
+  const availableServicesToAdd = useMemo(() => {
+    if (addCategoryFilter === 'todos') {
+      return CATALOG_SERVICES;
     }
+
+    return CATALOG_SERVICES.filter((s) => s.category === addCategoryFilter);
+  }, [addCategoryFilter]);
+
+  // Cart actions
+  const handleAddService = () => {
+    if (!serviceToAddId) {
+      return;
+    }
+
+    setSelectedServices((prev) => [
+      ...prev,
+      {
+        instanceId: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+        serviceId: serviceToAddId,
+        optionIndex: 0
+      }
+    ]);
+    setShowAddServiceBox(false);
+  };
+
+  const handleRemoveService = (instanceId: string) => {
+    if (selectedServices.length <= 1) {
+      setStepError('Debes mantener al menos un servicio en tu cita.');
+
+      return;
+    }
+
+    setStepError(null);
+    setSelectedServices((prev) => prev.filter((item) => item.instanceId !== instanceId));
+  };
+
+  const handleUpdateOptionIndex = (instanceId: string, newOptionIndex: number) => {
+    setSelectedServices((prev) =>
+      prev.map((item) =>
+        item.instanceId === instanceId ? { ...item, optionIndex: newOptionIndex } : item
+      )
+    );
+  };
+
+  const handleUpdateServiceId = (instanceId: string, newServiceId: string) => {
+    setSelectedServices((prev) =>
+      prev.map((item) =>
+        item.instanceId === instanceId
+          ? { ...item, serviceId: newServiceId, optionIndex: 0 }
+          : item
+      )
+    );
+  };
+
+  // Step 1 Validation & Next
+  const handleProceedToStep2 = () => {
+    if (selectedServices.length === 0) {
+      setStepError('Por favor selecciona al menos un servicio para continuar.');
+
+      return;
+    }
+
+    setStepError(null);
+    setCurrentStep(2);
+  };
+
+  // Step 2 Validation & Next
+  const handleProceedToStep3 = () => {
+    if (!date) {
+      setStepError('Por favor selecciona la fecha sugerida para tu cita.');
+
+      return;
+    }
+
+    if (locationType !== 'estudio' && !district) {
+      setStepError('Por favor selecciona tu distrito en Lima.');
+
+      return;
+    }
+
+    setStepError(null);
+    setCurrentStep(3);
   };
 
   // Build WhatsApp consolidated message text
   const buildConsolidatedMessage = () => {
     const isStudio = locationType === 'estudio';
 
+    const servicesListText = financialTotals.itemsDetailed
+      .map(
+        (it, idx) =>
+          `  ${idx + 1}. *${it.service.name}*${it.optionLabel ? ` (${it.optionLabel})` : ''} — S/ ${it.price}`
+      )
+      .join('\n');
+
     const lines = [
       '🌿 *SOLICITUD DE RESERVA — MERAKI SPA* 🌿',
       '━━━━━━━━━━━━━━━━━━━━',
-      `✨ *Servicio:* ${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`,
-      `🏷️ *Categoría:* ${currentService.categoryLabel} — ${currentService.subcategory}`,
-      `💰 *Tarifa del servicio:* S/ ${priceCalculation.basePrice}`,
-      `💳 *Adelanto de confirmación (40%):* S/ ${priceCalculation.advancePayment}`,
-      `💵 *Saldo al finalizar atención (60%):* S/ ${priceCalculation.balanceRemaining}`,
+      `✨ *Servicios a agendar (${financialTotals.count}):*`,
+      servicesListText,
       '━━━━━━━━━━━━━━━━━━━━',
-      `📍 *Modalidad:* ${isStudio ? 'Presencial en Estudio (Pueblo Libre)' : locationType === 'casa' ? 'En Casa / Domicilio' : 'En Oficina / Trabajo'}`,
+      `💰 *Inversión Total:* S/ ${financialTotals.totalPrice}`,
+      `💳 *Adelanto de confirmación (40%):* S/ ${financialTotals.advancePayment}`,
+      `💵 *Saldo al finalizar atención (60%):* S/ ${financialTotals.balanceRemaining}`,
+      '━━━━━━━━━━━━━━━━━━━━',
+      `📍 *Modalidad:* ${
+        isStudio
+          ? 'Presencial en Estudio (Pueblo Libre)'
+          : locationType === 'casa'
+            ? 'En Casa / Domicilio'
+            : 'En Oficina / Trabajo'
+      }`,
       isStudio
         ? '🏠 *Dirección del Estudio:* Calle Agustín Gamarra 515, Pueblo Libre, Lima'
         : `📌 *Distrito en Lima:* ${district}`,
-      !isStudio ? (address.trim() ? `🏠 *Dirección/Ref:* ${address.trim()}` : '🏠 *Dirección/Ref:* Por coordinar en chat') : '',
+      !isStudio
+        ? address.trim()
+          ? `🏠 *Dirección/Ref:* ${address.trim()}`
+          : '🏠 *Dirección/Ref:* Por coordinar en chat'
+        : '',
       `📅 *Fecha deseada:* ${date}`,
       `⏰ *Horario preferido:* ${timeSlot} hrs`,
       '━━━━━━━━━━━━━━━━━━━━',
@@ -235,12 +338,6 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
   const leadTrackedRef = useRef<boolean>(false);
 
-  useEffect(() => {
-    if (isOpen) {
-      leadTrackedRef.current = false;
-    }
-  }, [isOpen, selectedServiceId]);
-
   const triggerBookingConversion = () => {
     if (leadTrackedRef.current) {
       return;
@@ -248,63 +345,78 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
     leadTrackedRef.current = true;
 
-    const serviceTitle = `${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`;
+    const mainTitle = financialTotals.itemsDetailed
+      .map((it) => `${it.service.name}${it.optionLabel ? ` (${it.optionLabel})` : ''}`)
+      .join(' + ');
 
     trackMetaLead({
-      content_name: `Cita Spa - ${serviceTitle}`,
+      content_name: `Cita Spa (${financialTotals.count} servicios) - ${mainTitle}`,
       content_category: 'Cita Spa',
-      value: priceCalculation.basePrice,
-      currency: 'PEN',
+      value: financialTotals.totalPrice,
+      currency: 'PEN'
     });
 
     trackMetaSchedule({
-      content_name: `Cita Spa - ${serviceTitle}`,
-      value: priceCalculation.basePrice,
-      currency: 'PEN',
+      content_name: `Cita Spa - ${mainTitle}`,
+      value: financialTotals.totalPrice,
+      currency: 'PEN'
     });
 
     trackTikTokSubmitForm({
-      content_name: `Cita Spa - ${serviceTitle}`,
+      content_name: `Cita Spa - ${mainTitle}`,
       content_category: 'Cita Spa',
-      value: priceCalculation.basePrice,
-      currency: 'PEN',
+      value: financialTotals.totalPrice,
+      currency: 'PEN'
     });
 
     trackTikTokCompleteRegistration({
-      content_name: `Cita Spa - ${serviceTitle}`,
+      content_name: `Cita Spa - ${mainTitle}`,
       content_category: 'Cita Spa',
-      value: priceCalculation.basePrice,
-      currency: 'PEN',
+      value: financialTotals.totalPrice,
+      currency: 'PEN'
     });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsPreparingSummary(true);
+
+    if (!clientName.trim()) {
+      setStepError('Por favor ingresa tu nombre completo.');
+
+      return;
+    }
+
+    if (!clientPhone.trim()) {
+      setStepError('Por favor ingresa tu número de WhatsApp para contactarte.');
+
+      return;
+    }
+
+    setStepError(null);
     triggerBookingConversion();
 
-    const serviceTitle = `${currentService.name}${priceCalculation.optionLabel ? ` (${priceCalculation.optionLabel})` : ''}`;
+    const servicesSummaryString = financialTotals.itemsDetailed
+      .map((it) => `${it.service.name}${it.optionLabel ? ` [${it.optionLabel}]` : ''} (S/ ${it.price})`)
+      .join(' + ');
 
     syncLeadToGoogleSheets({
       formulario: 'Cita Spa',
-      cliente: clientName,
-      whatsapp: clientPhone,
-      servicio_detalle: serviceTitle,
-      modalidad: locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : 'A Domicilio',
-      distrito: locationType !== 'estudio' ? district : 'Pueblo Libre',
-      direccion: locationType !== 'estudio' ? address : SPA_INFO.studioAddress,
+      cliente: clientName.trim(),
+      whatsapp: clientPhone.trim(),
+      email: clientEmail.trim() || undefined,
+      servicio_detalle: servicesSummaryString,
+      modalidad: locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : 'A Domicilio / Oficina',
+      distrito: locationType === 'estudio' ? 'Pueblo Libre' : district,
+      direccion: locationType === 'estudio' ? SPA_INFO.studioAddress : address.trim() || undefined,
       fecha_preferida: date || 'A coordinar',
       hora_preferida: timeSlot || 'A coordinar',
-      monto_total: `S/ ${priceCalculation.basePrice}`,
-      monto_adelanto: `S/ ${Math.round(priceCalculation.basePrice * 0.4)} (40%)`,
+      monto_total: `S/ ${financialTotals.totalPrice}`,
+      monto_adelanto: `S/ ${financialTotals.advancePayment} (40%)`,
       codigo_reserva: `MRK-SPA-${Math.floor(1000 + Math.random() * 9000)}`,
-      mensaje_notas: specialNotes || undefined,
+      mensaje_notas: specialNotes.trim() || undefined
     });
 
-    window.setTimeout(() => {
-      setIsPreparingSummary(false);
-      setIsSubmitted(true);
-    }, 130);
+    setIsSubmitted(true);
   };
 
   const handleCopySummary = async () => {
@@ -321,15 +433,19 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     buildConsolidatedMessage()
   )}`;
 
+  if (!isOpen) {
+    return null;
+  }
+
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm animate-fade-in"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm animate-fade-in text-left"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-booking-title"
     >
       <div
-        className="relative w-full max-w-2xl bg-[#FFF2DE] rounded-3xl overflow-hidden shadow-2xl border border-[#5E765E]/20 max-h-[92vh] flex flex-col text-left"
+        className="relative w-full max-w-2xl bg-[#FFF2DE] rounded-3xl overflow-hidden shadow-2xl border border-[#5E765E]/20 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -343,56 +459,136 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
         </button>
 
         {/* Modal Header */}
-        <div className="bg-[#5E765E] text-[#FFF2DE] p-6 sm:p-7 relative border-b border-[#D5A688]/30">
+        <div className="bg-[#5E765E] text-[#FFF2DE] p-5 sm:p-6 relative border-b border-[#D5A688]/30 shrink-0">
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-            <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-[0.24em] text-[#D5A688]">
+            <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-[0.22em] text-[#D5A688]">
               Agenda tu Experiencia Personalizada
             </span>
           </div>
           <h2
             id="modal-booking-title"
-            className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-normal leading-tight text-white"
+            className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl font-normal leading-tight text-white"
           >
             Reservar Cita en Meraki
           </h2>
-          <p className="font-['Montserrat',sans-serif] text-xs font-light text-[#FFF2DE]/90 mt-1">
-            Atención presencial en estudio (Pueblo Libre) y servicio a domicilio u oficina en Lima
+          <p className="font-['Montserrat',sans-serif] text-xs font-light text-[#FFF2DE]/90 mt-0.5">
+            Atención en estudio (Pueblo Libre) y a domicilio u oficina en Lima
           </p>
+
+          {/* Stepper Progress Bar (Only visible when not submitted) */}
+          {!isSubmitted && (
+            <div className="mt-4 pt-3 border-t border-white/15">
+              <div className="flex items-center justify-between text-xs font-['Montserrat',sans-serif] mb-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentStep(1)}
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    currentStep === 1
+                      ? 'text-white font-bold'
+                      : currentStep > 1
+                        ? 'text-[#D5A688] hover:text-white font-medium'
+                        : 'text-white/50'
+                  }`}
+                >
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] ${
+                      currentStep === 1
+                        ? 'bg-[#D5A688] text-[#111111] font-bold'
+                        : currentStep > 1
+                          ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
+                          : 'bg-white/20 text-white/70'
+                    }`}
+                  >
+                    {currentStep > 1 ? '✓' : '1'}
+                  </span>
+                  <span>1. Servicios</span>
+                  {financialTotals.count > 0 && (
+                    <span className="text-[10px] opacity-75">({financialTotals.count})</span>
+                  )}
+                </button>
+
+                <div className="h-[1px] flex-1 mx-2 bg-white/20" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedServices.length > 0) setCurrentStep(2);
+                  }}
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    currentStep === 2
+                      ? 'text-white font-bold'
+                      : currentStep > 2
+                        ? 'text-[#D5A688] hover:text-white font-medium'
+                        : 'text-white/50'
+                  }`}
+                >
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] ${
+                      currentStep === 2
+                        ? 'bg-[#D5A688] text-[#111111] font-bold'
+                        : currentStep > 2
+                          ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
+                          : 'bg-white/20 text-white/70'
+                    }`}
+                  >
+                    {currentStep > 2 ? '✓' : '2'}
+                  </span>
+                  <span>2. Modalidad &amp; Fecha</span>
+                </button>
+
+                <div className="h-[1px] flex-1 mx-2 bg-white/20" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedServices.length > 0 && date) setCurrentStep(3);
+                  }}
+                  className={`flex items-center gap-1.5 transition-colors cursor-pointer ${
+                    currentStep === 3
+                      ? 'text-white font-bold'
+                      : 'text-white/50'
+                  }`}
+                >
+                  <span
+                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[11px] ${
+                      currentStep === 3
+                        ? 'bg-[#D5A688] text-[#111111] font-bold'
+                        : 'bg-white/20 text-white/70'
+                    }`}
+                  >
+                    3
+                  </span>
+                  <span>3. Tus Datos</span>
+                </button>
+              </div>
+
+              {/* Progress Line */}
+              <div className="w-full bg-black/20 h-1.5 rounded-full overflow-hidden">
+                <div
+                  className="bg-[#D5A688] h-full transition-all duration-300 rounded-full"
+                  style={{
+                    width: currentStep === 1 ? '33.33%' : currentStep === 2 ? '66.66%' : '100%'
+                  }}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Scrollable Form Body */}
-        <div className="overflow-y-auto p-5 sm:p-7 space-y-6 flex-1">
-          {isInitializing ? (
-            <BookingModalSkeleton />
-          ) : isPreparingSummary ? (
-            <div
-              role="status"
-              aria-live="polite"
-              aria-busy="true"
-              className="py-6 space-y-5 text-center"
-            >
-              <div className="flex flex-col items-center gap-3">
-                <progress aria-label="Generando consolidado de reserva" className="loading-spinner" />
-                <span className="text-[11px] uppercase tracking-[0.2em] font-semibold text-[#5E765E]">
-                  Preparando resumen de reserva...
-                </span>
-              </div>
-              <div className="bg-white/80 rounded-2xl border border-[#5E765E]/20 p-5 space-y-3.5 max-w-lg mx-auto">
-                <SkeletonBlock className="h-4 w-44 rounded" />
-                <SkeletonBlock className="h-4 w-full rounded" />
-                <SkeletonBlock className="h-4 w-5/6 rounded" />
-                <SkeletonBlock className="h-4 w-3/4 rounded" />
-                <SkeletonBlock className="h-16 w-full rounded-xl" variant="warm" />
-              </div>
-              <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
-                <SkeletonBlock className="h-12 flex-1 rounded-full" />
-                <SkeletonBlock className="h-12 w-full sm:w-36 rounded-full" variant="warm" />
-              </div>
+        <div className="overflow-y-auto p-5 sm:p-7 flex-1">
+          {/* Step Error Notice */}
+          {stepError && (
+            <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
+              <span className="font-bold shrink-0">!</span>
+              <span>{stepError}</span>
             </div>
-          ) : isSubmitted ? (
+          )}
+
+          {isSubmitted ? (
             /* =========================================================================
-               CONFIRMATION / WHATSAPP CONSOLIDATED VIEW
+               CONFIRMATION & WHATSAPP CONSOLIDATED VIEW
                ========================================================================= */
             <div className="py-4 space-y-6 animate-fade-in text-center">
               <div className="w-16 h-16 rounded-full bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center mx-auto ring-8 ring-[#5E765E]/10">
@@ -404,18 +600,18 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                   Paso Final: Envío por WhatsApp
                 </span>
                 <h3 className="font-['Cormorant_Garamond',serif] text-3xl font-normal text-[#111111]">
-                  ¡Consolidado Listo para Enviar!
+                  ¡Consolidado de Cita Listo!
                 </h3>
                 <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/75 max-w-md mx-auto mt-2 leading-relaxed">
-                  Gracias, <strong className="font-semibold text-[#111111]">{clientName}</strong>. Hemos preparado el resumen completo de tu reserva. Presiona el botón verde a continuación para abrir WhatsApp y enviarnos tu solicitud para confirmar disponibilidad y movilidad.
+                  Gracias, <strong className="font-semibold text-[#111111]">{clientName}</strong>. Hemos preparado el resumen completo de tu solicitud con los <strong className="font-semibold text-[#5E765E]">{financialTotals.count} servicios</strong> seleccionados. Haz clic en el botón a continuación para abrir WhatsApp y confirmar la disponibilidad de tu agenda.
                 </p>
               </div>
 
               {/* Consolidated Summary Card */}
-              <div className="bg-white/80 rounded-2xl border border-[#5E765E]/20 p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3.5 shadow-sm max-w-lg mx-auto">
+              <div className="bg-white/90 rounded-2xl border border-[#5E765E]/20 p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3.5 shadow-sm max-w-lg mx-auto">
                 <div className="flex items-center justify-between border-b border-[#5E765E]/15 pb-2.5">
                   <span className="text-[11px] uppercase tracking-wider font-bold text-[#5E765E]">
-                    Resumen de la Solicitud
+                    Resumen de Servicios Agendados ({financialTotals.count})
                   </span>
                   <span className="text-[10px] text-[#111111]/60 font-medium">
                     Lima, Perú
@@ -423,66 +619,85 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                 </div>
 
                 <div className="space-y-2 text-[#111111]">
-                  <div className="flex justify-between items-start gap-3">
-                    <span className="text-[#111111]/60">Servicio:</span>
-                    <span className="font-semibold text-right text-[#111111]">
-                      {currentService.name}
-                      {priceCalculation.optionLabel && (
-                        <span className="block text-[11px] font-normal text-[#5E765E]">
-                          {priceCalculation.optionLabel}
+                  {financialTotals.itemsDetailed.map((it, idx) => (
+                    <div
+                      key={it.instanceId}
+                      className="flex justify-between items-start gap-3 py-1 border-b border-[#5E765E]/10 last:border-b-0"
+                    >
+                      <div className="flex-1">
+                        <span className="font-semibold text-[#111111] block">
+                          {idx + 1}. {it.service.name}
                         </span>
-                      )}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#111111]/60">Modalidad:</span>
-                    <span className="font-medium text-right">
-                      {locationType === 'estudio' ? 'En Estudio (Pueblo Libre)' : locationType === 'casa' ? `A Domicilio • ${district}` : `En Oficina • ${district}`}
-                    </span>
-                  </div>
-
-                  {locationType === 'estudio' ? (
-                    <div className="flex justify-between items-start gap-3">
-                      <span className="text-[#111111]/60">Dirección Estudio:</span>
-                      <span className="font-semibold text-right max-w-xs text-[#5E765E]">Calle Agustín Gamarra 515, Pueblo Libre</span>
+                        {it.optionLabel && (
+                          <span className="text-[11px] text-[#5E765E] block font-light">
+                            {it.optionLabel}
+                          </span>
+                        )}
+                      </div>
+                      <span className="font-bold text-[#5E765E] shrink-0">
+                        S/. {it.price}
+                      </span>
                     </div>
-                  ) : address.trim() ? (
-                    <div className="flex justify-between items-start gap-3">
-                      <span className="text-[#111111]/60">Dirección / Ref:</span>
-                      <span className="font-medium text-right max-w-xs">{address.trim()}</span>
+                  ))}
+
+                  <div className="pt-2 border-t border-[#5E765E]/15 space-y-1 text-xs">
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#111111]/60">Modalidad:</span>
+                      <span className="font-medium text-right">
+                        {locationType === 'estudio'
+                          ? 'En Estudio (Pueblo Libre)'
+                          : locationType === 'casa'
+                            ? `A Domicilio • ${district}`
+                            : `En Oficina • ${district}`}
+                      </span>
                     </div>
-                  ) : null}
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#111111]/60">Fecha &amp; Hora sugerida:</span>
-                    <span className="font-semibold text-[#5E765E]">
-                      {date} a las {timeSlot} hrs
-                    </span>
-                  </div>
+                    {locationType === 'estudio' ? (
+                      <div className="flex justify-between items-start gap-3">
+                        <span className="text-[#111111]/60">Dirección Estudio:</span>
+                        <span className="font-semibold text-right max-w-xs text-[#5E765E]">
+                          Calle Agustín Gamarra 515, Pueblo Libre
+                        </span>
+                      </div>
+                    ) : address.trim() ? (
+                      <div className="flex justify-between items-start gap-3">
+                        <span className="text-[#111111]/60">Dirección / Ref:</span>
+                        <span className="font-medium text-right max-w-xs">{address.trim()}</span>
+                      </div>
+                    ) : null}
 
-                  <div className="flex justify-between items-center">
-                    <span className="text-[#111111]/60">Cliente:</span>
-                    <span className="font-medium">{clientName} ({clientPhone})</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#111111]/60">Fecha &amp; Hora sugerida:</span>
+                      <span className="font-semibold text-[#5E765E]">
+                        {date} a las {timeSlot} hrs
+                      </span>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <span className="text-[#111111]/60">Cliente:</span>
+                      <span className="font-medium">
+                        {clientName} ({clientPhone})
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {/* Financial Summary */}
-                <div className="pt-3 border-t border-[#5E765E]/15 bg-[#FFF2DE]/40 -mx-5 -mb-5 p-4 rounded-b-2xl space-y-1.5">
+                <div className="pt-3 border-t border-[#5E765E]/15 bg-[#FFF2DE]/50 -mx-5 -mb-5 p-4 rounded-b-2xl space-y-1.5">
                   <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#111111]/70">Inversión del servicio:</span>
-                    <span className="font-semibold text-[#111111]">S/. {priceCalculation.basePrice}</span>
+                    <span className="text-[#111111]/70">Inversión total ({financialTotals.count} servicios):</span>
+                    <span className="font-bold text-[#111111] text-sm">S/. {financialTotals.totalPrice}</span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-[#5E765E] font-medium">
                     <span>Adelanto de confirmación (40%):</span>
-                    <span className="font-bold">S/. {priceCalculation.advancePayment}</span>
+                    <span className="font-bold">S/. {financialTotals.advancePayment}</span>
                   </div>
                   <div className="flex justify-between items-center text-[11px] text-[#111111]/60">
                     <span>Saldo al concluir atención (60%):</span>
-                    <span>S/. {priceCalculation.balanceRemaining}</span>
+                    <span>S/. {financialTotals.balanceRemaining}</span>
                   </div>
                   <p className="text-[10px] text-[#111111]/60 italic pt-1 border-t border-[#5E765E]/10">
-                    * Movilidad sujeta a coordinación según distrito en Lima. La confirmación se sella con el abono del 40%.
+                    * Movilidad sujeta a coordinación según distrito en Lima. La reserva se sella con el abono del 40%.
                   </p>
                 </div>
               </div>
@@ -494,9 +709,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => {
-                    triggerBookingConversion();
-                  }}
+                  onClick={() => triggerBookingConversion()}
                   className="w-full sm:flex-1 inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-6 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
                 >
                   <MessageCircle className="w-4 h-4 fill-white" />
@@ -525,358 +738,571 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
               <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setIsSubmitted(false)}
+                  onClick={() => {
+                    setIsSubmitted(false);
+                    setCurrentStep(1);
+                  }}
                   className="inline-flex items-center gap-1.5 text-xs text-[#5E765E] hover:underline font-medium cursor-pointer"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Modificar datos de la reserva</span>
+                  <span>Modificar servicios o datos de la reserva</span>
                 </button>
               </div>
             </div>
           ) : (
-            /* =========================================================================
-               BOOKING FORM VIEW (Adapted to Meraki Catalog)
-               ========================================================================= */
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Step 1: Select Service from Catalog */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                    1. Elige tu Servicio del Catálogo
-                  </label>
-                  <span className="text-[10px] text-[#111111]/60 font-light">
-                    {CATALOG_SERVICES.length} servicios oficiales
-                  </span>
-                </div>
-
-                {/* Category quick tabs */}
-                <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 scrollbar-none text-[11px]">
-                  {CATEGORIES_DATA.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedCategory(cat.id);
-
-                        if (cat.id !== 'todos') {
-                          const firstInCat = CATALOG_SERVICES.find((s) => s.category === cat.id);
-
-                          if (firstInCat) {
-                            setSelectedServiceId(firstInCat.id);
-                            setSelectedOptionIndex(0);
-                          }
-                        }
-                      }}
-                      className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
-                        selectedCategory === cat.id
-                          ? 'bg-[#5E765E] text-[#FFF2DE] font-semibold shadow-xs'
-                          : 'bg-white/70 hover:bg-white text-[#111111]/80 border border-[#5E765E]/15'
-                      }`}
-                    >
-                      {cat.label}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Main Service Selector */}
-                <select
-                  value={selectedServiceId}
-                  onChange={(e) => handleServiceChange(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl bg-white border border-[#5E765E]/25 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E] shadow-2xs font-medium cursor-pointer"
-                  required
-                >
-                  {filteredServices.map((srv) => (
-                    <option key={srv.id} value={srv.id}>
-                      [{srv.categoryLabel}] {srv.name} — S/. {srv.pricePEN || (srv.priceOptions ? srv.priceOptions[0].pricePEN : '')} ({srv.subcategory})
-                    </option>
-                  ))}
-                </select>
-
-                {/* Service Variant / Price Options (if applicable) */}
-                {currentService.priceOptions && currentService.priceOptions.length > 0 && (
-                  <div className="p-3.5 rounded-xl bg-white/70 border border-[#5E765E]/20 space-y-2">
-                    <span className="block text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                      Selecciona la opción / duración:
+            <div>
+              {/* =========================================================================
+                 ETAPA 1: SERVICIOS A AGENDAR (CON INTEGRACIÓN DE MÚLTIPLES SERVICIOS)
+                 ========================================================================= */}
+              {currentStep === 1 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1 border-b border-[#5E765E]/15">
+                    <div>
+                      <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                        Fase 1 de 3: Selección de Servicios
+                      </span>
+                      <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
+                        ¿Qué tratamientos deseas agendar?
+                      </h3>
+                    </div>
+                    <span className="text-[11px] text-[#5E765E] font-medium bg-[#5E765E]/10 px-3 py-1 rounded-full self-start sm:self-auto">
+                      {financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'} en tu cita
                     </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                      {currentService.priceOptions.map((opt: ServicePriceOption, idx: number) => (
-                        <button
-                          key={opt.label}
-                          type="button"
-                          onClick={() => setSelectedOptionIndex(idx)}
-                          className={`p-2.5 rounded-lg text-left text-xs border transition-all cursor-pointer ${
-                            selectedOptionIndex === idx
-                              ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-medium shadow-2xs'
-                              : 'bg-white text-[#111111] border-[#5E765E]/20 hover:border-[#5E765E]/40'
-                          }`}
-                        >
-                          <div className="flex justify-between items-center">
-                            <span className="font-semibold">{opt.label}</span>
-                            <span className={selectedOptionIndex === idx ? 'text-[#D5A688] font-bold' : 'text-[#5E765E] font-bold'}>
-                              S/. {opt.pricePEN}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
                   </div>
-                )}
-              </div>
 
-              {/* Step 2: Location & District */}
-              <div className="border-t border-[#5E765E]/15 pt-5 space-y-4">
-                <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                  2. Lugar y Modalidad en Lima
-                </label>
+                  {/* List of currently selected services */}
+                  <div className="space-y-3">
+                    {selectedServices.map((item) => {
+                      const { service, price } = getItemDetails(item);
 
-                {/* Modalidad selector: Estudio vs Casa vs Trabajo */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLocationType('estudio');
-                      setDistrict('Pueblo Libre');
-                    }}
-                    className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      locationType === 'estudio'
-                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                        : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
-                    }`}
-                  >
-                    <MapPin className="w-4 h-4 text-[#D5A688]" />
-                    <span>En Estudio (Pueblo Libre)</span>
-                  </button>
+                      return (
+                        <div
+                          key={item.instanceId}
+                          className="p-4 rounded-2xl bg-white/95 border border-[#5E765E]/20 shadow-xs space-y-3"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#5E765E]/10 text-[#5E765E]">
+                                  {service.categoryLabel}
+                                </span>
+                                <span className="text-[10px] text-[#111111]/50 font-light">
+                                  {service.subcategory}
+                                </span>
+                              </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setLocationType('casa')}
-                    className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      locationType === 'casa'
-                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                        : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
-                    }`}
-                  >
-                    <HomeIcon className="w-4 h-4" />
-                    <span>En Casa / Domicilio</span>
-                  </button>
+                              {/* Dropdown to change this specific service */}
+                              <select
+                                value={item.serviceId}
+                                onChange={(e) => handleUpdateServiceId(item.instanceId, e.target.value)}
+                                className="w-full text-xs font-semibold text-[#111111] bg-transparent border-0 border-b border-[#5E765E]/20 py-1 focus:outline-none focus:border-[#5E765E] cursor-pointer"
+                              >
+                                {CATALOG_SERVICES.map((srv) => (
+                                  <option key={srv.id} value={srv.id}>
+                                    {srv.name} — Desde S/. {srv.pricePEN || srv.priceOptions?.[0]?.pricePEN}
+                                  </option>
+                                ))}
+                              </select>
+                            </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setLocationType('trabajo')}
-                    className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
-                      locationType === 'trabajo'
-                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                        : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
-                    }`}
-                  >
-                    <Building className="w-4 h-4" />
-                    <span>En Oficina / Trabajo</span>
-                  </button>
-                </div>
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="text-base font-bold text-[#5E765E] font-['Montserrat',sans-serif]">
+                                S/. {price}
+                              </span>
 
-                {locationType === 'estudio' ? (
-                  /* Studio Location Badge */
-                  <div className="bg-[#5E765E]/10 border border-[#5E765E]/25 rounded-2xl p-4 flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shrink-0">
-                      <MapPin className="w-5 h-5 text-[#D5A688]" />
-                    </div>
-                    <div className="text-left flex-1">
-                      <div className="flex items-center justify-between flex-wrap gap-1">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#5E765E]">
-                          Sede Principal Meraki
+                              {selectedServices.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => handleRemoveService(item.instanceId)}
+                                  className="w-7 h-7 rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
+                                  title="Quitar este servicio"
+                                  aria-label={`Quitar ${service.name}`}
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Variant / Option selector if available */}
+                          {service.priceOptions && service.priceOptions.length > 0 && (
+                            <div className="pt-2 border-t border-[#5E765E]/10 space-y-1.5">
+                              <span className="block text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]/90">
+                                Opción / Duración:
+                              </span>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+                                {service.priceOptions.map((opt: ServicePriceOption, optIdx: number) => (
+                                  <button
+                                    key={opt.label}
+                                    type="button"
+                                    onClick={() => handleUpdateOptionIndex(item.instanceId, optIdx)}
+                                    className={`p-2 rounded-lg text-left text-xs border transition-all cursor-pointer ${
+                                      item.optionIndex === optIdx
+                                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-medium shadow-2xs'
+                                        : 'bg-[#FFF2DE]/40 text-[#111111] border-[#5E765E]/15 hover:border-[#5E765E]/30'
+                                    }`}
+                                  >
+                                    <div className="flex justify-between items-center text-[11px]">
+                                      <span>{opt.label}</span>
+                                      <span className={item.optionIndex === optIdx ? 'text-[#D5A688] font-bold' : 'text-[#5E765E] font-bold'}>
+                                        S/. {opt.pricePEN}
+                                      </span>
+                                    </div>
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Add another service section */}
+                  {showAddServiceBox ? (
+                    <div className="p-4 rounded-2xl bg-white border border-[#5E765E]/30 shadow-sm space-y-3 animate-fade-in">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold uppercase tracking-wider text-[#5E765E]">
+                          + Selecciona otro servicio para añadir:
                         </span>
-                        <span className="text-[10px] bg-[#5E765E]/15 text-[#5E765E] font-semibold px-2 py-0.5 rounded-full">
-                          Sin costo de movilidad
+                        <button
+                          type="button"
+                          onClick={() => setShowAddServiceBox(false)}
+                          className="text-xs text-[#111111]/50 hover:text-[#111111]"
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+
+                      {/* Category quick tabs */}
+                      <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px]">
+                        {CATEGORIES_DATA.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => {
+                              setAddCategoryFilter(cat.id);
+
+                              const match = CATALOG_SERVICES.find(
+                                (s) => cat.id === 'todos' || s.category === cat.id
+                              );
+
+                              if (match) {
+                                setServiceToAddId(match.id);
+                              }
+                            }}
+                            className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
+                              addCategoryFilter === cat.id
+                                ? 'bg-[#5E765E] text-[#FFF2DE] font-semibold'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                          >
+                            {cat.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Service selector */}
+                      <select
+                        value={serviceToAddId}
+                        onChange={(e) => setServiceToAddId(e.target.value)}
+                        className="w-full px-3 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] bg-white focus:outline-none focus:border-[#5E765E]"
+                      >
+                        {availableServicesToAdd.map((srv) => (
+                          <option key={srv.id} value={srv.id}>
+                            [{srv.categoryLabel}] {srv.name} — S/. {srv.pricePEN || srv.priceOptions?.[0]?.pricePEN} ({srv.subcategory})
+                          </option>
+                        ))}
+                      </select>
+
+                      <button
+                        type="button"
+                        onClick={handleAddService}
+                        className="w-full py-2.5 rounded-xl bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-bold uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        Añadir a mi Cita
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowAddServiceBox(true)}
+                      className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-[#5E765E]/30 hover:border-[#5E765E] bg-white/60 hover:bg-white text-[#5E765E] text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
+                    >
+                      <Plus className="w-4 h-4 text-[#D5A688]" />
+                      <span>+ Agregar otro servicio a la cita (Manicure, Masaje, Facial, etc.)</span>
+                    </button>
+                  )}
+
+                  {/* Summary Bar & Navigation */}
+                  <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="text-left w-full sm:w-auto">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider font-semibold">
+                          Subtotal Servicios:
+                        </span>
+                        <span className="text-lg font-bold font-['Montserrat',sans-serif] text-[#5E765E]">
+                          S/. {financialTotals.totalPrice}
                         </span>
                       </div>
-                      <p className="text-xs font-semibold text-[#111111] mt-1">
-                        Calle Agustín Gamarra 515, Pueblo Libre, Lima
-                      </p>
-                      <p className="text-[11px] text-[#111111]/70 font-light mt-0.5">
-                        Te recibimos en un ambiente privado, relajante y equipado con instrumental esterilizado de grado profesional.
-                      </p>
+                      <span className="text-[11px] text-[#5E765E] font-medium block">
+                        Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                      </span>
                     </div>
+
+                    <button
+                      type="button"
+                      onClick={handleProceedToStep2}
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      <span>Continuar a Modalidad &amp; Fecha</span>
+                      <ArrowRight className="w-4 h-4 text-[#D5A688]" />
+                    </button>
                   </div>
-                ) : (
-                  /* District & Address Grid for Home/Work */
-                  <>
+                </div>
+              )}
+
+              {/* =========================================================================
+                 ETAPA 2: MODALIDAD, LUGAR Y FECHA/HORARIO
+                 ========================================================================= */}
+              {currentStep === 2 && (
+                <div className="space-y-5 animate-fade-in">
+                  <div className="pb-1 border-b border-[#5E765E]/15">
+                    <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                      Fase 2 de 3: Logística &amp; Agenda
+                    </span>
+                    <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
+                      ¿Dónde y cuándo te gustaría atenderte?
+                    </h3>
+                  </div>
+
+                  {/* Modalidad selector: Estudio vs Casa vs Trabajo */}
+                  <div className="space-y-3">
+                    <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                      Modalidad de Atención
+                    </label>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLocationType('estudio');
+                          setDistrict('Pueblo Libre');
+                        }}
+                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          locationType === 'estudio'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                        }`}
+                      >
+                        <MapPin className="w-4 h-4 text-[#D5A688]" />
+                        <span>En Estudio (Pueblo Libre)</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setLocationType('casa')}
+                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          locationType === 'casa'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                        }`}
+                      >
+                        <HomeIcon className="w-4 h-4 text-[#D5A688]" />
+                        <span>En Casa / Domicilio</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setLocationType('trabajo')}
+                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                          locationType === 'trabajo'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                        }`}
+                      >
+                        <Building className="w-4 h-4 text-[#D5A688]" />
+                        <span>En Oficina / Trabajo</span>
+                      </button>
+                    </div>
+
+                    {locationType === 'estudio' ? (
+                      /* Studio details */
+                      <div className="bg-[#5E765E]/10 border border-[#5E765E]/25 rounded-2xl p-4 flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shrink-0">
+                          <MapPin className="w-5 h-5 text-[#D5A688]" />
+                        </div>
+                        <div className="text-left flex-1">
+                          <div className="flex items-center justify-between flex-wrap gap-1">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5E765E]">
+                              Sede Principal Meraki
+                            </span>
+                            <span className="text-[10px] bg-[#5E765E]/15 text-[#5E765E] font-semibold px-2 py-0.5 rounded-full">
+                              Sin costo de movilidad
+                            </span>
+                          </div>
+                          <p className="text-xs font-semibold text-[#111111] mt-1">
+                            Calle Agustín Gamarra 515, Pueblo Libre, Lima
+                          </p>
+                          <p className="text-[11px] text-[#111111]/70 font-light mt-0.5">
+                            Ambiente privado, relajante y equipado con instrumental esterilizado de grado profesional.
+                          </p>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Home or Office inputs */
+                      <div className="space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
+                              Distrito en Lima *
+                            </label>
+                            <select
+                              value={district}
+                              onChange={(e) => setDistrict(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                              required
+                            >
+                              {LIMA_DISTRICTS.map((d) => (
+                                <option key={d} value={d}>
+                                  {d}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
+                              Dirección o Referencia
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Calle, nro, dpto o referencia..."
+                              value={address}
+                              onChange={(e) => setAddress(e.target.value)}
+                              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-2 text-[11px] text-[#5E765E] bg-white/60 p-2.5 rounded-xl border border-[#5E765E]/15">
+                          <MapPin className="w-4 h-4 shrink-0 text-[#D5A688]" />
+                          <span>
+                            El costo de movilidad se calcula de forma transparente según tu distrito y se coordina vía WhatsApp.
+                          </span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Date and Time */}
+                  <div className="border-t border-[#5E765E]/15 pt-4 space-y-3">
+                    <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                      Fecha y Horario Sugerido
+                    </label>
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                          Distrito en Lima *
+                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                          <Calendar className="w-3.5 h-3.5 text-[#5E765E]" />
+                          <span>Fecha deseada *</span>
+                        </label>
+                        <input
+                          type="date"
+                          value={date}
+                          min={new Date().toISOString().split('T')[0]}
+                          onChange={(e) => setDate(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-[#5E765E]" />
+                          <span>Horario sugerido *</span>
                         </label>
                         <select
-                          value={district}
-                          onChange={(e) => setDistrict(e.target.value)}
+                          value={timeSlot}
+                          onChange={(e) => setTimeSlot(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
                           required
                         >
-                          {LIMA_DISTRICTS.map((d) => (
-                            <option key={d} value={d}>
-                              {d}
+                          {TIME_SLOTS.map((slot) => (
+                            <option key={slot} value={slot}>
+                              {slot} hrs
                             </option>
                           ))}
                         </select>
                       </div>
+                    </div>
+                  </div>
 
+                  {/* Navigation Buttons */}
+                  <div className="pt-4 border-t border-[#5E765E]/15 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(1)}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Volver a Servicios</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleProceedToStep3}
+                      className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      <span>Continuar a Tus Datos</span>
+                      <ArrowRight className="w-4 h-4 text-[#D5A688]" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* =========================================================================
+                 ETAPA 3: DATOS DE CONTACTO Y CONFIRMACIÓN
+                 ========================================================================= */}
+              {currentStep === 3 && (
+                <form onSubmit={handleSubmit} className="space-y-5 animate-fade-in">
+                  <div className="pb-1 border-b border-[#5E765E]/15">
+                    <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                      Fase 3 de 3: Tus Datos de Contacto
+                    </span>
+                    <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
+                      Finaliza y genera tu solicitud
+                    </h3>
+                  </div>
+
+                  {/* Mini-Review Box of Chosen Plan */}
+                  <div className="p-3.5 rounded-2xl bg-white/80 border border-[#5E765E]/20 text-xs space-y-2">
+                    <div className="flex items-center justify-between text-[#5E765E] font-bold uppercase text-[10px] tracking-wider border-b border-[#5E765E]/10 pb-1.5">
+                      <span>Cita: {financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'}</span>
+                      <span>Total: S/. {financialTotals.totalPrice}</span>
+                    </div>
+                    <div className="text-[11px] text-[#111111]/80 space-y-0.5">
+                      <p>
+                        <strong className="text-[#111111]">Modalidad:</strong>{' '}
+                        {locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : `A Domicilio (${district})`} •{' '}
+                        <strong className="text-[#111111]">Fecha:</strong> {date} ({timeSlot} hrs)
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Contact Inputs */}
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                          Dirección o Referencia
+                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                          <User className="w-3.5 h-3.5 text-[#5E765E]" />
+                          <span>Nombre y Apellidos *</span>
                         </label>
                         <input
                           type="text"
-                          placeholder="Calle, nro, dpto o referencia..."
-                          value={address}
-                          onChange={(e) => setAddress(e.target.value)}
+                          placeholder="Tu nombre completo"
+                          value={clientName}
+                          onChange={(e) => setClientName(e.target.value)}
                           className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                          required
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                          <Phone className="w-3.5 h-3.5 text-[#5E765E]" />
+                          <span>WhatsApp / Celular *</span>
+                        </label>
+                        <input
+                          type="tel"
+                          placeholder="ej: 993 067 291"
+                          value={clientPhone}
+                          onChange={(e) => setClientPhone(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                          required
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-[11px] text-[#5E765E] bg-white/60 p-2.5 rounded-xl border border-[#5E765E]/15">
-                      <MapPin className="w-4 h-4 shrink-0 text-[#D5A688]" />
+                    <div>
+                      <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                        <Mail className="w-3.5 h-3.5 text-[#5E765E]" />
+                        <span>Correo Electrónico (opcional)</span>
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="tu-correo@ejemplo.com"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                        <FileText className="w-3.5 h-3.5 text-[#5E765E]" />
+                        <span>Observaciones / Requerimientos especiales</span>
+                      </label>
+                      <textarea
+                        rows={2}
+                        placeholder="Retiro de sistema acrílico previo, alergias, tipo de piel o indicaciones especiales..."
+                        value={specialNotes}
+                        onChange={(e) => setSpecialNotes(e.target.value)}
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Submission Row with financial note */}
+                  <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setCurrentStep(2)}
+                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                      >
+                        <ArrowLeft className="w-3.5 h-3.5" />
+                        <span>Volver</span>
+                      </button>
+
+                      <div className="text-left">
+                        <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider block font-semibold">
+                          Total: S/. {financialTotals.totalPrice}
+                        </span>
+                        <span className="text-[11px] text-[#5E765E] font-medium block">
+                          Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    <button
+                      type="submit"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#D5A688]" />
+                      <span>Confirmar y Generar Cita</span>
+                    </button>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] text-[#111111]/60 pt-1">
+                    <div className="flex items-center gap-1.5">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#5E765E] shrink-0" />
                       <span>
-                        El costo de movilidad se calcula de forma transparente según tu distrito y se coordina vía WhatsApp.
+                        Sin cobro automático. La reserva se formaliza al abonar el adelanto del 40% vía WhatsApp.
                       </span>
                     </div>
-                  </>
-                )}
-              </div>
-
-              {/* Step 3: Preferred Date & Time */}
-              <div className="border-t border-[#5E765E]/15 pt-5 space-y-3">
-                <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                  3. Fecha y Horario Sugerido
-                </label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                      Fecha Deseada *
-                    </label>
-                    <input
-                      type="date"
-                      value={date}
-                      min={new Date().toISOString().split('T')[0]}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                      Horario Sugerido *
-                    </label>
-                    <select
-                      value={timeSlot}
-                      onChange={(e) => setTimeSlot(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                      required
+                    <a
+                      href="/privacy"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline hover:text-[#5E765E] transition-colors"
                     >
-                      {TIME_SLOTS.map((slot) => (
-                        <option key={slot} value={slot}>
-                          {slot} hrs
-                        </option>
-                      ))}
-                    </select>
+                      Políticas &amp; Privacidad
+                    </a>
                   </div>
-                </div>
-              </div>
-
-              {/* Step 4: Client Contact Information */}
-              <div className="border-t border-[#5E765E]/15 pt-5 space-y-3">
-                <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                  4. Tus Datos de Contacto
-                </label>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Nombre y Apellidos *"
-                      value={clientName}
-                      onChange={(e) => setClientName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                      required
-                    />
-                  </div>
-
-                  <div>
-                    <input
-                      type="tel"
-                      placeholder="WhatsApp / Celular * (ej: 993 067 291)"
-                      value={clientPhone}
-                      onChange={(e) => setClientPhone(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <input
-                    type="email"
-                    placeholder="Correo Electrónico (opcional)"
-                    value={clientEmail}
-                    onChange={(e) => setClientEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                  />
-                </div>
-
-                <div>
-                  <textarea
-                    rows={2}
-                    placeholder="Observaciones, retiro de sistema previo, tipo de uña/piel o requerimientos especiales..."
-                    value={specialNotes}
-                    onChange={(e) => setSpecialNotes(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                  />
-                </div>
-              </div>
-
-              {/* Step 5: Financial Policy & Submit Button */}
-              <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="text-left w-full sm:w-auto">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider font-semibold">
-                      Tarifa del servicio:
-                    </span>
-                    <span className="text-lg font-bold font-['Montserrat',sans-serif] text-[#5E765E]">
-                      S/. {priceCalculation.basePrice}
-                    </span>
-                  </div>
-                  <span className="text-[11px] text-[#5E765E] font-medium block">
-                    Adelanto de confirmación (40%): <strong>S/. {priceCalculation.advancePayment}</strong>
-                  </span>
-                </div>
-
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
-                >
-                  <Sparkles className="w-4 h-4 text-[#D5A688]" />
-                  <span>Generar Solicitud de Cita</span>
-                </button>
-              </div>
-
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] text-[#111111]/60 pt-1">
-                <div className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#5E765E] shrink-0" />
-                  <span>
-                    Sin cobro automático. La reserva se formaliza al abonar el 40% vía WhatsApp.
-                  </span>
-                </div>
-                <a
-                  href="/privacy"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline hover:text-[#5E765E] transition-colors"
-                >
-                  Políticas &amp; Privacidad
-                </a>
-              </div>
-            </form>
+                </form>
+              )}
+            </div>
           )}
         </div>
       </div>

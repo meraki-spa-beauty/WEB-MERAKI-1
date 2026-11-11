@@ -140,8 +140,14 @@ export function Catalogo() {
 
       <main className="flex-1">
         {/* Subpage Header Banner */}
-        <section className="bg-gradient-to-b from-[#5E765E]/15 to-transparent pt-12 lg:pt-28 pb-10 border-b border-[#5E765E]/15">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <section className="relative overflow-hidden bg-gradient-to-b from-[#5E765E]/12 via-white/50 to-transparent pt-12 lg:pt-28 pb-10 border-b border-[#5E765E]/15">
+          {/* Ambient luminous glow */}
+          <div
+            aria-hidden="true"
+            className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[280px] bg-gradient-to-b from-white/90 via-[#FFF2DE]/40 to-transparent blur-3xl pointer-events-none rounded-full"
+          />
+
+          <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#5E765E]/10 border border-[#5E765E]/20 text-[#5E765E] text-xs font-semibold uppercase tracking-[0.2em] mb-4">
               <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
               <span>Fuente Oficial de Servicios Meraki</span>
