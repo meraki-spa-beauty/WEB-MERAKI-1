@@ -115,21 +115,38 @@ export function Catalogo() {
         currentOption,
         options: service.priceOptions,
         pricePEN: currentOption.pricePEN,
-        label: currentOption.label
+        label: currentOption.label,
+        formattedPrice: `S/ ${currentOption.pricePEN}`
       };
     }
 
+    const pricePEN = service.pricePEN || 0;
+
+    const formattedPrice = service.priceNote
+      ? service.priceNote
+      : pricePEN > 0
+        ? `S/ ${pricePEN}`
+        : 'Bajo pedido';
+
     return {
       isVariant: false,
-      pricePEN: service.pricePEN || 0,
-      label: ''
+      pricePEN,
+      label: '',
+      formattedPrice
     };
   };
 
   const buildWhatsAppLink = (service: CatalogService) => {
     const priceInfo = getServicePriceInfo(service);
     const variantText = priceInfo.isVariant ? ` (${priceInfo.label})` : '';
-    const message = `Hola Meraki Spa, deseo agendar el servicio *${service.name}*${variantText} de S/ ${priceInfo.pricePEN}. ¿Me podrían indicar disponibilidad para atención en su estudio de Pueblo Libre o a domicilio?`;
+
+    const priceText = service.priceNote
+      ? ` (${service.priceNote})`
+      : priceInfo.pricePEN > 0
+        ? ` de S/ ${priceInfo.pricePEN}`
+        : ' (bajo pedido / a cotizar)';
+
+    const message = `Hola Meraki Spa, deseo agendar el servicio *${service.name}*${variantText}${priceText}. ¿Me podrían indicar disponibilidad para atención en su estudio de Pueblo Libre o a domicilio?`;
 
     return `https://wa.me/${SPA_INFO.whatsappNumber}?text=${encodeURIComponent(message)}`;
   };
@@ -312,7 +329,7 @@ export function Catalogo() {
                             )}
                           </div>
                           <div className="absolute bottom-3 right-3 z-20 bg-[#5E765E] text-[#FFF2DE] px-3 py-1 rounded-lg font-['Montserrat',sans-serif] text-sm font-bold shadow-md">
-                            S/ {priceInfo.pricePEN}
+                            {priceInfo.formattedPrice}
                           </div>
                         </SkeletonImage>
                       ) : (
@@ -321,7 +338,7 @@ export function Catalogo() {
                             {service.subcategory}
                           </span>
                           <span className="text-sm font-['Montserrat',sans-serif] font-bold text-[#5E765E]">
-                            S/ {priceInfo.pricePEN}
+                            {priceInfo.formattedPrice}
                           </span>
                         </div>
                       )}
@@ -396,7 +413,7 @@ export function Catalogo() {
                             className="flex-1 inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] py-2.5 px-4 rounded-xl text-xs font-semibold uppercase tracking-wider transition-all shadow-sm hover:shadow-md cursor-pointer"
                           >
                             <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
-                            <span>Agendar Cita • S/ {priceInfo.pricePEN}</span>
+                            <span>Agendar Cita • {priceInfo.formattedPrice}</span>
                           </button>
                           <a
                             href={waLink}

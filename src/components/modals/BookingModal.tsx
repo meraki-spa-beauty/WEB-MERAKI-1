@@ -172,16 +172,27 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       optionLabel = opt.label;
     }
 
-    return { service, price, optionLabel };
+    const formattedPrice = service.priceNote
+      ? service.priceNote
+      : price > 0
+        ? `S/. ${price}`
+        : 'Bajo pedido';
+
+    return { service, price, optionLabel, formattedPrice };
   };
 
   // Consolidated financial totals for all selected services
   const financialTotals = useMemo(() => {
     let totalPrice = 0;
+    let hasUnpriced = false;
 
     const itemsDetailed = selectedServices.map((item) => {
       const details = getItemDetails(item);
       totalPrice += details.price;
+
+      if (details.price === 0 || details.service.priceNote) {
+        hasUnpriced = true;
+      }
 
       return {
         ...item,
@@ -197,6 +208,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       advancePayment,
       balanceRemaining,
       itemsDetailed,
+      hasUnpriced,
       count: selectedServices.length
     };
   }, [selectedServices]);
@@ -321,23 +333,47 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
   // Build WhatsApp consolidated message text
   const buildConsolidatedMessage = () => {
     const isStudio = locationType === 'estudio';
+    const hasSculpted = selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida');
+    const hasPressOn = selectedServices.some((s) => s.serviceId === 'manos-press-on-nails');
 
     const servicesListText = financialTotals.itemsDetailed
-      .map(
-        (it, idx) =>
-          `  ${idx + 1}. *${it.service.name}*${it.optionLabel ? ` (${it.optionLabel})` : ''} — S/ ${it.price}`
-      )
+      .map((it, idx) => {
+        if (it.service.id === 'manos-press-on-nails') {
+          return `  ${idx + 1}. *${it.service.name}* — Bajo pedido / A cotizar (diseño personalizado)`;
+        }
+
+        const optText = it.optionLabel ? ` (${it.optionLabel})` : '';
+        const priceText = it.price > 0 ? `S/ ${it.price}` : (it.service.priceNote || 'Bajo pedido');
+
+        return `  ${idx + 1}. *${it.service.name}*${optText} — ${priceText}`;
+      })
       .join('\n');
+
+    const totalText = financialTotals.hasUnpriced
+      ? financialTotals.totalPrice > 0
+        ? `S/ ${financialTotals.totalPrice} (+ servicio bajo pedido por cotizar)`
+        : 'A cotizar bajo pedido'
+      : `S/ ${financialTotals.totalPrice}`;
+
+    const advanceText = financialTotals.advancePayment > 0
+      ? `S/ ${financialTotals.advancePayment} (Yape al 993 067 291 - Ana Díaz)`
+      : 'A coordinar por WhatsApp al definir el set (Yape al 993 067 291 - Ana Díaz)';
+
+    const balanceText = financialTotals.balanceRemaining > 0
+      ? `S/ ${financialTotals.balanceRemaining}`
+      : 'A definir tras cotización';
 
     const lines = [
       '🌿 *SOLICITUD DE RESERVA — MERAKI SPA* 🌿',
       '━━━━━━━━━━━━━━━━━━━━',
       `✨ *Servicios a agendar (${financialTotals.count}):*`,
       servicesListText,
+      hasSculpted ? '⚠️ *Nota Uñas Esculpidas:* El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.' : '',
+      hasPressOn ? '💅 *Nota Press On Nails:* Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por este chat.' : '',
       '━━━━━━━━━━━━━━━━━━━━',
-      `💰 *Inversión Total:* S/ ${financialTotals.totalPrice}`,
-      `💳 *Adelanto de confirmación (40%):* S/ ${financialTotals.advancePayment} (Yape al 993 067 291 - Ana Díaz)`,
-      `💵 *Saldo al finalizar atención (60%):* S/ ${financialTotals.balanceRemaining}`,
+      `💰 *Inversión Total:* ${totalText}`,
+      `💳 *Adelanto de confirmación (40%):* ${advanceText}`,
+      financialTotals.balanceRemaining > 0 ? `💵 *Saldo al finalizar atención (60%):* ${balanceText}` : '',
       '━━━━━━━━━━━━━━━━━━━━',
       `📍 *Modalidad:* ${
         isStudio
@@ -363,8 +399,8 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       specialNotes.trim() ? `📝 *Observaciones/Alergias:* ${specialNotes.trim()}` : '',
       '━━━━━━━━━━━━━━━━━━━━',
       isStudio
-        ? `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita presencial en su estudio (Calle Agustín Gamarra 515, Pueblo Libre) para verificar disponibilidad. Coordinamos el pago del adelanto de S/ ${financialTotals.advancePayment} por Yape a su número.`
-        : `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita a domicilio para verificar disponibilidad de agenda y movilidad. Coordinamos el pago del adelanto de S/ ${financialTotals.advancePayment} por Yape a su número.`
+        ? `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita presencial en su estudio (Calle Agustín Gamarra 515, Pueblo Libre) para verificar disponibilidad. Coordinamos los detalles por WhatsApp.`
+        : `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita a domicilio para verificar disponibilidad de agenda y movilidad. Coordinamos los detalles por WhatsApp.`
     ].filter(Boolean);
 
     return lines.join('\n');
@@ -707,10 +743,25 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                         )}
                       </div>
                       <span className="font-bold text-[#5E765E] shrink-0">
-                        S/. {it.price}
+                        {it.formattedPrice}
                       </span>
                     </div>
                   ))}
+
+                  {/* Highlights / Special Notes for Confirmation */}
+                  {selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida') && (
+                    <div className="p-2.5 rounded-xl bg-[#FFF2DE] border border-[#D5A688]/40 text-[11px] text-[#111111]/85 flex items-start gap-2">
+                      <AlertCircle className="w-3.5 h-3.5 text-[#D5A688] shrink-0 mt-0.5" />
+                      <span><strong>Extensión Esculpida:</strong> El precio puede variar según el largo y diseño elegido.</span>
+                    </div>
+                  )}
+
+                  {selectedServices.some((s) => s.serviceId === 'manos-press-on-nails') && (
+                    <div className="p-2.5 rounded-xl bg-[#FFF8FA] border border-[#722282]/30 text-[11px] text-[#111111]/85 flex items-start gap-2">
+                      <Sparkles className="w-3.5 h-3.5 text-[#722282] shrink-0 mt-0.5" />
+                      <span><strong>Press On Nails:</strong> Set elaborado a medida bajo pedido. Coordinaremos diseño y medidas por WhatsApp.</span>
+                    </div>
+                  )}
 
                   <div className="pt-2 border-t border-[#5E765E]/15 space-y-1 text-xs">
                     <div className="flex justify-between items-center">
@@ -758,16 +809,28 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                 <div className="pt-3 border-t border-[#5E765E]/15 bg-[#FFF2DE]/50 -mx-5 -mb-5 p-4 rounded-b-2xl space-y-1.5">
                   <div className="flex justify-between items-center text-xs">
                     <span className="text-[#111111]/70">Inversión total ({financialTotals.count} servicios):</span>
-                    <span className="font-bold text-[#111111] text-sm">S/. {financialTotals.totalPrice}</span>
+                    <span className="font-bold text-[#111111] text-sm">
+                      {financialTotals.hasUnpriced
+                        ? financialTotals.totalPrice > 0
+                          ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
+                          : 'A cotizar bajo pedido'
+                        : `S/. ${financialTotals.totalPrice}`}
+                    </span>
                   </div>
                   <div className="flex justify-between items-center text-xs text-[#5E765E] font-medium">
                     <span>Adelanto de confirmación (40%):</span>
-                    <span className="font-bold">S/. {financialTotals.advancePayment}</span>
+                    <span className="font-bold">
+                      {financialTotals.advancePayment > 0
+                        ? `S/. ${financialTotals.advancePayment}`
+                        : 'A coordinar por WhatsApp'}
+                    </span>
                   </div>
-                  <div className="flex justify-between items-center text-[11px] text-[#111111]/60">
-                    <span>Saldo al concluir atención (60%):</span>
-                    <span>S/. {financialTotals.balanceRemaining}</span>
-                  </div>
+                  {financialTotals.balanceRemaining > 0 && (
+                    <div className="flex justify-between items-center text-[11px] text-[#111111]/60">
+                      <span>Saldo al concluir atención (60%):</span>
+                      <span>S/. {financialTotals.balanceRemaining}</span>
+                    </div>
+                  )}
                   <p className="text-[10px] text-[#111111]/60 italic pt-1 border-t border-[#5E765E]/10">
                     * Movilidad sujeta a coordinación según distrito en Lima. La reserva se sella con el abono del 40%.
                   </p>
@@ -886,7 +949,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                   {/* List of currently selected services */}
                   <div className="space-y-3">
                     {selectedServices.map((item) => {
-                      const { service, price } = getItemDetails(item);
+                      const { service, formattedPrice } = getItemDetails(item);
 
                       return (
                         <div
@@ -912,15 +975,15 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                               >
                                 {CATALOG_SERVICES.map((srv) => (
                                   <option key={srv.id} value={srv.id}>
-                                    {srv.name} — Desde S/. {srv.pricePEN || srv.priceOptions?.[0]?.pricePEN}
+                                    {srv.name} — {srv.priceNote || (srv.pricePEN ? `S/. ${srv.pricePEN}` : srv.priceOptions?.[0]?.pricePEN ? `Desde S/. ${srv.priceOptions[0].pricePEN}` : 'Bajo pedido')}
                                   </option>
                                 ))}
                               </select>
                             </div>
 
                             <div className="flex items-center gap-3 shrink-0">
-                              <span className="text-base font-bold text-[#5E765E] font-['Montserrat',sans-serif]">
-                                S/. {price}
+                              <span className="text-sm sm:text-base font-bold text-[#5E765E] font-['Montserrat',sans-serif]">
+                                {formattedPrice}
                               </span>
 
                               {selectedServices.length > 1 && (
@@ -966,10 +1029,51 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                               </div>
                             </div>
                           )}
+
+                          {/* Specific Service Note Callout inside item card */}
+                          {service.note && (
+                            <div className="pt-2 border-t border-[#5E765E]/10">
+                              <div className="p-2.5 rounded-xl bg-[#FFF2DE]/90 border border-[#D5A688]/40 text-[11px] text-[#111111]/85 flex items-start gap-2">
+                                <AlertCircle className="w-3.5 h-3.5 text-[#D5A688] shrink-0 mt-0.5" />
+                                <span className="leading-snug">
+                                  <strong className="text-[#5E765E] font-semibold">Nota:</strong> {service.note}
+                                </span>
+                              </div>
+                            </div>
+                          )}
                         </div>
                       );
                     })}
                   </div>
+
+                  {/* Highlights / Special Notes for Selected Services */}
+                  {selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida') && (
+                    <div className="p-3.5 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/50 text-xs text-[#111111] flex items-start gap-2.5 shadow-2xs">
+                      <AlertCircle className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
+                      <div className="leading-relaxed">
+                        <strong className="text-[#5E765E] font-semibold block mb-0.5">
+                          Extensión de Uña Esculpida (S/ 180):
+                        </strong>
+                        <span>
+                          El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {selectedServices.some((s) => s.serviceId === 'manos-press-on-nails') && (
+                    <div className="p-3.5 rounded-2xl bg-[#FFF8FA] border border-[#722282]/25 text-xs text-[#111111] flex items-start gap-2.5 shadow-2xs">
+                      <Sparkles className="w-4 h-4 text-[#722282] shrink-0 mt-0.5" />
+                      <div className="leading-relaxed">
+                        <strong className="text-[#722282] font-semibold block mb-0.5">
+                          Press On Nails (Bajo Pedido):
+                        </strong>
+                        <span>
+                          Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por WhatsApp (envío de medidas y referencias de diseño).
+                        </span>
+                      </div>
+                    </div>
+                  )}
 
                   {/* Add another service section */}
                   {showAddServiceBox ? (
@@ -1021,11 +1125,15 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                         onChange={(e) => setServiceToAddId(e.target.value)}
                         className="w-full px-3 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] bg-white focus:outline-none focus:border-[#5E765E]"
                       >
-                        {availableServicesToAdd.map((srv) => (
-                          <option key={srv.id} value={srv.id}>
-                            [{srv.categoryLabel}] {srv.name} — S/. {srv.pricePEN || srv.priceOptions?.[0]?.pricePEN} ({srv.subcategory})
-                          </option>
-                        ))}
+                        {availableServicesToAdd.map((srv) => {
+                          const priceDisplay = srv.priceNote || (srv.pricePEN ? `S/. ${srv.pricePEN}` : srv.priceOptions?.[0]?.pricePEN ? `Desde S/. ${srv.priceOptions[0].pricePEN}` : 'Bajo pedido');
+
+                          return (
+                            <option key={srv.id} value={srv.id}>
+                              [{srv.categoryLabel}] {srv.name} — {priceDisplay} ({srv.subcategory})
+                            </option>
+                          );
+                        })}
                       </select>
 
                       <button
@@ -1055,11 +1163,23 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                           Subtotal Servicios:
                         </span>
                         <span className="text-lg font-bold font-['Montserrat',sans-serif] text-[#5E765E]">
-                          S/. {financialTotals.totalPrice}
+                          {financialTotals.hasUnpriced
+                            ? financialTotals.totalPrice > 0
+                              ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
+                              : 'A cotizar bajo pedido'
+                            : `S/. ${financialTotals.totalPrice}`}
                         </span>
                       </div>
                       <span className="text-[11px] text-[#5E765E] font-medium block">
-                        Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                        {financialTotals.advancePayment > 0 ? (
+                          <>
+                            Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                          </>
+                        ) : (
+                          <>
+                            Adelanto: <strong>A coordinar por WhatsApp</strong>
+                          </>
+                        )}
                       </span>
                     </div>
 
@@ -1383,10 +1503,23 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
                       <div className="text-left">
                         <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider block font-semibold">
-                          Total: S/. {financialTotals.totalPrice}
+                          Total:{' '}
+                          {financialTotals.hasUnpriced
+                            ? financialTotals.totalPrice > 0
+                              ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
+                              : 'A cotizar bajo pedido'
+                            : `S/. ${financialTotals.totalPrice}`}
                         </span>
                         <span className="text-[11px] text-[#5E765E] font-medium block">
-                          Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                          {financialTotals.advancePayment > 0 ? (
+                            <>
+                              Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
+                            </>
+                          ) : (
+                            <>
+                              Adelanto: <strong>A coordinar por WhatsApp</strong>
+                            </>
+                          )}
                         </span>
                       </div>
                     </div>
@@ -1544,17 +1677,31 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                         <div className="pt-2 border-t border-[#722282]/20 flex items-center justify-between flex-wrap gap-2 text-xs">
                           <div>
                             <span className="text-[10px] text-[#111111]/60 block uppercase font-medium">Inversión Total:</span>
-                            <strong className="text-sm text-[#111111] font-bold">S/ {financialTotals.totalPrice}</strong>
+                            <strong className="text-sm text-[#111111] font-bold">
+                              {financialTotals.hasUnpriced
+                                ? financialTotals.totalPrice > 0
+                                ? `S/ ${financialTotals.totalPrice} (+ bajo pedido)`
+                                : 'A cotizar bajo pedido'
+                                : `S/ ${financialTotals.totalPrice}`}
+                            </strong>
                           </div>
                           <div className="bg-[#722282] text-white px-3.5 py-1.5 rounded-xl shadow-xs text-right">
                             <span className="text-[10px] text-[#FFF2DE] block uppercase tracking-wider font-medium">
                               Adelanto a abonar (40%):
                             </span>
-                            <strong className="text-base font-bold">S/ {financialTotals.advancePayment}</strong>
+                            <strong className="text-base font-bold">
+                              {financialTotals.advancePayment > 0
+                                ? `S/ ${financialTotals.advancePayment}`
+                                : 'A coordinar por WhatsApp'}
+                            </strong>
                           </div>
                           <div>
                             <span className="text-[10px] text-[#111111]/60 block uppercase font-medium">Saldo al finalizar (60%):</span>
-                            <strong className="text-sm text-[#5E765E] font-bold">S/ {financialTotals.balanceRemaining}</strong>
+                            <strong className="text-sm text-[#5E765E] font-bold">
+                              {financialTotals.balanceRemaining > 0
+                                ? `S/ ${financialTotals.balanceRemaining}`
+                                : 'A definir'}
+                            </strong>
                           </div>
                         </div>
                       </div>
