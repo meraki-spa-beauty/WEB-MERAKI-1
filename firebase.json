@@ -1,44 +1,22 @@
 {
-  "hosting": [
-    {
-      "target": "merakispa",
-      "public": "dist",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{"source": "**", "destination": "/index.html"}],
-      "headers": [
-        {
-          "source": "/favicon*",
-          "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
-        },
-        {
-          "source": "/apple-touch-icon.png",
-          "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
-        },
-        {
-          "source": "/assets/**",
-          "headers": [{"key": "Cache-Control", "value": "public,max-age=31536000,immutable"}]
-        }
-      ]
-    },
-    {
-      "target": "default",
-      "public": "dist",
-      "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
-      "rewrites": [{"source": "**", "destination": "/index.html"}],
-      "headers": [
-        {
-          "source": "/favicon*",
-          "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
-        },
-        {
-          "source": "/apple-touch-icon.png",
-          "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
-        },
-        {
-          "source": "/assets/**",
-          "headers": [{"key": "Cache-Control", "value": "public,max-age=31536000,immutable"}]
-        }
-      ]
-    }
-  ]
+  "hosting": {
+    "target": "merakispa",
+    "public": "dist",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [{"source": "**", "destination": "/index.html"}],
+    "headers": [
+      {
+        "source": "/favicon*",
+        "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
+      },
+      {
+        "source": "/apple-touch-icon.png",
+        "headers": [{"key": "Cache-Control", "value": "no-cache, must-revalidate"}]
+      },
+      {
+        "source": "/assets/**",
+        "headers": [{"key": "Cache-Control", "value": "public,max-age=31536000,immutable"}]
+      }
+    ]
+  }
 }

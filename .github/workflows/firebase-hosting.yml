@@ -27,7 +27,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase Hosting (merakispa)
+      - name: Deploy to Firebase Hosting
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
@@ -36,11 +36,12 @@ jobs:
           channelId: live
           firebaseToolsVersion: "15.32.1"
 
-      - name: Deploy to Firebase Hosting (web-meraki-14bc4)
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
-          projectId: web-meraki-14bc4
-          target: default
-          channelId: live
-          firebaseToolsVersion: "15.32.1"
+      - name: Disable legacy default Hosting site
+        env:
+          FIREBASE_SA: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+        run: |
+          SA_FILE="$(mktemp)"
+          printf '%s' "$FIREBASE_SA" > "$SA_FILE"
+          export GOOGLE_APPLICATION_CREDENTIALS="$SA_FILE"
+          npx --yes firebase-tools@15.32.1 hosting:disable --project web-meraki-14bc4 --site web-meraki-14bc4 --force
+          rm -f "$SA_FILE"

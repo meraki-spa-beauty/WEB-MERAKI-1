@@ -7,9 +7,6 @@
       "hosting": {
         "merakispa": [
           "merakispa"
-        ],
-        "default": [
-          "web-meraki-14bc4"
         ]
       }
     }
