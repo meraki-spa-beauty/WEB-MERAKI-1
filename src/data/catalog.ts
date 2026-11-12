@@ -91,8 +91,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Manos Básico & Nivelación',
     pricePEN: 120,
     description: 'Base autonivelante de alta flexibilidad y resistencia que protege y refuerza la uña natural.',
-    includes: ['Preparación profunda de uña natural', 'Nivelación con base rubber fortalecedora', 'Esmaltado y sellado de alta resistencia'],
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80'
+    includes: ['Preparación profunda (manicura rusa)', 'Nivelación de base rubber o builder gel', 'Esmaltado y sellado de alta resistencia'],
+    image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
   },
   {
     id: 'manos-extension-tip',
