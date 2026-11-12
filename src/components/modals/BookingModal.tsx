@@ -958,14 +958,6 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-[#5E765E]/10 text-[#5E765E]">
-                                  {service.categoryLabel}
-                                </span>
-                                <span className="text-[10px] text-[#111111]/50 font-light">
-                                  {service.subcategory}
-                                </span>
-                              </div>
 
                               {/* Dropdown to change this specific service */}
                               <select
@@ -1130,7 +1122,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
                           return (
                             <option key={srv.id} value={srv.id}>
-                              [{srv.categoryLabel}] {srv.name} — {priceDisplay} ({srv.subcategory})
+                              {srv.name} — {priceDisplay}
                             </option>
                           );
                         })}

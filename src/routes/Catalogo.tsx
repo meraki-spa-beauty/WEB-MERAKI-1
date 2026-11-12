@@ -297,7 +297,7 @@ export function Catalogo() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredServices.map((service) => {
+                {filteredServices.map((service, index) => {
                   const priceInfo = getServicePriceInfo(service);
                   const waLink = buildWhatsAppLink(service);
 
@@ -313,30 +313,32 @@ export function Catalogo() {
                           alt={service.name}
                           width={640}
                           height={360}
-                          loading="lazy"
+                          loading={index < 3 ? 'eager' : 'lazy'}
+                          fetchPriority={index === 0 ? 'high' : 'auto'}
                           containerClassName="aspect-[16/9] w-full bg-[#EAE2D5]"
                           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         >
                           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
-                          <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5">
-                            <span className="px-2.5 py-1 rounded-md bg-white/90 backdrop-blur-sm text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E]">
-                              {service.subcategory}
-                            </span>
-                            {service.popular && (
-                              <span className="px-2 py-1 rounded-md bg-[#5E765E] text-[#FFF2DE] text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider">
+                          {service.popular && (
+                            <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5">
+                              <span className="px-2.5 py-1 rounded-md bg-[#5E765E] text-[#FFF2DE] text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-sm">
                                 Popular
                               </span>
-                            )}
-                          </div>
+                            </div>
+                          )}
                           <div className="absolute bottom-3 right-3 z-20 bg-[#5E765E] text-[#FFF2DE] px-3 py-1 rounded-lg font-['Montserrat',sans-serif] text-sm font-bold shadow-md">
                             {priceInfo.formattedPrice}
                           </div>
                         </SkeletonImage>
                       ) : (
                         <div className="px-6 pt-5 pb-2 flex items-center justify-between border-b border-[#5E765E]/10 bg-[#5E765E]/5">
-                          <span className="text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E]">
-                            {service.subcategory}
-                          </span>
+                          {service.popular ? (
+                            <span className="px-2 py-0.5 rounded-md bg-[#5E765E] text-[#FFF2DE] text-[10px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider">
+                              Popular
+                            </span>
+                          ) : (
+                            <span />
+                          )}
                           <span className="text-sm font-['Montserrat',sans-serif] font-bold text-[#5E765E]">
                             {priceInfo.formattedPrice}
                           </span>

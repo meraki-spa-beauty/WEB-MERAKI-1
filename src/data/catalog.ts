@@ -113,7 +113,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Manos',
     subcategory: 'Esculpidas',
     pricePEN: 180,
-    popular: true,
     description: 'Alargamiento de la uña mediante esculpido directo con un molde anatómico en poligel, acrílico o gel de construcción.',
     includes: ['Colocación de moldes anatómicos', 'Esculpido manual en poligel, acrílico o gel de construcción', 'Arquitectura de uña, limado de precisión y acabado brillante', 'Exfoliación e hidratación'],
     note: 'El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.',
@@ -176,7 +175,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Pies',
     subcategory: 'Cuidado de Pies',
     pricePEN: 90,
-    popular: true,
     description: 'Pedicura completa combinada con esmaltado en gel de secado inmediato y resistencia absoluta.',
     includes: ['Pedicura completa e higiene de talones', 'Esmalte en gel de máxima duración', 'Secado en lámpara que permite calzarte de inmediato', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
@@ -203,7 +201,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Pestañas',
     subcategory: 'Pestañas Básicas',
     pricePEN: 100,
-    popular: true,
     description: 'Elevación y curvatura duradera de tus pestañas naturales desde la raíz.',
     includes: ['Elevación y moldeado curvo de pestañas propias', 'Nutrición profunda con keratina', 'Efecto de ojos abiertos y descansados por 4 a 6 semanas'],
     image: 'https://images.unsplash.com/photo-1583001800475-7f55f6063b4f?auto=format&fit=crop&w=800&q=80'
@@ -237,7 +234,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Pestañas',
     subcategory: 'Extensión de Pestaña',
     pricePEN: 150,
-    popular: true,
     description: 'Abanicos ultralivianos de volumen ruso para una mirada densa, tupida e impactante.',
     includes: ['Abanicos hechos a mano según tu tolerancia natural', 'Gran densidad sin añadir peso nocivo', 'Efecto glamuroso y aterciopelado'],
     image: 'https://images.unsplash.com/photo-1512290900672-1f41d739e1e2?auto=format&fit=crop&w=800&q=80'
@@ -340,7 +336,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     category: 'depilacion',
     categoryLabel: 'Depilación',
     subcategory: 'Zonas Faciales',
-    popular: true,
     priceOptions: [
       { label: 'Cera', pricePEN: 70 },
       { label: 'Hilo', pricePEN: 65 }
@@ -396,7 +391,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Depilación',
     subcategory: 'Zonas Corporales Cera',
     pricePEN: 80,
-    popular: true,
     description: 'Depilación completa de ambas piernas de muslos a pies.',
     includes: ['Muslos, rodillas, pantorrillas y pies', 'Cera de alta calidad y máxima suavidad'],
     image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
@@ -428,7 +422,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Depilación',
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 70,
-    popular: true,
     description: 'Depilación íntima completa con la máxima higiene y delicadeza.',
     includes: ['Depilación total de la zona íntima', 'Cera elástica hipoalergénica de baja temperatura'],
     image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80'
@@ -483,7 +476,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     category: 'masajes',
     categoryLabel: 'Masajes',
     subcategory: 'Masajes Individuales',
-    popular: true,
     priceOptions: [
       { label: '1 Hora', pricePEN: 100 },
       { label: '1/2 Hora (30 min)', pricePEN: 60 }
@@ -498,7 +490,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     category: 'masajes',
     categoryLabel: 'Masajes',
     subcategory: 'Masajes Individuales',
-    popular: true,
     priceOptions: [
       { label: '1 Hora', pricePEN: 120 },
       { label: '1/2 Hora (30 min)', pricePEN: 80 }
@@ -528,7 +519,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     category: 'masajes',
     categoryLabel: 'Masajes',
     subcategory: 'Packs Corporales',
-    popular: true,
     priceOptions: [
       { label: '4 Sesiones', pricePEN: 380, sessions: 4 },
       { label: '6 Sesiones', pricePEN: 400, sessions: 6 },
@@ -581,7 +571,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Faciales',
     subcategory: 'Cuidado Facial',
     pricePEN: 140,
-    popular: true,
     description: 'Limpieza profunda con vaporizador y aparatología de alta frecuencia para poros limpios y piel renovada.',
     includes: [
       'Exfoliación dérmica preparatoria',
@@ -600,7 +589,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Faciales',
     subcategory: 'Cuidado Facial',
     pricePEN: 160,
-    popular: true,
     description: 'La experiencia facial más completa con máscara LED, oro, miel, colágeno y rutina de skincare personalizada.',
     includes: [
       'Exfoliación profunda y vaporizador dérmico',

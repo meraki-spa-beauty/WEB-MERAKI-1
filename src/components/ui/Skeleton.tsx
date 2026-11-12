@@ -139,12 +139,6 @@ export function CatalogGridSkeleton({ count = 6 }: CatalogGridSkeletonProps) {
         >
           {/* Aspect 16:9 Image Header Skeleton */}
           <div className="relative aspect-[16/9] w-full meraki-skeleton">
-            <div className="absolute top-3 left-3 flex items-center gap-1.5">
-              <div className="h-5 w-24 rounded-md bg-white/75" />
-              {itemIndex % 2 === 0 && (
-                <div className="h-5 w-14 rounded-md bg-[#5E765E]/35" />
-              )}
-            </div>
             <div className="absolute bottom-3 right-3 h-7 w-16 rounded-lg bg-[#5E765E]/40" />
           </div>
 
