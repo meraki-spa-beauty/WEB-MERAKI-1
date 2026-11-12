@@ -8,11 +8,27 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Meraki Spa" />
-    <link rel="manifest" href="/manifest.json?v=20261112" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=20261112" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=20261112" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20261112" />
-    <link rel="shortcut icon" href="/favicon.ico?v=20261112" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <link rel="manifest" href="/manifest.json?v=3" />
+    <link rel="icon" type="image/png" href="/assets/brand/meraki-logo-official-dark.png?v=3" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png?v=3" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
+    <link rel="shortcut icon" href="/favicon.ico?v=3" />
+    <script>
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          for (var reg of regs) { reg.unregister(); }
+        });
+      }
+      if ('caches' in window) {
+        caches.keys().then(function(names) {
+          for (var name of names) { caches.delete(name); }
+        });
+      }
+    </script>
     <title>Meraki | Bienestar, belleza y rituales</title>
     <meta name="description" content="Servicios de spa y estética en estudio (Pueblo Libre) y a domicilio u oficina en Lima: manicura, pedicura, pestañas, depilación, masajes y faciales profesionales liderados por Ana Maria Díaz." />
     <meta property="og:title" content="Meraki | Bienestar, belleza y rituales" />
