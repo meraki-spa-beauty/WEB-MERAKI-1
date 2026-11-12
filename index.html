@@ -18,6 +18,11 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
     <link rel="shortcut icon" href="/favicon.ico?v=3" />
     <script>
+      window.addEventListener('pageshow', function(e) {
+        if (e.persisted) {
+          window.location.reload();
+        }
+      });
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(regs) {
           for (var reg of regs) { reg.unregister(); }
