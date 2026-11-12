@@ -90,6 +90,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Manos',
     subcategory: 'Manos Básico & Nivelación',
     pricePEN: 120,
+    popular: true,
     description: 'Base autonivelante de alta flexibilidad y resistencia que protege y refuerza la uña natural.',
     includes: ['Preparación profunda (manicura rusa)', 'Nivelación de base rubber o builder gel', 'Esmaltado y sellado de alta resistencia', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
