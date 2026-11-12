@@ -1,9 +1,9 @@
 {
   "id": "https://merakispa.web.app/",
-  "name": "Meraki Spa",
-  "short_name": "Meraki Spa",
-  "description": "Servicios de spa y estética en estudio (Pueblo Libre) y a domicilio u oficina en Lima.",
-  "start_url": "/?source=pwa&v=20261112c",
+  "name": "Meraki",
+  "short_name": "Meraki",
+  "description": "Especialistas en uñas, nails y spa en estudio (Pueblo Libre) y a domicilio u oficina en Lima.",
+  "start_url": "/?source=pwa&v=20261112d",
   "scope": "/",
   "display": "standalone",
   "background_color": "#FFF2DE",
@@ -12,19 +12,19 @@
   "lang": "es",
   "icons": [
     {
-      "src": "/pwa-192x192.png?v=20261112c",
+      "src": "/pwa-192x192.png?v=20261112d",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa-512x512.png?v=20261112c",
+      "src": "/pwa-512x512.png?v=20261112d",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/pwa-maskable-512x512.png?v=20261112c",
+      "src": "/pwa-maskable-512x512.png?v=20261112d",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"

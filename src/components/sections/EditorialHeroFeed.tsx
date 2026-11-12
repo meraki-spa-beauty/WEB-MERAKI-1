@@ -154,6 +154,9 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
 
       {/* Main Hero Content: Original padding on mobile, extended on desktop */}
       <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-36 flex flex-col items-center justify-center text-center flex-1">
+        <h1 className="sr-only">
+          Meraki — Especialistas en uñas, nails, manicura y rituales de spa en Pueblo Libre y a domicilio en Lima
+        </h1>
         <div className="flex flex-col items-center justify-center relative">
           {!showLogo && <HomeHeroCenterpieceSkeleton />}
           <img
