@@ -11,12 +11,11 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="0" />
-    <link rel="manifest" href="/manifest.json?v=3" />
-    <link rel="icon" type="image/png" href="/assets/brand/meraki-logo-official-dark.png?v=3" />
-    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png?v=3" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=3" />
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
-    <link rel="shortcut icon" href="/favicon.ico?v=3" />
+    <link rel="manifest" href="/manifest.json?v=20261112c" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=20261112c" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/pwa-192x192.png?v=20261112c" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=20261112c" />
+    <link rel="shortcut icon" href="/favicon.ico?v=20261112c" />
     <script>
       window.addEventListener('pageshow', function(e) {
         if (e.persisted) {
@@ -33,6 +32,16 @@
           for (var name of names) { caches.delete(name); }
         });
       }
+      var ACTIVE_BUILD = '2026-11-12-c';
+      try {
+        var lastBuild = localStorage.getItem('mrk_build_v');
+        if (lastBuild && lastBuild !== ACTIVE_BUILD) {
+          localStorage.setItem('mrk_build_v', ACTIVE_BUILD);
+          window.location.reload();
+        } else {
+          localStorage.setItem('mrk_build_v', ACTIVE_BUILD);
+        }
+      } catch (err) {}
     </script>
     <title>Meraki | Bienestar, belleza y rituales</title>
     <meta name="description" content="Servicios de spa y estética en estudio (Pueblo Libre) y a domicilio u oficina en Lima: manicura, pedicura, pestañas, depilación, masajes y faciales profesionales liderados por Ana Maria Díaz." />
