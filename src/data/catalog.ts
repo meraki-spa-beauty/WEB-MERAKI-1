@@ -57,7 +57,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Manos Básico',
     pricePEN: 60,
     description: 'Cuidado esencial y prolijo para las manos con acabado natural.',
-    includes: ['Corte y limado higiénico de uñas', 'Limpieza y cuidado suave de cutículas', 'Exfoliación hidratante y esmaltado tradicional'],
+    includes: ['Corte y limado higiénico de uñas', 'Limpieza y cuidado suave de cutículas', 'Esmaltado tradicional', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -69,7 +69,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 80,
     popular: true,
     description: 'Esmaltado semipermanente de máxima duración con secado inmediato bajo lámpara LED.',
-    includes: ['Manicura completa preparatoria', 'Esmaltado en gel con brillo prolongado', 'Hidratación final con aceite de cutículas'],
+    includes: ['Manicura completa preparatoria', 'Esmaltado en gel con brillo prolongado', 'Cuidado con aceite de cutículas', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -80,7 +80,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Manos Básico',
     pricePEN: 95,
     description: 'Tratamiento restaurador intensivo para manos secas o deshidratadas.',
-    includes: ['Baño sensorial de textura jelly', 'Envoltura tibia de parafina nutritiva', 'Masaje nutritivo y acabado sedoso'],
+    includes: ['Baño sensorial de textura jelly', 'Envoltura tibia de parafina nutritiva', 'Masaje nutritivo y acabado sedoso', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -91,7 +91,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Manos Básico & Nivelación',
     pricePEN: 120,
     description: 'Base autonivelante de alta flexibilidad y resistencia que protege y refuerza la uña natural.',
-    includes: ['Preparación profunda (manicura rusa)', 'Nivelación de base rubber o builder gel', 'Esmaltado y sellado de alta resistencia'],
+    includes: ['Preparación profunda (manicura rusa)', 'Nivelación de base rubber o builder gel', 'Esmaltado y sellado de alta resistencia', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -102,7 +102,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Acrílicos + Tip',
     pricePEN: 150,
     description: 'Alargamiento de uña con tip combinado con poligel, gel de construcción, o acrílico.',
-    includes: ['Colocación precisa de tips con ajuste anatómico', 'Estructura moldeada en poligel, gel de construcción o acrílico', 'Limado estético y esmaltado profesional'],
+    includes: ['Colocación precisa de tips con ajuste anatómico', 'Estructura moldeada en poligel, gel de construcción o acrílico', 'Limado estético y esmaltado profesional', 'Exfoliación e hidratación'],
     note: 'Los mantenimientos tienen el mismo coste que la puesta inicial (remisión del 90% y sistema nuevo).',
     image: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=800&q=80'
   },
@@ -115,7 +115,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 180,
     popular: true,
     description: 'Alargamiento de la uña mediante esculpido directo con un molde anatómico en poligel, acrílico o gel de construcción.',
-    includes: ['Colocación de moldes anatómicos', 'Esculpido manual en poligel, acrílico o gel de construcción', 'Arquitectura de uña, limado de precisión y acabado brillante'],
+    includes: ['Colocación de moldes anatómicos', 'Esculpido manual en poligel, acrílico o gel de construcción', 'Arquitectura de uña, limado de precisión y acabado brillante', 'Exfoliación e hidratación'],
     note: 'El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.',
     image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
   },
@@ -127,7 +127,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Soft Gel',
     pricePEN: 120,
     description: 'Es un tip completo sobre la uña natural con esmaltado en gel.',
-    includes: ['Preparación y deshidratación cuidadosa de la uña natural', 'Adhesión de tip de cobertura total en gel (Soft Gel)', 'Esmaltado en gel y sellado con brillo de larga duración'],
+    includes: ['Preparación y deshidratación cuidadosa de la uña natural', 'Adhesión de tip de cobertura total en gel (Soft Gel)', 'Esmaltado en gel y sellado con brillo de larga duración', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -139,7 +139,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 0,
     priceNote: 'Bajo pedido',
     description: 'Set de uñas elaboradas artesanalmente, con diseños exclusivos y acabado profesional, fácil de colocar y retirar, para lucir una manicura impecable en cualquier ocasión.',
-    includes: ['Set artesanal elaborado a medida bajo pedido', 'Kit completo de colocación rápida y adhesivos especiales', 'Asesoría de diseño exclusivo y coordinación directa por WhatsApp'],
+    includes: ['Set artesanal elaborado a medida bajo pedido', 'Kit completo de colocación rápida y adhesivos especiales', 'Asesoría de diseño exclusivo y coordinación directa por WhatsApp', 'Exfoliación e hidratación'],
     note: 'Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por WhatsApp.',
     image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
   },
@@ -151,7 +151,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Esculpidas & Retiro',
     pricePEN: 50,
     description: 'Retiro seguro y cuidadoso de sistemas acrílicos o poligel protegiendo la lámina ungueal.',
-    includes: ['Remoción química y mecánica cuidadosa', 'Pulido suave de la uña natural', 'Tratamiento nutritivo de fortalecimiento'],
+    includes: ['Remoción química y mecánica cuidadosa', 'Pulido suave de la uña natural', 'Tratamiento nutritivo de fortalecimiento', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
   },
 
@@ -166,7 +166,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Cuidado de Pies',
     pricePEN: 70,
     description: 'Pedicura higiénica integral para mantener tus pies impecables y descansados.',
-    includes: ['Baño podal relajante', 'Limpieza y corte estético de uñas', 'Exfoliación de asperezas y esmaltado tradicional'],
+    includes: ['Baño podal relajante', 'Limpieza y corte estético de uñas', 'Limpieza de asperezas y esmaltado tradicional', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -178,7 +178,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 90,
     popular: true,
     description: 'Pedicura completa combinada con esmaltado en gel de secado inmediato y resistencia absoluta.',
-    includes: ['Pedicura completa e higiene de talones', 'Esmalte en gel de máxima duración', 'Secado en lámpara que permite calzarte de inmediato'],
+    includes: ['Pedicura completa e higiene de talones', 'Esmalte en gel de máxima duración', 'Secado en lámpara que permite calzarte de inmediato', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
   },
   {
@@ -189,7 +189,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Cuidado de Pies',
     pricePEN: 105,
     description: 'Ritual spa de máxima hidratación para aliviar pies cansados y talones resecos.',
-    includes: ['Inmersión en gelatina botánica tibia (Jelly Spa)', 'Exfoliación profunda desincrustante', 'Tratamiento de parafina térmica hidratante y masaje'],
+    includes: ['Inmersión en gelatina botánica tibia (Jelly Spa)', 'Tratamiento de parafina térmica nutritiva y masaje', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80'
   },
 
