@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
-import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
+import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
 import { BOOKING_STEPS, POLICIES_DATA } from '../data/catalog';
 import { FAQ_ITEMS } from '../data/spaData';
 import { useBooking } from '../context/BookingContext';

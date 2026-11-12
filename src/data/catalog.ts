@@ -58,7 +58,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 60,
     description: 'Cuidado esencial y prolijo para las manos con acabado natural.',
     includes: ['Corte y limado higiénico de uñas', 'Limpieza y cuidado suave de cutículas', 'Esmaltado tradicional', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/aistudio/meraki_servicio_manicura_sin_logo_133d5a5b.webp'
   },
   {
     id: 'manos-esmalte-gel',

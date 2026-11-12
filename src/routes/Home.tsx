@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
-import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
+import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
 import { EditorialHeroFeed } from '../components/sections/EditorialHeroFeed';
 import { HomeBodySectionsSkeleton } from '../components/ui/Skeleton';
 import { TESTIMONIALS } from '../data/spaData';

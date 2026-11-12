@@ -1,6 +1,6 @@
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
-import { FloatingWhatsAppButton } from '../components/common/FloatingWhatsAppButton';
+import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
 import { SPA_INFO } from '../data/spaData';
 import {
   ShieldCheck,
