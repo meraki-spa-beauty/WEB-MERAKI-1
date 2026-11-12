@@ -27,10 +27,20 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting (merakispa)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
           projectId: web-meraki-14bc4
+          target: merakispa
+          channelId: live
+          firebaseToolsVersion: "15.32.1"
+
+      - name: Deploy to Firebase Hosting (web-meraki-14bc4)
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: "${{ secrets.FIREBASE_SERVICE_ACCOUNT }}"
+          projectId: web-meraki-14bc4
+          target: default
           channelId: live
           firebaseToolsVersion: "15.32.1"

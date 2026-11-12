@@ -2,6 +2,17 @@
   "projects": {
     "production": "web-meraki-14bc4"
   },
-  "targets": {},
+  "targets": {
+    "web-meraki-14bc4": {
+      "hosting": {
+        "merakispa": [
+          "merakispa"
+        ],
+        "default": [
+          "web-meraki-14bc4"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
