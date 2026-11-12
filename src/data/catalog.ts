@@ -67,7 +67,6 @@ export const CATALOG_SERVICES: CatalogService[] = [
     categoryLabel: 'Manos',
     subcategory: 'Manos Básico',
     pricePEN: 80,
-    popular: true,
     description: 'Esmaltado semipermanente de máxima duración con secado inmediato bajo lámpara LED.',
     includes: ['Manicura completa preparatoria', 'Esmaltado en gel con brillo prolongado', 'Cuidado con aceite de cutículas', 'Exfoliación e hidratación'],
     image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
