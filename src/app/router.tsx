@@ -39,9 +39,9 @@ interface RouteSeoMeta {
 }
 
 const DEFAULT_SEO_META: RouteSeoMeta = {
-  title: 'Meraki | Nails, Spa & Bienestar en Lima',
+  title: 'Meraki Spa | Uñas, Belleza y Spa en Pueblo Libre, Lima',
   description:
-    'Especialistas en uñas, nails y spa en Pueblo Libre y a domicilio en Lima: manicura, soft gel, esculpidas, press on, pedicura, pestañas, masajes y faciales.',
+    'Meraki Spa en Pueblo Libre, Lima: manicura, soft gel, uñas esculpidas, press on, pedicura, pestañas, masajes y faciales. Atención a domicilio, experiencias para cumpleaños y matrimonios, y gift cards.',
 };
 
 function getRouteSeoMeta(pathname: string): RouteSeoMeta {
