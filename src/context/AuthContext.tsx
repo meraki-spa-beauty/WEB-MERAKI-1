@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { auth, loginWithGoogle, logoutUser } from '../services/firebase';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { auth, db, loginWithGoogle, logoutUser } from '../services/firebase';
 
 interface LoyaltyData {
   stamps: number;
@@ -41,22 +42,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       setUser(firebaseUser);
       setLoading(false);
 
       if (firebaseUser) {
-        const saved = localStorage.getItem(`meraki_loyalty_${firebaseUser.uid}`);
+        let loadedData: LoyaltyData | null = null;
 
-        if (saved) {
+        // Try loading from Firestore if db is available
+        if (db) {
           try {
-            setLoyalty(JSON.parse(saved));
-          } catch {
-            // fallback
+            const userDocRef = doc(db, 'users', firebaseUser.uid);
+            const docSnap = await getDoc(userDocRef);
+
+            if (docSnap.exists()) {
+              // SAFETY: Firestore document data matches LoyaltyData interface contract
+              loadedData = docSnap.data() as LoyaltyData;
+            }
+          } catch (err) {
+            console.warn('Could not fetch loyalty from Firestore, falling back to localStorage:', err);
           }
+        }
+
+        // Fallback to localStorage if not in Firestore
+        if (!loadedData) {
+          const saved = localStorage.getItem(`meraki_loyalty_${firebaseUser.uid}`);
+
+          if (saved) {
+            try {
+              loadedData = JSON.parse(saved);
+            } catch {
+              // fallback
+            }
+          }
+        }
+
+        if (loadedData) {
+          setLoyalty(loadedData);
         } else {
           // Default initial loyalty for new user
-          setLoyalty({
+          const defaultData: LoyaltyData = {
             stamps: 1, // 1 welcome stamp!
             rewardsClaimed: 0,
             history: [
@@ -67,7 +92,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 price: 0,
               },
             ],
-          });
+          };
+
+          setLoyalty(defaultData);
+          saveLoyaltyToCloudAndLocal(defaultData, firebaseUser.uid);
         }
       } else {
         setLoyalty({ stamps: 0, rewardsClaimed: 0, history: [] });
@@ -77,13 +105,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => unsubscribe();
   }, []);
 
-  const saveLoyalty = (newData: LoyaltyData, userId?: string) => {
+  const saveLoyaltyToCloudAndLocal = async (newData: LoyaltyData, userId?: string) => {
     setLoyalty(newData);
 
     const uid = userId || user?.uid;
 
-    if (uid) {
-      localStorage.setItem(`meraki_loyalty_${uid}`, JSON.stringify(newData));
+    if (!uid) return;
+
+    localStorage.setItem(`meraki_loyalty_${uid}`, JSON.stringify(newData));
+
+    if (db) {
+      try {
+        const userDocRef = doc(db, 'users', uid);
+
+        await setDoc(userDocRef, newData, { merge: true });
+      } catch (err) {
+        console.warn('Could not save loyalty to Firestore:', err);
+      }
     }
   };
 
@@ -122,7 +160,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       history: [newEntry, ...loyalty.history],
     };
 
-    saveLoyalty(updated);
+    saveLoyaltyToCloudAndLocal(updated);
   };
 
   const claimReward = () => {
@@ -134,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       rewardsClaimed: loyalty.rewardsClaimed + 1,
     };
 
-    saveLoyalty(updated);
+    saveLoyaltyToCloudAndLocal(updated);
 
     return true;
   };
