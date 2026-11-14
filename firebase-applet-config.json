@@ -1,9 +1,12 @@
 {
-  "apiKey": "AIzaSyDGSYSUiTrJZXmlDp0EpNXXf-QDvNogyUk",
-  "authDomain": "web-meraki-14bc4.firebaseapp.com",
   "projectId": "web-meraki-14bc4",
+  "appId": "1:957042648142:web:3a10ac44286cda9fa74f1f",
+  "apiKey": "AIzaSyDGSYSUiTrJZXmlDp0EpNXXf-QDvNogyUk",
+  "authDomain": "merakispa.web.app",
+  "firestoreDatabaseId": "ai-studio-mrkaptpb101-6022721b-c047-4d7a-8b15-ab4d7167baa0",
   "storageBucket": "web-meraki-14bc4.firebasestorage.app",
   "messagingSenderId": "957042648142",
-  "appId": "1:957042648142:web:3a10ac44286cda9fa74f1f",
-  "measurementId": "G-B8B88X584E"
+  "measurementId": "G-B8B88X584E",
+  "oAuthClientId": "957042648142-c26fhf697em8iap8qfgs1h1itf5vd1kq.apps.googleusercontent.com",
+  "recaptchaSiteKey": ""
 }
