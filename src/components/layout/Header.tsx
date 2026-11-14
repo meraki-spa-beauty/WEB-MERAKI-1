@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom';
 import { Link, useLocation } from 'react-router-dom';
 import { Logo } from '../brand/Logo';
 import { useBooking } from '../../context/BookingContext';
+import { useAuth } from '../../context/AuthContext';
+import { VipLoyaltyModal } from '../ui/VipLoyaltyModal';
 import {
   Menu,
   X,
@@ -15,7 +17,8 @@ import {
   Eye,
   Scissors,
   Flame,
-  Smile
+  Smile,
+  Award
 } from 'lucide-react';
 import { SPA_INFO } from '../../data/spaData';
 
@@ -81,7 +84,9 @@ export const HEADER_CATEGORIES: HeaderCategoryItem[] = [
 
 export function Header() {
   const { openBooking } = useBooking();
+  const { user, loyalty } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const [isVipModalOpen, setIsVipModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
   const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false);
@@ -376,6 +381,21 @@ export function Header() {
         {/* Right CTA */}
         <div className="hidden sm:flex items-center gap-3">
           <button
+            type="button"
+            onClick={() => setIsVipModalOpen(true)}
+            className={`inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-['Montserrat',sans-serif] font-medium transition-all border cursor-pointer ${
+              user
+                ? 'bg-[#D5A688]/20 text-[#111111] border-[#D5A688]'
+                : isDarkHero
+                  ? 'bg-white/10 hover:bg-white/20 text-white border-white/30'
+                  : 'bg-[#5E765E]/10 hover:bg-[#5E765E]/20 text-[#5E765E] border-[#5E765E]/30'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5 text-[#D5A688]" />
+            <span>{user ? `${loyalty.stamps} Sellos` : 'Club VIP'}</span>
+          </button>
+
+          <button
             id="btn-header-booking"
             type="button"
             onClick={() => openBooking()}
@@ -408,6 +428,8 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      <VipLoyaltyModal isOpen={isVipModalOpen} onClose={() => setIsVipModalOpen(false)} />
 
       {/* Mobile Menu Drawer (Portaled to document.body to prevent containing-block clipping from header backdrop-filter) */}
       {isOpen && typeof document !== 'undefined' && createPortal(
@@ -558,6 +580,18 @@ export function Header() {
             </div>
 
             <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsVipModalOpen(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-[#D5A688]/20 hover:bg-[#D5A688]/30 text-[#111111] border border-[#D5A688] py-3 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest transition-colors cursor-pointer"
+              >
+                <Award className="w-4 h-4 text-[#5E765E]" />
+                <span>{user ? `Mi Club VIP (${loyalty.stamps} Sellos)` : 'Club VIP & Tarjeta de Puntos'}</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => {
