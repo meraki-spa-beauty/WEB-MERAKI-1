@@ -566,6 +566,21 @@ export async function deleteStaffAccessEntry(staffId: string): Promise<void> {
   }
 }
 
+function sanitizeLoyaltyHistory(items: LoyaltyHistoryItem[]): LoyaltyHistoryItem[] {
+  const sanitized: LoyaltyHistoryItem[] = [];
+
+  for (const item of items.slice(0, 100)) {
+    sanitized.push({
+      id: clampText(item.id || 'entry', 64) || 'entry',
+      date: clampText(item.date || '', 40),
+      service: clampText(item.service || 'Servicio Meraki', 160) || 'Servicio Meraki',
+      price: Math.max(0, Math.min(10000, Math.round(Number(item.price || 0)))),
+    });
+  }
+
+  return sanitized;
+}
+
 export async function fetchAllVipUsers(): Promise<UserLoyaltyProfile[]> {
   if (!db) return [];
 
@@ -592,9 +607,11 @@ export async function fetchAllVipUsers(): Promise<UserLoyaltyProfile[]> {
       }
 
       list.push({
-        uid: readStr(d, 'uid', docSnap.id),
+        uid: docSnap.id,
         email: readStr(d, 'email', ''),
-        displayName: readStr(d, 'displayName', 'Clienta VIP'),
+        displayName: readStr(d, 'displayName', '') || 'Clienta VIP',
+        phone: readStr(d, 'phone', ''),
+        adminNote: readStr(d, 'adminNote', ''),
         photoURL: readStr(d, 'photoURL', ''),
         stamps: Math.max(0, Math.min(5, Math.round(readNum(d, 'stamps', 0)))),
         rewardsClaimed: Math.max(0, Math.round(readNum(d, 'rewardsClaimed', 0))),
@@ -616,8 +633,9 @@ export async function adminStampUserVip(params: {
 }): Promise<UserLoyaltyProfile> {
   if (!db) throw new Error('Firestore no está disponible.');
 
-  const path = `users/${params.user.uid}`;
-  const cleanName = clampText(params.serviceName, 160);
+  const cleanUid = params.user.uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128);
+  const path = `users/${cleanUid}`;
+  const cleanName = clampText(params.serviceName || 'Servicio Meraki', 160) || 'Servicio Meraki';
   const cleanPrice = Math.max(0, Math.min(10000, Math.round(params.pricePEN)));
 
   const todayLabel = new Date().toLocaleDateString('es-PE', {
@@ -628,21 +646,38 @@ export async function adminStampUserVip(params: {
 
   const entry: LoyaltyHistoryItem = {
     id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`,
-    date: todayLabel,
-    service: params.action === 'redeem' ? `Canje VIP: ${cleanName}` : cleanName,
+    date: clampText(todayLabel, 40),
+    service: clampText(
+      params.action === 'redeem' ? `Canje VIP: ${cleanName}` : cleanName,
+      160,
+    ),
     price: params.action === 'redeem' ? 0 : cleanPrice,
   };
 
   const nextStamps =
-    params.action === 'redeem' ? 0 : Math.min(5, Math.max(0, params.user.stamps + 1));
+    params.action === 'redeem' ? 0 : Math.min(5, Math.max(0, Math.round(params.user.stamps) + 1));
 
   const nextRewards =
-    params.action === 'redeem' ? params.user.rewardsClaimed + 1 : params.user.rewardsClaimed;
+    params.action === 'redeem'
+      ? Math.max(0, Math.min(1000, Math.round(params.user.rewardsClaimed) + 1))
+      : Math.max(0, Math.min(1000, Math.round(params.user.rewardsClaimed)));
 
-  const nextHistory = [entry, ...params.user.history].slice(0, 100);
+  const nextHistory = sanitizeLoyaltyHistory([entry, ...params.user.history]);
+
+  const normalizedEmail = clampText(params.user.email || '', 160);
+  const normalizedDisplayName = clampText(params.user.displayName || 'Clienta VIP', 120) || 'Clienta VIP';
+  const normalizedPhone = clampText(params.user.phone || '', 30);
+  const normalizedAdminNote = clampText(params.user.adminNote || '', 160);
+  const normalizedPhoto = clampText(params.user.photoURL || '', 500);
 
   try {
-    await updateDoc(doc(db, 'users', params.user.uid), {
+    await setDoc(doc(db, 'users', cleanUid), {
+      uid: cleanUid,
+      email: normalizedEmail,
+      displayName: normalizedDisplayName,
+      phone: normalizedPhone,
+      adminNote: normalizedAdminNote,
+      photoURL: normalizedPhoto,
       stamps: nextStamps,
       rewardsClaimed: nextRewards,
       history: nextHistory,
@@ -650,13 +685,93 @@ export async function adminStampUserVip(params: {
     });
 
     return {
-      ...params.user,
+      uid: cleanUid,
+      email: normalizedEmail,
+      displayName: normalizedDisplayName,
+      phone: normalizedPhone,
+      adminNote: normalizedAdminNote,
+      photoURL: normalizedPhoto,
       stamps: nextStamps,
       rewardsClaimed: nextRewards,
       history: nextHistory,
     };
   } catch (err) {
-    handleFirestoreError(err, OperationType.UPDATE, path);
+    handleFirestoreError(err, OperationType.WRITE, path);
+  }
+}
+
+export async function adminSaveVipCardProfile(params: {
+  existing?: UserLoyaltyProfile;
+  displayName: string;
+  email: string;
+  phone: string;
+  adminNote: string;
+}): Promise<UserLoyaltyProfile> {
+  if (!db) throw new Error('Firestore no está disponible.');
+
+  const cleanUid = params.existing
+    ? params.existing.uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128)
+    : `vip-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+
+  const path = `users/${cleanUid}`;
+  const cleanName = clampText(params.displayName, 120) || 'Clienta VIP';
+  const cleanEmail = clampText(params.email, 160);
+  const cleanPhone = clampText(params.phone, 30);
+  const cleanNote = clampText(params.adminNote, 160);
+  const cleanPhoto = clampText(params.existing?.photoURL || '', 500);
+
+  const todayLabel = new Date().toLocaleDateString('es-PE', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const stamps = params.existing
+    ? Math.max(0, Math.min(5, Math.round(params.existing.stamps)))
+    : 1;
+
+  const rewardsClaimed = params.existing
+    ? Math.max(0, Math.min(1000, Math.round(params.existing.rewardsClaimed)))
+    : 0;
+
+  const history = params.existing
+    ? sanitizeLoyaltyHistory(params.existing.history)
+    : sanitizeLoyaltyHistory([
+        {
+          id: 'welcome',
+          date: todayLabel,
+          service: 'Registro en Meraki Club VIP',
+          price: 0,
+        },
+      ]);
+
+  try {
+    await setDoc(doc(db, 'users', cleanUid), {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: cleanNote,
+      photoURL: cleanPhoto,
+      stamps,
+      rewardsClaimed,
+      history,
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: cleanNote,
+      photoURL: cleanPhoto,
+      stamps,
+      rewardsClaimed,
+      history,
+    };
+  } catch (err) {
+    handleFirestoreError(err, OperationType.WRITE, path);
   }
 }
 

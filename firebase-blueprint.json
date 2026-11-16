@@ -2,12 +2,14 @@
   "entities": {
     "UserLoyalty": {
       "title": "User Loyalty & Profile",
-      "description": "Stores client Google profile summary, Meraki Club VIP loyalty stamps (0-5), completed cards, and visit history",
+      "description": "Stores client Google profile summary, WhatsApp contact, salon identification note, Meraki Club VIP loyalty stamps (0-5), completed cards, and visit history",
       "type": "object",
       "properties": {
         "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
         "email": { "type": "string", "maxLength": 160 },
         "displayName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "adminNote": { "type": "string", "maxLength": 160 },
         "photoURL": { "type": "string", "maxLength": 500 },
         "stamps": { "type": "integer" },
         "rewardsClaimed": { "type": "integer" },

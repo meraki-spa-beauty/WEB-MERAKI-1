@@ -68,6 +68,8 @@ export interface UserLoyaltyProfile {
   uid: string;
   email: string;
   displayName: string;
+  phone?: string;
+  adminNote?: string;
   photoURL?: string;
   stamps: number;
   rewardsClaimed: number;

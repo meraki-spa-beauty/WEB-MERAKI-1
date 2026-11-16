@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc, type DocumentData } from 'firebase/firestore';
 import { auth, db, loginWithGoogle, logoutUser } from '../services/firebase';
 import {
   fetchMyStaffAccess,
@@ -28,10 +28,14 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   loyalty: LoyaltyData;
+  profileName: string;
+  profileEmail: string;
+  profilePhone: string;
   adminPermissions: AdminPermissions;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   claimReward: () => Promise<boolean>;
+  updateMemberProfile: (displayName: string, phone: string) => Promise<void>;
   isConfigured: boolean;
 }
 
@@ -50,25 +54,63 @@ function isLoyaltyArrayItem(value: LoyaltyHistoryItem | null | undefined): value
   return Boolean(value && value.service && value.date && value.id);
 }
 
-function parseLoyaltyFromDoc(raw: LoyaltyData): LoyaltyData {
+function readDocText(data: DocumentData, key: string): string {
+  const raw = data[key];
+
+  return Object.prototype.toString.call(raw) === '[object String]' ? String(raw).trim() : '';
+}
+
+interface GoogleIdentity {
+  email: string;
+  displayName: string;
+  photoURL: string;
+}
+
+function extractGoogleIdentity(firebaseUser: User): GoogleIdentity {
+  let email = (firebaseUser.email || '').trim();
+  let displayName = (firebaseUser.displayName || '').trim();
+  let photoURL = (firebaseUser.photoURL || '').trim();
+
+  for (const provider of firebaseUser.providerData) {
+    if (!email && provider.email) {
+      email = provider.email.trim();
+    }
+
+    if (!displayName && provider.displayName) {
+      displayName = provider.displayName.trim();
+    }
+
+    if (!photoURL && provider.photoURL) {
+      photoURL = provider.photoURL.trim();
+    }
+  }
+
+  return {
+    email: email.slice(0, 160),
+    displayName: displayName.slice(0, 120),
+    photoURL: photoURL.slice(0, 500),
+  };
+}
+
+function parseLoyaltyFromDoc(raw: DocumentData): LoyaltyData {
   const safeHistory: LoyaltyHistoryItem[] = [];
 
   if (Array.isArray(raw.history)) {
     for (const item of raw.history) {
       if (isLoyaltyArrayItem(item)) {
         safeHistory.push({
-          id: String(item.id || 'entry'),
-          date: String(item.date || ''),
-          service: String(item.service || 'Servicio Meraki'),
-          price: Number(item.price || 0),
+          id: String(item.id || 'entry').slice(0, 64),
+          date: String(item.date || '').slice(0, 40),
+          service: String(item.service || 'Servicio Meraki').slice(0, 160),
+          price: Math.max(0, Math.min(10000, Number(item.price || 0))),
         });
       }
     }
   }
 
   return {
-    stamps: Math.max(0, Math.min(5, Number(raw.stamps || 0))),
-    rewardsClaimed: Math.max(0, Number(raw.rewardsClaimed || 0)),
+    stamps: Math.max(0, Math.min(5, Math.round(Number(raw.stamps || 0)))),
+    rewardsClaimed: Math.max(0, Math.round(Number(raw.rewardsClaimed || 0))),
     history: safeHistory,
   };
 }
@@ -82,6 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     rewardsClaimed: 0,
     history: [],
   });
+
+  const [profileName, setProfileName] = useState<string>('');
+  const [profileEmail, setProfileEmail] = useState<string>('');
+  const [profilePhone, setProfilePhone] = useState<string>('');
 
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions>(
     DEFAULT_ADMIN_PERMISSIONS,
@@ -103,14 +149,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (!firebaseUser) {
         setLoyalty({ stamps: 0, rewardsClaimed: 0, history: [] });
+        setProfileName('');
+        setProfileEmail('');
+        setProfilePhone('');
         setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
         setLoading(false);
 
         return;
       }
 
-      // Compute role / permissions for central owner or active Pancake-style staff member
-      const verifiedEmail = firebaseUser.emailVerified ? firebaseUser.email : null;
+      const googleIdentity = extractGoogleIdentity(firebaseUser);
+      const effectiveEmail = firebaseUser.email || googleIdentity.email;
+      const verifiedEmail = firebaseUser.emailVerified ? effectiveEmail : null;
       const centralOwner = isCentralOwnerEmail(verifiedEmail);
 
       if (centralOwner) {
@@ -146,8 +196,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
       }
 
-      // Load or create loyalty profile in Firestore (with safe localStorage fallback)
       let loadedData: LoyaltyData | null = null;
+      let resolvedName = googleIdentity.displayName || 'Clienta VIP';
+      let resolvedEmail = googleIdentity.email;
+      let resolvedPhone = '';
 
       if (db) {
         try {
@@ -155,19 +207,40 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const docSnap = await getDoc(userDocRef);
 
           if (docSnap.exists()) {
-            // SAFETY: Firestore document data conforms to LoyaltyData contract
-            loadedData = parseLoyaltyFromDoc(docSnap.data() as LoyaltyData);
+            const docData = docSnap.data();
 
-            // Keep display profile synced without modifying stamps or history
-            try {
-              await updateDoc(userDocRef, {
-                email: (firebaseUser.email || '').slice(0, 160),
-                displayName: (firebaseUser.displayName || 'Clienta VIP').slice(0, 120),
-                photoURL: (firebaseUser.photoURL || '').slice(0, 500),
-                updatedAt: serverTimestamp(),
-              });
-            } catch {
-              // Ignore sync errors
+            loadedData = parseLoyaltyFromDoc(docData);
+
+            const existingName = readDocText(docData, 'displayName');
+            const existingEmail = readDocText(docData, 'email');
+            const existingPhone = readDocText(docData, 'phone');
+            const existingPhoto = readDocText(docData, 'photoURL');
+
+            resolvedName =
+              existingName && existingName !== 'Clienta VIP'
+                ? existingName
+                : googleIdentity.displayName || existingName || 'Clienta VIP';
+            resolvedEmail = existingEmail || googleIdentity.email;
+            resolvedPhone = existingPhone;
+
+            const resolvedPhoto = googleIdentity.photoURL || existingPhoto;
+
+            if (
+              resolvedEmail !== existingEmail ||
+              resolvedName !== existingName ||
+              resolvedPhoto !== existingPhoto
+            ) {
+              try {
+                await updateDoc(userDocRef, {
+                  email: resolvedEmail.slice(0, 160),
+                  displayName: resolvedName.slice(0, 120),
+                  phone: resolvedPhone.slice(0, 30),
+                  photoURL: resolvedPhoto.slice(0, 500),
+                  updatedAt: serverTimestamp(),
+                });
+              } catch {
+                // Keep existing stored values if schema has legacy fields handled by admin sync
+              }
             }
           } else {
             const initialLoyalty: LoyaltyData = {
@@ -192,9 +265,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             try {
               await setDoc(userDocRef, {
                 uid: firebaseUser.uid,
-                email: (firebaseUser.email || '').slice(0, 160),
-                displayName: (firebaseUser.displayName || 'Clienta VIP').slice(0, 120),
-                photoURL: (firebaseUser.photoURL || '').slice(0, 500),
+                email: resolvedEmail.slice(0, 160),
+                displayName: resolvedName.slice(0, 120),
+                phone: '',
+                adminNote: '',
+                photoURL: googleIdentity.photoURL.slice(0, 500),
                 stamps: 1,
                 rewardsClaimed: 0,
                 history: initialLoyalty.history,
@@ -215,7 +290,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (saved) {
           try {
             // SAFETY: Parsed from localStorage stored by this provider
-            loadedData = parseLoyaltyFromDoc(JSON.parse(saved) as LoyaltyData);
+            loadedData = parseLoyaltyFromDoc(JSON.parse(saved) as DocumentData);
           } catch {
             loadedData = null;
           }
@@ -239,6 +314,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ],
       };
 
+      setProfileName(resolvedName);
+      setProfileEmail(resolvedEmail);
+      setProfilePhone(resolvedPhone);
       setLoyalty(finalLoyalty);
       localStorage.setItem(`meraki_loyalty_${firebaseUser.uid}`, JSON.stringify(finalLoyalty));
       setLoading(false);
@@ -257,7 +335,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await logoutUser();
     setUser(null);
     setLoyalty({ stamps: 0, rewardsClaimed: 0, history: [] });
+    setProfileName('');
+    setProfileEmail('');
+    setProfilePhone('');
     setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
+  };
+
+  const updateMemberProfile = async (displayName: string, phone: string): Promise<void> => {
+    if (!user) return;
+
+    const cleanName = displayName.trim().slice(0, 120) || 'Clienta VIP';
+    const cleanPhone = phone.trim().slice(0, 30);
+
+    if (db) {
+      await updateDoc(doc(db, 'users', user.uid), {
+        displayName: cleanName,
+        phone: cleanPhone,
+        email: (profileEmail || user.email || '').trim().slice(0, 160),
+        photoURL: (user.photoURL || '').trim().slice(0, 500),
+        updatedAt: serverTimestamp(),
+      });
+    }
+
+    setProfileName(cleanName);
+    setProfilePhone(cleanPhone);
   };
 
   const claimReward = async (): Promise<boolean> => {
@@ -307,10 +408,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         loading,
         loyalty,
+        profileName,
+        profileEmail,
+        profilePhone,
         adminPermissions,
         login,
         logout,
         claimReward,
+        updateMemberProfile,
         isConfigured,
       }}
     >

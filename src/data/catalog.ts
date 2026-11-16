@@ -70,7 +70,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     popular: true,
     description: 'Esmaltado semipermanente de máxima duración con secado inmediato bajo lámpara LED.',
     includes: ['Manicura completa preparatoria', 'Esmaltado en gel con brillo prolongado', 'Cuidado con aceite de cutículas', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-esmalte-gel.jpg'
   },
   {
     id: 'manos-jelly-parafina',
@@ -81,7 +81,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 95,
     description: 'Tratamiento restaurador intensivo para manos secas o deshidratadas.',
     includes: ['Baño sensorial de textura jelly', 'Envoltura tibia de parafina nutritiva', 'Masaje nutritivo y acabado sedoso', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1607779097040-26e80aa78e66?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-jelly-parafina.jpg'
   },
   {
     id: 'manos-rubber-gel',
@@ -93,7 +93,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     popular: true,
     description: 'Base autonivelante de alta flexibilidad y resistencia que protege y refuerza la uña natural.',
     includes: ['Preparación profunda (manicura rusa)', 'Nivelación de base rubber o builder gel', 'Esmaltado y sellado de alta resistencia', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-rubber-gel.jpg'
   },
   {
     id: 'manos-extension-tip',
@@ -105,7 +105,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     description: 'Alargamiento de uña con tip combinado con poligel, gel de construcción, o acrílico.',
     includes: ['Colocación precisa de tips con ajuste anatómico', 'Estructura moldeada en poligel, gel de construcción o acrílico', 'Limado estético y esmaltado profesional', 'Exfoliación e hidratación'],
     note: 'Los mantenimientos tienen el mismo coste que la puesta inicial (remisión del 90% y sistema nuevo).',
-    image: 'https://images.unsplash.com/photo-1599940824399-b87987ceb72a?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-extension-tip.jpg'
   },
   {
     id: 'manos-extension-esculpida',
@@ -117,7 +117,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     description: 'Alargamiento de la uña mediante esculpido directo con un molde anatómico en poligel, acrílico o gel de construcción.',
     includes: ['Colocación de moldes anatómicos', 'Esculpido manual en poligel, acrílico o gel de construcción', 'Arquitectura de uña, limado de precisión y acabado brillante', 'Exfoliación e hidratación'],
     note: 'El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.',
-    image: 'https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-extension-esculpida.jpg'
   },
   {
     id: 'manos-soft-gel',
@@ -128,7 +128,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 120,
     description: 'Es un tip completo sobre la uña natural con esmaltado en gel.',
     includes: ['Preparación y deshidratación cuidadosa de la uña natural', 'Adhesión de tip de cobertura total en gel (Soft Gel)', 'Esmaltado en gel y sellado con brillo de larga duración', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1632345031435-8727f6897d53?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-soft-gel.jpg'
   },
   {
     id: 'manos-press-on-nails',
@@ -141,7 +141,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     description: 'Set de uñas elaboradas artesanalmente, con diseños exclusivos y acabado profesional, fácil de colocar y retirar, para lucir una manicura impecable en cualquier ocasión.',
     includes: ['Set artesanal elaborado a medida bajo pedido', 'Kit completo de colocación rápida y adhesivos especiales', 'Asesoría de diseño exclusivo y coordinación directa por WhatsApp', 'Exfoliación e hidratación'],
     note: 'Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por WhatsApp.',
-    image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-press-on.jpg'
   },
   {
     id: 'manos-retirado-sistemas',
@@ -152,7 +152,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 50,
     description: 'Retiro seguro y cuidadoso de sistemas acrílicos o poligel protegiendo la lámina ungueal.',
     includes: ['Remoción química y mecánica cuidadosa', 'Pulido suave de la uña natural', 'Tratamiento nutritivo de fortalecimiento', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1519014816548-bf5fe059798b?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/manos-retiro.jpg'
   },
 
   // ==========================================
@@ -167,7 +167,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 70,
     description: 'Pedicura higiénica integral para mantener tus pies impecables y descansados.',
     includes: ['Baño podal relajante', 'Limpieza y corte estético de uñas', 'Limpieza de asperezas y esmaltado tradicional', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1519415510236-718bdfcd89c8?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pies-basico.jpg'
   },
   {
     id: 'pies-gel',
@@ -178,7 +178,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 90,
     description: 'Pedicura completa combinada con esmaltado en gel de secado inmediato y resistencia absoluta.',
     includes: ['Pedicura completa e higiene de talones', 'Esmalte en gel de máxima duración', 'Secado en lámpara que permite calzarte de inmediato', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pies-gel.jpg'
   },
   {
     id: 'pies-jellyparafina',
@@ -189,7 +189,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 105,
     description: 'Ritual spa de máxima hidratación para aliviar pies cansados y talones resecos.',
     includes: ['Inmersión en gelatina botánica tibia (Jelly Spa)', 'Tratamiento de parafina térmica nutritiva y masaje', 'Exfoliación e hidratación'],
-    image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pies-jellyparafina.jpg'
   },
 
   // ==========================================
@@ -204,7 +204,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 100,
     description: 'Elevación y curvatura duradera de tus pestañas naturales desde la raíz.',
     includes: ['Elevación y moldeado curvo de pestañas propias', 'Nutrición profunda con keratina', 'Efecto de ojos abiertos y descansados por 4 a 6 semanas'],
-    image: 'https://images.unsplash.com/photo-1583001800475-7f55f6063b4f?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pestanas-lifting.jpg'
   },
   {
     id: 'pestanas-clasicas',
@@ -215,7 +215,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 120,
     description: 'Aplicación meticulosa pelo a pelo para un resultado natural, ligero y elegante.',
     includes: ['Técnica 1:1 sobre cada pestaña natural', 'Aislamiento cuidadoso con adhesivo hipoalergénico', 'Efecto natural ideal para el día a día'],
-    image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pestanas-clasicas-rimel.jpg'
   },
   {
     id: 'pestanas-efecto-rimel',
@@ -226,7 +226,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 120,
     description: 'Simula el efecto de pestañas recién maquilladas con máscara de pestañas de alta definición.',
     includes: ['Fibras con mayor grosor y pigmentación', 'Curvatura estilizada que define la mirada', 'Olvídate del rímel y desmaquillante diario'],
-    image: 'https://images.unsplash.com/photo-1583001800475-7f55f6063b4f?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pestanas-clasicas-rimel.jpg'
   },
   {
     id: 'pestanas-efecto-volumen',
@@ -237,7 +237,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 150,
     description: 'Abanicos ultralivianos de volumen ruso para una mirada densa, tupida e impactante.',
     includes: ['Abanicos hechos a mano según tu tolerancia natural', 'Gran densidad sin añadir peso nocivo', 'Efecto glamuroso y aterciopelado'],
-    image: 'https://images.unsplash.com/photo-1512290900672-1f41d739e1e2?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pestanas-volumen-hibrido.jpg'
   },
   {
     id: 'pestanas-efecto-hibrido',
@@ -248,7 +248,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 180,
     description: 'Combinación balanceada de técnica clásica pelo a pelo con abanicos de volumen.',
     includes: ['Textura multidimensional con efecto de pestañas tupidas', 'Diseño personalizado al tipo de ojo', 'Excelente retención y estilo moderno'],
-    image: 'https://images.unsplash.com/photo-1583001800475-7f55f6063b4f?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/pestanas-volumen-hibrido.jpg'
   },
   {
     id: 'pestanas-retoque',
@@ -259,7 +259,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 100,
     description: 'Mantenimiento y relleno de extensiones para conservar la plenitud de la mirada.',
     includes: ['Retiro de extensiones crecidas', 'Relleno de nuevos espacios', 'Peinado y sellado protector'],
-    note: 'El costo del retoque es solo para los primeros 15 días luego de la puesta del sistema. Y dependerá de la condición en la que lleguen las pestañas.'
+    note: 'El costo del retoque es solo para los primeros 15 días luego de la puesta del sistema. Y dependerá de la condición en la que lleguen las pestañas.',
+    image: '/assets/catalog/pestanas-retoque.jpg'
   },
 
   // ==========================================
@@ -277,7 +278,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Perfilado y limpieza de cejas según la armonía facial.',
     includes: ['Diseño y perfilado estético', 'Técnica en cera tibia hipoalergénica o hilo hindú', 'Gel calmante descongestivo'],
-    image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-bozo',
@@ -290,7 +291,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
       { label: 'Hilo', pricePEN: 15 }
     ],
     description: 'Eliminación rápida y suave del vello del labio superior.',
-    includes: ['Elección entre cera suave o hilo de algodón', 'Protección previa de la piel y tónico calmante']
+    includes: ['Elección entre cera suave o hilo de algodón', 'Protección previa de la piel y tónico calmante'],
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-patillas',
@@ -303,7 +305,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
       { label: 'Hilo', pricePEN: 27 }
     ],
     description: 'Definición del contorno lateral del rostro.',
-    includes: ['Limpieza precisa del lateral facial', 'Técnica en cera o hilo según sensibilidad']
+    includes: ['Limpieza precisa del lateral facial', 'Técnica en cera o hilo según sensibilidad'],
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-menton',
@@ -316,7 +319,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
       { label: 'Hilo', pricePEN: 22 }
     ],
     description: 'Depilación del vello en la zona del mentón con efecto suave.',
-    includes: ['Extracción de raíz con cera o hilo', 'Loción descongestiva posdepilatoria']
+    includes: ['Extracción de raíz con cera o hilo', 'Loción descongestiva posdepilatoria'],
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-frente',
@@ -329,7 +333,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
       { label: 'Hilo', pricePEN: 27 }
     ],
     description: 'Despeje estético de la línea capilar y zona frontal.',
-    includes: ['Limpieza prolija de la zona frontal', 'Acabado suave y limpio']
+    includes: ['Limpieza prolija de la zona frontal', 'Acabado suave y limpio'],
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-rostro-completo',
@@ -343,7 +348,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Depilación integral de cejas, bozo, patillas, mentón y frente en una sola sesión.',
     includes: ['Cejas, bozo, patillas, mentón y frente', 'Técnica a elección (Cera S/ 70 o Hilo S/ 65)', 'Mascarilla o gel refrescante para cerrar poros'],
-    image: 'https://images.unsplash.com/photo-1512290900672-1f41d739e1e2?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/depilacion-facial-cejas.jpg'
   },
   {
     id: 'depilacion-axilas',
@@ -353,7 +358,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Corporales Cera',
     pricePEN: 35,
     description: 'Depilación higiénica con cera tibia que debilita progresivamente el vello.',
-    includes: ['Cera descartable higiénica', 'Aplicación de talco preparatorio y loción calmante']
+    includes: ['Cera descartable higiénica', 'Aplicación de talco preparatorio y loción calmante'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-medio-brazo',
@@ -363,7 +369,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Corporales Cera',
     pricePEN: 45,
     description: 'Depilación desde codo hasta muñeca con cera tibia.',
-    includes: ['Depilación en ambos antebrazos', 'Hidratación calmante inmediata']
+    includes: ['Depilación en ambos antebrazos', 'Hidratación calmante inmediata'],
+    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
   },
   {
     id: 'depilacion-brazo-completo',
@@ -373,7 +380,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Corporales Cera',
     pricePEN: 60,
     description: 'Depilación integral de ambos brazos desde el hombro.',
-    includes: ['Brazos completos de hombro a muñeca', 'Retiro uniforme de raíz y suavizado']
+    includes: ['Brazos completos de hombro a muñeca', 'Retiro uniforme de raíz y suavizado'],
+    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
   },
   {
     id: 'depilacion-media-pierna',
@@ -383,7 +391,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Corporales Cera',
     pricePEN: 50,
     description: 'Depilación desde rodillas hasta tobillos con cera elástica.',
-    includes: ['Ambas pantorrillas y empeines', 'Aceite descongestivo de manzanilla']
+    includes: ['Ambas pantorrillas y empeines', 'Aceite descongestivo de manzanilla'],
+    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
   },
   {
     id: 'depilacion-pierna-completa',
@@ -394,7 +403,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 80,
     description: 'Depilación completa de ambas piernas de muslos a pies.',
     includes: ['Muslos, rodillas, pantorrillas y pies', 'Cera de alta calidad y máxima suavidad'],
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
   },
   {
     id: 'depilacion-bikini',
@@ -404,7 +413,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 40,
     description: 'Depilación de los bordes externos de la línea del bikini.',
-    includes: ['Depilación precisa de laterales', 'Cera especial para pieles sensibles']
+    includes: ['Depilación precisa de laterales', 'Cera especial para pieles sensibles'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-mini-bikini',
@@ -414,7 +424,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 45,
     description: 'Depilación más profunda en laterales y parte superior del bikini.',
-    includes: ['Mayor cobertura que el bikini tradicional', 'Protocolo suave y delicado']
+    includes: ['Mayor cobertura que el bikini tradicional', 'Protocolo suave y delicado'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-brasilera',
@@ -425,7 +436,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 70,
     description: 'Depilación íntima completa con la máxima higiene y delicadeza.',
     includes: ['Depilación total de la zona íntima', 'Cera elástica hipoalergénica de baja temperatura'],
-    image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-espalda-baja',
@@ -435,7 +446,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 40,
     description: 'Depilación de la zona lumbar con cera tibia.',
-    includes: ['Zona sacrolumbar', 'Loción calmante posdepilación']
+    includes: ['Zona sacrolumbar', 'Loción calmante posdepilación'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-espalda-completa',
@@ -445,7 +457,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 80,
     description: 'Depilación desde hombros y cervicales hasta la zona lumbar.',
-    includes: ['Toda la superficie de la espalda', 'Piel suave y libre de vello']
+    includes: ['Toda la superficie de la espalda', 'Piel suave y libre de vello'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-gluteos',
@@ -455,7 +468,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 50,
     description: 'Depilación de glúteos con cera de alta tolerancia dérmica.',
-    includes: ['Zona glútea completa', 'Tratamiento calmante de cierre']
+    includes: ['Zona glútea completa', 'Tratamiento calmante de cierre'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
   {
     id: 'depilacion-abdomen',
@@ -465,7 +479,8 @@ export const CATALOG_SERVICES: CatalogService[] = [
     subcategory: 'Zonas Cera Íntima & Tronco',
     pricePEN: 45,
     description: 'Depilación de la zona abdominal completa.',
-    includes: ['Línea alba y zona abdominal', 'Piel tersa y libre de irritación']
+    includes: ['Línea alba y zona abdominal', 'Piel tersa y libre de irritación'],
+    image: '/assets/catalog/depilacion-cera-corporal.jpg'
   },
 
   // ==========================================
@@ -483,7 +498,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Maniobras rítmicas y suaves para inducir el descanso y aliviar el estrés corporal.',
     includes: ['Maniobras relajantes continuas con aceites esenciales', 'Música ambiental y aromaterapia en tu propio espacio', 'Enfocado en soltar tensiones y renovar la energía'],
-    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/masaje-relajante.jpg'
   },
   {
     id: 'masajes-descontracturantes',
@@ -497,7 +512,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Presión focalizada para desarmar nudos y aliviar contracturas en espalda, cuello y hombros.',
     includes: ['Evaluación previa de puntos de tensión', 'Maniobras profundas para liberar contracturas crónicas', 'Bálsamo analgésico desinflamatorio'],
-    image: 'https://images.unsplash.com/photo-1519823551278-64ac92734fb1?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/masaje-descontracturante.jpg'
   },
   {
     id: 'masajes-pack-mesoterapia',
@@ -512,7 +527,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Tratamiento corporal avanzado orientado a la reducción de grasa localizada y mejora de la firmeza.',
     includes: ['Protocolo por sesiones programadas', 'Principios activos reductores focalizados', 'Seguimiento de evolución corporal en cada visita'],
-    image: 'https://images.unsplash.com/photo-1515377905703-c4788e51af15?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/masaje-drenaje-reductor.jpg'
   },
   {
     id: 'masajes-drenaje-linfatico',
@@ -527,7 +542,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Movimientos rítmicos muy suaves para movilizar líquidos retenidos y desinflamar el cuerpo.',
     includes: ['Activación de ganglios linfáticos principales', 'Ideal para retención de líquidos, piernas pesadas o postoperatorio', 'Sensación inmediata de ligereza y desinflamación'],
-    image: 'https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/masaje-drenaje-reductor.jpg'
   },
   {
     id: 'masajes-reductores',
@@ -542,7 +557,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Maniobras intensas y enérgicas para remodelar la silueta y combatir la celulitis.',
     includes: ['Fricciones y amasamientos intensos moldeadores', 'Cremas térmicas reductoras activas', 'Packs de 4, 6 u 8 sesiones para resultados sostenibles'],
-    image: 'https://images.unsplash.com/photo-1544161515-4ab6ce6db874?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/masaje-drenaje-reductor.jpg'
   },
 
   // ==========================================
@@ -563,7 +578,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
       'Crema hidratante reparadora',
       'Protector solar con acabado ligero'
     ],
-    image: 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/facial-basico.jpg'
   },
   {
     id: 'facial-intermedio',
@@ -581,7 +596,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
       'Serum concentrado acorde a cada tipo de piel',
       'Mascarillas específicas y cremas hidratantes de sellado'
     ],
-    image: 'https://images.unsplash.com/photo-1512290900672-1f41d739e1e2?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/facial-intermedio.jpg'
   },
   {
     id: 'facial-profundo',
@@ -601,7 +616,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
       'Bono exclusivo: PDF complementario sobre tu tipo de piel con rutina completa de skincare de día y noche adaptada a tu necesidad'
     ],
     note: 'El tratamiento profundo incluye un PDF complementario sobre tu tipo de piel y una rutina de skin care completa de día y noche en base a tu necesidad.',
-    image: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=800&q=80'
+    image: '/assets/catalog/facial-profundo.jpg'
   }
 ];
 

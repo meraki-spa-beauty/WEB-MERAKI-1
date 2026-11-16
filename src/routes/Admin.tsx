@@ -15,6 +15,7 @@ import {
   buildBlockedSlotKey,
 } from '../utils/scheduleEngine';
 import {
+  adminSaveVipCardProfile,
   adminStampUserVip,
   deleteStaffAccessEntry,
   fetchAllStaffAccess,
@@ -42,6 +43,10 @@ import {
   Save,
   Search,
   RefreshCw,
+  Pencil,
+  UserPlus,
+  Phone,
+  Sparkles,
 } from 'lucide-react';
 
 type AdminTab = 'bookings' | 'agenda' | 'vip' | 'staff';
@@ -70,6 +75,17 @@ export function Admin() {
   const [vipUsers, setVipUsers] = useState<UserLoyaltyProfile[]>([]);
   const [vipSearch, setVipSearch] = useState('');
   const [stampServiceName, setStampServiceName] = useState(CATALOG_SERVICES[0]?.name || 'Soft Gel');
+  const [editingVipUid, setEditingVipUid] = useState<string | null>(null);
+  const [vipEditName, setVipEditName] = useState('');
+  const [vipEditPhone, setVipEditPhone] = useState('');
+  const [vipEditEmail, setVipEditEmail] = useState('');
+  const [vipEditNote, setVipEditNote] = useState('');
+  const [savingVipUid, setSavingVipUid] = useState<string | null>(null);
+  const [showNewVipForm, setShowNewVipForm] = useState(false);
+  const [newVipName, setNewVipName] = useState('');
+  const [newVipPhone, setNewVipPhone] = useState('');
+  const [newVipEmail, setNewVipEmail] = useState('');
+  const [newVipNote, setNewVipNote] = useState('');
 
   // Toast notice
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
@@ -246,6 +262,8 @@ export function Admin() {
   };
 
   const handleVipAction = async (targetUser: UserLoyaltyProfile, action: 'stamp' | 'redeem') => {
+    setSavingVipUid(targetUser.uid);
+
     try {
       const updated = await adminStampUserVip({
         user: targetUser,
@@ -260,9 +278,104 @@ export function Admin() {
           ? `+1 sello asignado a ${updated.displayName} (${updated.stamps}/5)`
           : `Beneficio canjeado para ${updated.displayName}`,
       );
-    } catch {
-      showNotice('No se pudo actualizar la tarjeta VIP.');
+    } catch (err) {
+      console.error('VIP action failed:', err);
+      showNotice('No se pudo actualizar la tarjeta VIP. Revisa tu conexión o recarga las tarjetas.');
+    } finally {
+      setSavingVipUid(null);
     }
+  };
+
+  const openEditVipCard = (u: UserLoyaltyProfile) => {
+    setEditingVipUid(u.uid);
+    setVipEditName(u.displayName === 'Clienta VIP' ? '' : u.displayName);
+    setVipEditPhone(u.phone || '');
+    setVipEditEmail(u.email || '');
+    setVipEditNote(u.adminNote || '');
+  };
+
+  const handleSaveVipProfile = async (targetUser: UserLoyaltyProfile) => {
+    setSavingVipUid(targetUser.uid);
+
+    try {
+      const updated = await adminSaveVipCardProfile({
+        existing: targetUser,
+        displayName: vipEditName || targetUser.displayName,
+        email: vipEditEmail,
+        phone: vipEditPhone,
+        adminNote: vipEditNote,
+      });
+
+      setVipUsers((prev) => prev.map((u) => (u.uid === updated.uid ? updated : u)));
+      setEditingVipUid(null);
+      showNotice(`Tarjeta identificada para ${updated.displayName}.`);
+    } catch {
+      showNotice('No se pudieron guardar los datos de la tarjeta VIP.');
+    } finally {
+      setSavingVipUid(null);
+    }
+  };
+
+  const handleApplyBookingIdentity = async (targetUser: UserLoyaltyProfile, booking: MerakiBooking) => {
+    setSavingVipUid(targetUser.uid);
+
+    try {
+      const updated = await adminSaveVipCardProfile({
+        existing: targetUser,
+        displayName: booking.clientName || targetUser.displayName,
+        email: targetUser.email || booking.clientEmail,
+        phone: targetUser.phone || booking.clientPhone,
+        adminNote: targetUser.adminNote || `Cita ${booking.bookingCode}`,
+      });
+
+      setVipUsers((prev) => prev.map((u) => (u.uid === updated.uid ? updated : u)));
+      showNotice(`Datos de ${updated.displayName} aplicados desde su cita.`);
+    } catch {
+      showNotice('No se pudieron vincular los datos de la cita.');
+    } finally {
+      setSavingVipUid(null);
+    }
+  };
+
+  const handleCreateManualVipCard = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!newVipName.trim() || !newVipPhone.trim()) return;
+
+    setSavingVipUid('new');
+
+    try {
+      const created = await adminSaveVipCardProfile({
+        displayName: newVipName.trim(),
+        phone: newVipPhone.trim(),
+        email: newVipEmail.trim(),
+        adminNote: newVipNote.trim(),
+      });
+
+      setVipUsers((prev) => [created, ...prev]);
+      setNewVipName('');
+      setNewVipPhone('');
+      setNewVipEmail('');
+      setNewVipNote('');
+      setShowNewVipForm(false);
+      showNotice(`Nueva tarjeta VIP creada para ${created.displayName}.`);
+    } catch {
+      showNotice('No se pudo crear la nueva tarjeta VIP.');
+    } finally {
+      setSavingVipUid(null);
+    }
+  };
+
+  const findSuggestedBookingForVip = (u: UserLoyaltyProfile): MerakiBooking | null => {
+    const cleanEmail = u.email.trim().toLowerCase();
+
+    for (const b of bookings) {
+      if (b.uid && b.uid === u.uid) return b;
+
+      if (cleanEmail && b.clientEmail.trim().toLowerCase() === cleanEmail) return b;
+    }
+
+    return null;
   };
 
   const filteredVipUsers = useMemo(() => {
@@ -273,7 +386,13 @@ export function Admin() {
     const matched: UserLoyaltyProfile[] = [];
 
     for (const u of vipUsers) {
-      if (u.displayName.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)) {
+      if (
+        u.displayName.toLowerCase().includes(q) ||
+        u.email.toLowerCase().includes(q) ||
+        (u.phone || '').toLowerCase().includes(q) ||
+        (u.adminNote || '').toLowerCase().includes(q) ||
+        u.uid.toLowerCase().includes(q)
+      ) {
         matched.push(u);
       }
     }
@@ -799,7 +918,7 @@ export function Admin() {
                   Tarjetas de Fidelidad Club VIP
                 </h2>
                 <p className="text-xs text-[#111111]/65">
-                  Busca a la clienta por nombre o correo y asigna su sello cuando concluya su atención.
+                  Identifica por nombre, correo, WhatsApp o nota interna y asigna el sello al concluir la atención.
                 </p>
               </div>
 
@@ -820,50 +939,262 @@ export function Admin() {
                   <Search className="w-4 h-4 text-[#5E765E] absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
                     type="text"
-                    placeholder="Buscar clienta..."
+                    aria-label="Buscar tarjeta VIP por nombre, WhatsApp, correo o código"
+                    placeholder="Nombre, WhatsApp, correo o ID..."
                     value={vipSearch}
                     onChange={(e) => setVipSearch(e.target.value)}
                     className="pl-9 pr-4 py-2 rounded-xl border border-[#5E765E]/25 text-xs"
                   />
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setShowNewVipForm((prev) => !prev)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#EDF2EC] hover:bg-[#5E765E] hover:text-white text-[#5E765E] text-xs font-semibold transition-colors cursor-pointer"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>Nueva Tarjeta</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    const users = await fetchAllVipUsers();
+
+                    setVipUsers(users);
+                  }}
+                  className="p-2 rounded-xl bg-[#EDF2EC] text-[#5E765E] cursor-pointer"
+                  aria-label="Actualizar tarjetas VIP"
+                >
+                  <RefreshCw className={`w-4 h-4 ${loadingData ? 'animate-spin' : ''}`} />
+                </button>
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredVipUsers.map((u) => (
-                <div
-                  key={u.uid}
-                  className="p-4 rounded-2xl bg-[#FAF0E1]/50 border border-[#D5A688]/30 flex items-center justify-between gap-3"
-                >
-                  <div>
-                    <p className="font-bold text-sm text-[#111111]">{u.displayName}</p>
-                    <p className="text-[11px] text-[#111111]/65">{u.email}</p>
-                    <p className="text-xs font-semibold text-[#5E765E] mt-1">
-                      Sellos: {u.stamps}/5 • Tarjetas completadas: {u.rewardsClaimed}
-                    </p>
-                  </div>
+            {showNewVipForm && (
+              <form
+                onSubmit={handleCreateManualVipCard}
+                className="p-4 sm:p-5 rounded-2xl bg-[#FAF0E1]/75 border border-[#D5A688]/40 space-y-3"
+              >
+                <h3 className="text-xs font-bold uppercase tracking-wider text-[#5E765E]">
+                  Registrar Nueva Tarjeta VIP Manual
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                  <input
+                    type="text"
+                    required
+                    aria-label="Nombre completo de la clienta"
+                    placeholder="Nombre completo *"
+                    value={newVipName}
+                    onChange={(e) => setNewVipName(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                  />
+                  <input
+                    type="tel"
+                    required
+                    aria-label="WhatsApp de la clienta"
+                    placeholder="WhatsApp *"
+                    value={newVipPhone}
+                    onChange={(e) => setNewVipPhone(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                  />
+                  <input
+                    type="email"
+                    aria-label="Correo Google opcional"
+                    placeholder="Correo Google (opcional)"
+                    value={newVipEmail}
+                    onChange={(e) => setNewVipEmail(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                  />
+                  <input
+                    type="text"
+                    aria-label="Nota interna opcional"
+                    placeholder="Nota (distrito o preferencia)"
+                    value={newVipNote}
+                    onChange={(e) => setNewVipNote(e.target.value)}
+                    className="px-3 py-2 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                  />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setShowNewVipForm(false)}
+                    className="px-3 py-1.5 rounded-lg text-xs text-[#111111]/70 cursor-pointer"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={savingVipUid === 'new'}
+                    className="px-4 py-1.5 rounded-lg bg-[#5E765E] text-[#FFF2DE] text-xs font-semibold cursor-pointer disabled:opacity-50"
+                  >
+                    {savingVipUid === 'new' ? 'Creando...' : 'Crear Tarjeta VIP'}
+                  </button>
+                </div>
+              </form>
+            )}
 
-                  <div className="flex flex-col gap-1.5">
-                    <button
-                      type="button"
-                      disabled={u.stamps >= 5}
-                      onClick={() => void handleVipAction(u, 'stamp')}
-                      className="px-3 py-1.5 rounded-lg bg-[#5E765E] hover:bg-[#4d634d] disabled:opacity-45 text-white text-xs font-semibold cursor-pointer"
-                    >
-                      +1 Sello
-                    </button>
-                    {u.stamps >= 5 && (
-                      <button
-                        type="button"
-                        onClick={() => void handleVipAction(u, 'redeem')}
-                        className="px-3 py-1.5 rounded-lg bg-[#D5A688] text-[#111111] text-xs font-bold cursor-pointer"
-                      >
-                        Registrar Canje
-                      </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {filteredVipUsers.map((u) => {
+                const isEditing = editingVipUid === u.uid;
+                const isUnidentified = u.displayName === 'Clienta VIP' && !u.phone;
+                const suggestedBooking = isUnidentified ? findSuggestedBookingForVip(u) : null;
+                const lastEntry = u.history[0];
+                const isBusy = savingVipUid === u.uid;
+
+                return (
+                  <div
+                    key={u.uid}
+                    className="p-4 rounded-2xl bg-[#FAF0E1]/50 border border-[#D5A688]/30 space-y-3"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0 space-y-0.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <p className="font-bold text-sm text-[#111111] truncate">{u.displayName}</p>
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#5E765E]/20 text-[#5E765E]">
+                            #{u.uid.slice(0, 8).toUpperCase()}
+                          </span>
+                          {isUnidentified && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold">
+                              Sin identificar
+                            </span>
+                          )}
+                        </div>
+
+                        <p className="text-[11px] text-[#111111]/70 truncate">
+                          {u.email || 'Sin correo visible'}
+                        </p>
+
+                        {u.phone && (
+                          <p className="text-[11px] text-[#5E765E] font-medium inline-flex items-center gap-1">
+                            <Phone className="w-3 h-3" />
+                            <span>{u.phone}</span>
+                          </p>
+                        )}
+
+                        {u.adminNote && (
+                          <p className="text-[11px] text-[#9A6342] bg-[#FFF2DE]/90 px-2 py-0.5 rounded-lg inline-block">
+                            {u.adminNote}
+                          </p>
+                        )}
+
+                        <p className="text-xs font-semibold text-[#5E765E] pt-1">
+                          Sellos: {u.stamps}/5 • Tarjetas completadas: {u.rewardsClaimed}
+                        </p>
+
+                        {lastEntry && (
+                          <p className="text-[10px] text-[#111111]/55">
+                            Último movimiento: {lastEntry.service} ({lastEntry.date || 'reciente'})
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex flex-col gap-1.5 shrink-0">
+                        <button
+                          type="button"
+                          disabled={u.stamps >= 5 || isBusy}
+                          onClick={() => void handleVipAction(u, 'stamp')}
+                          className="px-3 py-1.5 rounded-lg bg-[#5E765E] hover:bg-[#4d634d] disabled:opacity-45 text-white text-xs font-semibold cursor-pointer"
+                        >
+                          {isBusy ? 'Guardando...' : '+1 Sello'}
+                        </button>
+                        {u.stamps >= 5 && (
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => void handleVipAction(u, 'redeem')}
+                            className="px-3 py-1.5 rounded-lg bg-[#D5A688] text-[#111111] text-xs font-bold cursor-pointer disabled:opacity-45"
+                          >
+                            Registrar Canje
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => (isEditing ? setEditingVipUid(null) : openEditVipCard(u))}
+                          className="px-3 py-1 rounded-lg bg-white border border-[#5E765E]/25 text-[#5E765E] text-[11px] font-semibold inline-flex items-center justify-center gap-1 cursor-pointer hover:bg-[#EDF2EC]"
+                        >
+                          <Pencil className="w-3 h-3" />
+                          <span>{isEditing ? 'Cerrar' : 'Identificar'}</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {suggestedBooking && !isEditing && (
+                      <div className="p-2.5 rounded-xl bg-white border border-[#5E765E]/25 flex flex-wrap items-center justify-between gap-2 text-[11px]">
+                        <span className="inline-flex items-center gap-1.5 text-[#111111]/80">
+                          <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
+                          <span>
+                            Coincide con cita de <strong>{suggestedBooking.clientName}</strong> ({suggestedBooking.clientPhone})
+                          </span>
+                        </span>
+                        <button
+                          type="button"
+                          disabled={isBusy}
+                          onClick={() => void handleApplyBookingIdentity(u, suggestedBooking)}
+                          className="px-2.5 py-1 rounded-lg bg-[#5E765E] text-white font-semibold cursor-pointer"
+                        >
+                          Aplicar nombre y WhatsApp
+                        </button>
+                      </div>
+                    )}
+
+                    {isEditing && (
+                      <div className="pt-3 border-t border-[#D5A688]/30 space-y-2">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <input
+                            type="text"
+                            aria-label="Editar nombre completo"
+                            placeholder="Nombre completo"
+                            value={vipEditName}
+                            onChange={(e) => setVipEditName(e.target.value)}
+                            className="px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                          />
+                          <input
+                            type="tel"
+                            aria-label="Editar WhatsApp"
+                            placeholder="WhatsApp"
+                            value={vipEditPhone}
+                            onChange={(e) => setVipEditPhone(e.target.value)}
+                            className="px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                          />
+                          <input
+                            type="email"
+                            aria-label="Editar correo"
+                            placeholder="Correo"
+                            value={vipEditEmail}
+                            onChange={(e) => setVipEditEmail(e.target.value)}
+                            className="px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                          />
+                          <input
+                            type="text"
+                            aria-label="Editar nota interna"
+                            placeholder="Nota interna (ej. alias, distrito)"
+                            value={vipEditNote}
+                            onChange={(e) => setVipEditNote(e.target.value)}
+                            className="px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setEditingVipUid(null)}
+                            className="px-3 py-1 rounded-lg text-xs text-[#111111]/70 cursor-pointer"
+                          >
+                            Cancelar
+                          </button>
+                          <button
+                            type="button"
+                            disabled={isBusy}
+                            onClick={() => void handleSaveVipProfile(u)}
+                            className="inline-flex items-center gap-1 px-3.5 py-1.5 rounded-lg bg-[#5E765E] text-white text-xs font-semibold cursor-pointer disabled:opacity-50"
+                          >
+                            <Save className="w-3 h-3" />
+                            <span>{isBusy ? 'Guardando...' : 'Guardar Datos'}</span>
+                          </button>
+                        </div>
+                      </div>
                     )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}

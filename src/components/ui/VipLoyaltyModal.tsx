@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkles, Award, LogOut, CheckCircle2, Gift, X, User as UserIcon } from 'lucide-react';
+import { Sparkles, Award, LogOut, CheckCircle2, Gift, X, User as UserIcon, Pencil, Phone, Save } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface VipLoyaltyModalProps {
@@ -9,11 +9,47 @@ interface VipLoyaltyModalProps {
 }
 
 export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
-  const { user, loyalty, login, logout, claimReward, isConfigured } = useAuth();
+  const {
+    user,
+    loyalty,
+    profileName,
+    profileEmail,
+    profilePhone,
+    login,
+    logout,
+    claimReward,
+    updateMemberProfile,
+    isConfigured,
+  } = useAuth();
+
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [isLoggingIn, setIsLoggingIn] = useState<boolean>(false);
   const [isClaiming, setIsClaiming] = useState<boolean>(false);
   const [claimedSuccess, setClaimedSuccess] = useState<boolean>(false);
+
+  const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
+  const [draftName, setDraftName] = useState<string>('');
+  const [draftPhone, setDraftPhone] = useState<string>('');
+  const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
+  const [profileSavedNotice, setProfileSavedNotice] = useState<boolean>(false);
+
+  const effectiveName = profileName || user?.displayName || 'Clienta VIP';
+  const effectiveEmail = profileEmail || user?.email || '';
+
+  const needsProfileCompletion = Boolean(
+    user && (!profilePhone.trim() || effectiveName === 'Clienta VIP'),
+  );
+
+  useEffect(() => {
+    if (user) {
+      setDraftName(effectiveName === 'Clienta VIP' ? '' : effectiveName);
+      setDraftPhone(profilePhone);
+
+      if (needsProfileCompletion) {
+        setIsEditingProfile(true);
+      }
+    }
+  }, [user, effectiveName, profilePhone, needsProfileCompletion]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -67,6 +103,26 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
     }
   };
 
+  const handleSaveProfile = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!user || isSavingProfile) return;
+
+    setErrorMsg(null);
+    setIsSavingProfile(true);
+
+    try {
+      await updateMemberProfile(draftName || effectiveName, draftPhone);
+      setIsEditingProfile(false);
+      setProfileSavedNotice(true);
+      window.setTimeout(() => setProfileSavedNotice(false), 3500);
+    } catch {
+      setErrorMsg('No se pudieron guardar tus datos en este momento.');
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
   return createPortal(
     <div
       className="meraki-overlay-enter fixed inset-0 z-[99999] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto"
@@ -94,7 +150,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
             <span>Meraki Club VIP</span>
           </span>
           <h3 id="vip-modal-title" className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111]">
-            {user ? `¡Hola, ${user.displayName || 'Clienta VIP'}!` : 'Mi Cuenta & Tarjeta de Puntos'}
+            {user ? `¡Hola, ${effectiveName}!` : 'Mi Cuenta & Tarjeta de Puntos'}
           </h3>
           <p className="text-xs text-[#111111]/75 font-light mt-1">
             {user
@@ -154,34 +210,117 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
             </button>
           </div>
         ) : (
-          <div className="space-y-6">
-            <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#FFF2DE]/70 border border-[#D5A688]/30">
-              <div className="flex items-center gap-3 min-w-0">
-                {user.photoURL ? (
-                  <img
-                    src={user.photoURL}
-                    alt={user.displayName || 'Avatar'}
-                    className="w-10 h-10 rounded-full object-cover border border-[#5E765E]/30 shrink-0"
-                  />
-                ) : (
-                  <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-bold shrink-0">
-                    {user.displayName?.[0] || 'M'}
+          <div className="space-y-5">
+            <div className="p-3.5 rounded-2xl bg-[#FFF2DE]/70 border border-[#D5A688]/30 space-y-3">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-3 min-w-0">
+                  {user.photoURL ? (
+                    <img
+                      src={user.photoURL}
+                      alt={effectiveName}
+                      className="w-10 h-10 rounded-full object-cover border border-[#5E765E]/30 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-bold shrink-0">
+                      {effectiveName[0] || 'M'}
+                    </div>
+                  )}
+                  <div className="min-w-0 text-left">
+                    <h4 className="font-semibold text-xs text-[#111111] truncate">{effectiveName}</h4>
+                    <p className="text-[11px] text-[#111111]/65 font-light truncate">
+                      {effectiveEmail || 'Cuenta Google vinculada'}
+                    </p>
+                    <p className="text-[10px] text-[#5E765E] font-medium truncate mt-0.5">
+                      ID Tarjeta: {user.uid.slice(0, 8).toUpperCase()}
+                      {profilePhone ? ` · WhatsApp: ${profilePhone}` : ''}
+                    </p>
                   </div>
-                )}
-                <div className="min-w-0 text-left">
-                  <h4 className="font-semibold text-xs text-[#111111] truncate">{user.displayName}</h4>
-                  <p className="text-[11px] text-[#111111]/65 font-light truncate">{user.email}</p>
+                </div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditingProfile((prev) => !prev)}
+                    className="text-[#5E765E] hover:bg-[#5E765E]/10 p-2 rounded-full transition-colors cursor-pointer"
+                    aria-label="Editar mis datos de tarjeta VIP"
+                    title="Editar mis datos"
+                  >
+                    <Pencil className="w-4 h-4" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={logout}
+                    className="text-[#111111]/60 hover:text-red-600 p-2 rounded-full transition-colors cursor-pointer"
+                    aria-label="Cerrar sesión"
+                    title="Cerrar sesión"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={logout}
-                className="text-[#111111]/60 hover:text-red-600 p-2 rounded-full transition-colors cursor-pointer"
-                aria-label="Cerrar sesión"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+
+              {profileSavedNotice && (
+                <div className="p-2 rounded-xl bg-[#5E765E]/10 text-[#5E765E] text-[11px] font-medium text-left">
+                  Tus datos se guardaron en tu tarjeta VIP.
+                </div>
+              )}
+
+              {isEditingProfile && (
+                <form onSubmit={handleSaveProfile} className="pt-2 border-t border-[#D5A688]/25 space-y-2.5 text-left">
+                  <p className="text-[11px] text-[#111111]/75 leading-snug">
+                    Completa tu nombre y WhatsApp para que nuestras especialistas identifiquen rápido tu tarjeta al atenderte:
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    <div>
+                      <label htmlFor="vip-member-name" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                        Nombre completo
+                      </label>
+                      <input
+                        id="vip-member-name"
+                        type="text"
+                        required
+                        placeholder="Ej. Valeria Paredes"
+                        value={draftName}
+                        onChange={(e) => setDraftName(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111]"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="vip-member-phone" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                        WhatsApp
+                      </label>
+                      <div className="relative">
+                        <Phone className="w-3.5 h-3.5 text-[#5E765E]/70 absolute left-2.5 top-1/2 -translate-y-1/2" />
+                        <input
+                          id="vip-member-phone"
+                          type="tel"
+                          required
+                          placeholder="999 888 777"
+                          value={draftPhone}
+                          onChange={(e) => setDraftPhone(e.target.value)}
+                          className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111]"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center justify-end gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingProfile(false)}
+                      className="px-3 py-1.5 rounded-full text-[11px] text-[#111111]/70 hover:bg-black/5 cursor-pointer"
+                    >
+                      Omitir por ahora
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingProfile}
+                      className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-[11px] font-semibold cursor-pointer disabled:opacity-50"
+                    >
+                      <Save className="w-3 h-3" />
+                      <span>{isSavingProfile ? 'Guardando...' : 'Guardar datos'}</span>
+                    </button>
+                  </div>
+                </form>
+              )}
             </div>
 
             <div className="p-5 rounded-3xl bg-gradient-to-br from-[#5E765E] to-[#4d634d] text-[#FFF2DE] shadow-md relative overflow-hidden">

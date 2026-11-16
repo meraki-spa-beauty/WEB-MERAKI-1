@@ -1,5 +1,5 @@
 import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Home } from '../routes/Home';
 import { Catalogo } from '../routes/Catalogo';
 import { ComoReservar } from '../routes/ComoReservar';
@@ -116,6 +116,7 @@ function syncRouteSeoMetadata(pathname: string) {
 function RootLayout() {
   const location = useLocation();
   const isFirstRender = useRef(true);
+  const [transitionKey, setTransitionKey] = useState<number>(0);
 
   useEffect(() => {
     syncRouteSeoMetadata(location.pathname);
@@ -125,6 +126,8 @@ function RootLayout() {
 
       return;
     }
+
+    setTransitionKey((prev) => prev + 1);
 
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'instant' });
@@ -136,10 +139,31 @@ function RootLayout() {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (transitionKey === 0) return;
+
+    const timer = window.setTimeout(() => {
+      setTransitionKey(0);
+    }, 1080);
+
+    return () => window.clearTimeout(timer);
+  }, [transitionKey]);
+
   return (
-    <div key={location.pathname} className="meraki-route-enter">
-      <Outlet />
-    </div>
+    <>
+      {transitionKey > 0 && (
+        <div
+          key={`curtain-${transitionKey}`}
+          aria-hidden="true"
+          className="meraki-page-curtain fixed inset-0 z-[9990] flex items-center justify-center"
+        >
+          <span className="h-px w-24 bg-gradient-to-r from-transparent via-[#D5A688] to-transparent opacity-70" />
+        </div>
+      )}
+      <div key={location.pathname} className="meraki-route-enter">
+        <Outlet />
+      </div>
+    </>
   );
 }
 
