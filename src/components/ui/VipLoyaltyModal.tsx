@@ -243,7 +243,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
             {!user
               ? 'Inicia sesión con tu cuenta de Google para revisar tus tarjetas de fidelización y sellos acumulados.'
               : needsVipRegistration
-                ? 'Confirma tus datos y autoriza el uso de tu perfil para identificar tu tarjeta y asignar sellos al instante.'
+                ? 'Confirma tus datos personales para vincular de forma privada tu tarjeta y registrar tus sellos al instante en cada atención.'
                 : 'Acumula sellos verificados en cada visita y desbloquea beneficios exclusivos en Meraki Spa.'}
           </p>
         </div>
@@ -299,7 +299,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
             </button>
 
             <p className="text-[11px] text-[#111111]/65 leading-relaxed px-2">
-              Al ingresar te pediremos confirmar tu nombre, correo y consentimiento de datos antes de activar tu tarjeta.
+              Al ingresar te pediremos confirmar tus datos personales para vincular tu tarjeta digital de forma privada y confidencial.
             </p>
           </div>
         ) : needsVipRegistration ? (
@@ -403,7 +403,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
                   className="mt-0.5 rounded border-[#5E765E]/40 text-[#5E765E] cursor-pointer"
                 />
                 <label htmlFor="vip-consent-checkbox" className="text-[11px] text-[#111111]/85 leading-relaxed cursor-pointer">
-                  Autorizo a Meraki Spa a almacenar y mostrar mi nombre completo, correo electrónico y WhatsApp para identificar mi tarjeta digital, registrar sellos y gestionar beneficios del Club VIP según la{' '}
+                  Autorizo a Meraki Spa a resguardar de forma privada y confidencial mi nombre, correo electrónico y WhatsApp exclusivamente para uso interno del equipo al identificar mi tarjeta digital, registrar sellos y otorgar beneficios del Club VIP, sin publicarlos ni compartirlos con terceros, conforme a la{' '}
                   <Link
                     to="/privacy"
                     onClick={onClose}

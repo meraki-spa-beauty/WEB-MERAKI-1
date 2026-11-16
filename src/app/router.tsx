@@ -166,9 +166,9 @@ function RootLayout() {
       <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0.85 }}
-          animate={{ opacity: 1, transition: { duration: 0.45, ease: ROUTE_EASE } }}
-          exit={{ opacity: 0.35, transition: { duration: 0.44, ease: [0.76, 0, 0.24, 1] } }}
+          initial={{ opacity: 0.82 }}
+          animate={{ opacity: 1, transition: { duration: 0.72, ease: ROUTE_EASE } }}
+          exit={{ opacity: 0.3, transition: { duration: 0.68, ease: [0.65, 0, 0.24, 1] } }}
         >
           <FrozenRouteOutlet />
         </motion.div>
