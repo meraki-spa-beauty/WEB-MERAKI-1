@@ -4,7 +4,8 @@ import { BookingModal } from '../components/modals/BookingModal';
 interface BookingContextType {
   isBookingOpen: boolean;
   preselectedServiceId?: string;
-  openBooking: (serviceId?: string) => void;
+  preselectedOptionIndex?: number;
+  openBooking: (serviceId?: string, optionIndex?: number) => void;
   closeBooking: () => void;
 }
 
@@ -13,9 +14,11 @@ const BookingContext = createContext<BookingContextType | undefined>(undefined);
 export function BookingProvider({ children }: { children: ReactNode }) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [selectedServiceId, setSelectedServiceId] = useState<string | undefined>(undefined);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState<number | undefined>(undefined);
 
-  const openBooking = (serviceId?: string) => {
+  const openBooking = (serviceId?: string, optionIndex?: number) => {
     setSelectedServiceId(serviceId);
+    setSelectedOptionIndex(optionIndex);
     setIsOpen(true);
   };
 
@@ -28,8 +31,9 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       value={{
         isBookingOpen: isOpen,
         preselectedServiceId: selectedServiceId,
+        preselectedOptionIndex: selectedOptionIndex,
         openBooking,
-        closeBooking
+        closeBooking,
       }}
     >
       {children}
@@ -37,6 +41,7 @@ export function BookingProvider({ children }: { children: ReactNode }) {
         isOpen={isOpen}
         onClose={closeBooking}
         preselectedServiceId={selectedServiceId}
+        preselectedOptionIndex={selectedOptionIndex}
       />
     </BookingContext.Provider>
   );

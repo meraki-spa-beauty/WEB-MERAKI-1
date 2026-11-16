@@ -126,6 +126,11 @@ export function Footer() {
                   Términos del Servicio
                 </Link>
               </li>
+              <li>
+                <Link to="/libro-reclamaciones" className="hover:text-[#D5A688] transition-colors">
+                  Libro de Reclamaciones
+                </Link>
+              </li>
             </ul>
           </div>
 
@@ -171,7 +176,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] font-['Montserrat',sans-serif] text-[#FFF2DE]/65">
           <p>© {new Date().getFullYear()} Meraki Spa • Liderado por Ana Maria Díaz</p>
-          
+
           <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
             <Link to="/privacy" className="hover:text-[#FFF2DE] transition-colors">
               Política de Privacidad
@@ -179,6 +184,10 @@ export function Footer() {
             <span>•</span>
             <Link to="/privacy#terminos-reserva" className="hover:text-[#FFF2DE] transition-colors">
               Términos del Servicio
+            </Link>
+            <span>•</span>
+            <Link to="/libro-reclamaciones" className="hover:text-[#FFF2DE] transition-colors">
+              Libro de Reclamaciones
             </Link>
             <span>•</span>
             <span className="flex items-center gap-1">

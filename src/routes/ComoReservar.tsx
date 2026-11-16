@@ -16,7 +16,7 @@ import {
   Truck,
   Clock,
   HelpCircle,
-  Camera
+  Camera,
 } from 'lucide-react';
 
 export function ComoReservar() {
@@ -52,11 +52,6 @@ export function ComoReservar() {
           >
             <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
             <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
-            <img
-              src="/assets/brand/meraki-monogram.svg"
-              alt=""
-              className="absolute -right-14 top-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 opacity-[0.045] -rotate-6"
-            />
           </div>
 
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -74,16 +69,16 @@ export function ComoReservar() {
                 <span className="h-px w-12 sm:w-20 bg-gradient-to-l from-transparent via-[#D5A688]/70 to-[#5E765E]/50" />
               </div>
               <p className="font-['Montserrat',sans-serif] text-sm sm:text-base text-[#111111]/75 max-w-2xl mx-auto font-light leading-relaxed mb-8">
-                Agenda tu atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o solicita el servicio a domicilio en la comodidad de tu casa u oficina. Sigue estos 5 sencillos pasos para asegurar tu atención.
+                Agenda tu atención presencial en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o solicita servicio a domicilio de <strong>06:00 a 20:00</strong>. Registra tu cita en el asistente web y envía tu ficha por WhatsApp para confirmarla con el 40% de adelanto.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <button
                   type="button"
                   onClick={() => openBooking()}
-                  className="bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md inline-flex items-center gap-2 cursor-pointer"
+                  className="meraki-btn-fluid bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest shadow-md inline-flex items-center gap-2 cursor-pointer"
                 >
                   <Calendar className="w-4 h-4 text-[#D5A688]" />
-                  <span>Agendar Cita en el Formulario</span>
+                  <span>Agendar Cita Ahora</span>
                 </button>
                 <Link
                   to="/catalogo"
@@ -117,9 +112,9 @@ export function ComoReservar() {
 
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
+                      <h2 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
                         {step.title}
-                      </h3>
+                      </h2>
                       <div className="hidden md:flex w-8 h-8 rounded-lg bg-[#FFF2DE] border border-[#D5A688]/30 items-center justify-center">
                         {getStepIcon(step.number)}
                       </div>
@@ -128,19 +123,18 @@ export function ComoReservar() {
                       {step.description}
                     </p>
 
-                    {/* Step 4 details list */}
                     {step.number === '4' && (
                       <div className="mt-4 p-4 rounded-2xl meraki-cream-card">
                         <span className="block text-[11px] font-['Montserrat',sans-serif] font-bold uppercase tracking-wider text-[#5E765E] mb-2">
-                          Datos requeridos en el mensaje:
+                          Datos incluidos en tu ficha de reserva:
                         </span>
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs text-[#111111]/85">
                           <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Nombre completo</div>
-                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Modalidad / Dirección (o Estudio Pueblo Libre)</div>
-                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Hora de atención</div>
-                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Número de teléfono</div>
-                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Correo electrónico</div>
-                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Fecha de nacimiento</div>
+                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Modalidad / Dirección</div>
+                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Bloque horario (06:00–20:00)</div>
+                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• WhatsApp de contacto</div>
+                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Correo para constancia</div>
+                          <div className="p-2 rounded-lg bg-white/90 border border-[#D5A688]/25">• Código de reserva único</div>
                         </div>
                       </div>
                     )}
@@ -168,9 +162,9 @@ export function ComoReservar() {
               <div className="p-6 rounded-2xl meraki-cream-card flex items-start gap-4">
                 <Truck className="w-6 h-6 text-[#D5A688] shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
+                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
                     Costo de Movilidad
-                  </h4>
+                  </h3>
                   <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
                     {POLICIES_DATA.mobility}
                   </p>
@@ -180,9 +174,9 @@ export function ComoReservar() {
               <div className="p-6 rounded-2xl meraki-cream-card flex items-start gap-4">
                 <Clock className="w-6 h-6 text-[#5E765E] shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
+                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
                     Cancelaciones con 24h
-                  </h4>
+                  </h3>
                   <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
                     {POLICIES_DATA.cancellation}
                   </p>
@@ -192,9 +186,9 @@ export function ComoReservar() {
               <div className="p-6 rounded-2xl meraki-cream-card flex items-start gap-4">
                 <ShieldCheck className="w-6 h-6 text-[#5E765E] shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
+                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
                     Protocolos de Bioseguridad
-                  </h4>
+                  </h3>
                   <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
                     {POLICIES_DATA.biosecurity}
                   </p>
@@ -204,9 +198,9 @@ export function ComoReservar() {
               <div className="p-6 rounded-2xl meraki-cream-card flex items-start gap-4">
                 <Camera className="w-6 h-6 text-[#D5A688] shrink-0 mt-1" />
                 <div>
-                  <h4 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
+                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-1">
                     Registro Visual para Redes
-                  </h4>
+                  </h3>
                   <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
                     {POLICIES_DATA.socialMedia}
                   </p>
@@ -235,10 +229,10 @@ export function ComoReservar() {
                   key={faq.id}
                   className="theme-card-surface rounded-2xl p-6"
                 >
-                  <h4 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-2 flex items-center gap-2">
+                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-2 flex items-center gap-2">
                     <HelpCircle className="w-4 h-4 text-[#5E765E] shrink-0" />
                     <span>{faq.question}</span>
-                  </h4>
+                  </h3>
                   <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed pl-6">
                     {faq.answer}
                   </p>

@@ -1,12 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
 import { EditorialHeroFeed } from '../components/sections/EditorialHeroFeed';
-import { HomeBodySectionsSkeleton } from '../components/ui/Skeleton';
 import { TESTIMONIALS } from '../data/spaData';
-import { CATEGORIES_DATA } from '../data/catalog';
+import { CATALOG_SERVICES, CATEGORIES_DATA } from '../data/catalog';
 import { useBooking } from '../context/BookingContext';
 import {
   Sparkles,
@@ -24,20 +22,11 @@ import {
   Scissors,
   Flame,
   Smile,
-  Calendar
+  Calendar,
 } from 'lucide-react';
 
 export function Home() {
   const { openBooking } = useBooking();
-  const [isHydratingSections, setIsHydratingSections] = useState<boolean>(true);
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      setIsHydratingSections(false);
-    }, 110);
-
-    return () => window.clearTimeout(timer);
-  }, []);
 
   const getCategoryIcon = (id: string) => {
     switch (id) {
@@ -65,19 +54,9 @@ export function Home() {
       <Header />
 
       <main className="flex-1">
-        {/* =========================================================================
-            1. EDITORIAL HERO FEED: Full-bleed photo, moody gray filter, centered semitransparent isotype
-            (Inspired by Heavenly Spa by Westin reference & Meraki brand identity)
-           ========================================================================= */}
         <EditorialHeroFeed onOpenBooking={() => openBooking()} />
 
-        {isHydratingSections ? (
-          <HomeBodySectionsSkeleton />
-        ) : (
-          <>
-        {/* =========================================================================
-            2. CÓMO FUNCIONA EL SERVICIO A DOMICILIO (Para quien recién conoce la marca)
-           ========================================================================= */}
+        {/* 2. CÓMO FUNCIONA EL SERVICIO */}
         <section className="py-16 md:py-20 meraki-section-ivory border-b border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-14">
@@ -94,8 +73,7 @@ export function Home() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Step 1 */}
-              <div className="meraki-cream-card rounded-3xl p-8 relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   01
                 </span>
@@ -119,8 +97,7 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Step 2 */}
-              <div className="meraki-cream-card rounded-3xl p-8 relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   02
                 </span>
@@ -128,10 +105,10 @@ export function Home() {
                   <MessageSquare className="w-6 h-6 text-[#D5A688]" />
                 </div>
                 <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Escríbenos por WhatsApp
+                  Reserva &amp; Coordina por WhatsApp
                 </h3>
                 <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Indícanos tu servicio, fecha y si prefieres atención en estudio (Pueblo Libre) o a domicilio. Aseguras con el 40% de adelanto.
+                  Selecciona fecha y horario disponible en web, asegura con el 40% de adelanto por Yape y envíanos tu constancia al WhatsApp.
                 </p>
                 <div className="mt-4">
                   <Link
@@ -144,8 +121,7 @@ export function Home() {
                 </div>
               </div>
 
-              {/* Step 3 */}
-              <div className="meraki-cream-card rounded-3xl p-8 relative">
+              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
                 <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
                   03
                 </span>
@@ -169,9 +145,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* =========================================================================
-            3. NUESTRAS 6 ESPECIALIDADES (Preview sin saturar la página)
-           ========================================================================= */}
+        {/* 3. NUESTRAS 6 ESPECIALIDADES */}
         <section className="py-16 md:py-20 meraki-section-cream text-left">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
@@ -188,7 +162,7 @@ export function Home() {
                 to="/catalogo"
                 className="inline-flex items-center gap-2 text-xs font-semibold text-[#5E765E] uppercase tracking-wider hover:underline"
               >
-                <span>Explorar los 36 servicios con tarifas</span>
+                <span>Explorar los {CATALOG_SERVICES.length} servicios con tarifas</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -198,7 +172,7 @@ export function Home() {
                 <Link
                   key={cat.id}
                   to={`/catalogo?cat=${cat.id}`}
-                  className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between group cursor-pointer"
+                  className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between group cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
                 >
                   <div>
                     <div className="flex items-center justify-between mb-4">
@@ -238,13 +212,10 @@ export function Home() {
           </div>
         </section>
 
-        {/* =========================================================================
-            4. BIENVENIDA & CONOCE A ANA MARIA DÍAZ
-           ========================================================================= */}
+        {/* 4. BIENVENIDA & CONOCE A ANA MARIA DÍAZ */}
         <section className="py-16 md:py-20 meraki-section-ivory border-y border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              
               <div className="lg:col-span-5">
                 <div className="meraki-cream-card rounded-3xl p-8">
                   <div className="w-16 h-16 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-2xl font-bold mb-6 shadow-sm">
@@ -305,14 +276,11 @@ export function Home() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
 
-        {/* =========================================================================
-            5. CONDICIONES CLAVE PARA CLIENTES NUEVOS (Transparencia Total)
-           ========================================================================= */}
+        {/* 5. CONDICIONES CLAVE PARA CLIENTES NUEVOS */}
         <section className="py-16 meraki-section-cream text-left">
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="p-8 sm:p-10 rounded-3xl theme-card-surface">
@@ -372,9 +340,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* =========================================================================
-            6. TESTIMONIOS REALES A DOMICILIO
-           ========================================================================= */}
+        {/* 6. TESTIMONIOS REALES */}
         <section className="py-16 meraki-section-ivory border-t border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-xl mx-auto mb-12">
@@ -421,9 +387,7 @@ export function Home() {
           </div>
         </section>
 
-        {/* =========================================================================
-            7. CTA FINAL DIRECTO A WHATSAPP Y CATÁLOGO
-           ========================================================================= */}
+        {/* 7. CTA FINAL */}
         <section className="py-20 meraki-section-sage text-[#FFF2DE] text-center">
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-[#D5A688]/45 shadow-sm text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#FFF2DE] mb-4">
@@ -434,7 +398,7 @@ export function Home() {
               Agenda tu cita hoy y déjanos consentirte donde estés
             </h2>
             <p className="text-xs sm:text-sm text-[#FFF2DE]/85 font-light max-w-xl mx-auto mb-10 leading-relaxed">
-              Consulta disponibilidad para hoy o programa tu cita con anticipación. Respondemos tus consultas de inmediato por WhatsApp.
+              Consulta disponibilidad en horario real de 06:00 a 20:00 o programa tu cita con anticipación.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -444,7 +408,7 @@ export function Home() {
                 className="w-full sm:w-auto bg-[#FFFDF9] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
               >
                 <Calendar className="w-4 h-4 text-[#D5A688]" />
-                <span>Agendar Cita en el Formulario</span>
+                <span>Agendar Cita</span>
               </button>
 
               <Link
@@ -457,8 +421,6 @@ export function Home() {
             </div>
           </div>
         </section>
-          </>
-        )}
       </main>
 
       <Footer />

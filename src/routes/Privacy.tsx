@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
@@ -14,7 +15,8 @@ import {
   AlertCircle,
   Sparkles,
   ExternalLink,
-  UserCheck
+  UserCheck,
+  BookOpen,
 } from 'lucide-react';
 
 type PrivacySection = {
@@ -36,14 +38,15 @@ const privacySections: PrivacySection[] = [
     category: 'Protección de Datos',
     title: 'Responsable del Tratamiento y Datos de Contacto',
     badge: 'Identificación Legal',
-    content: 'De conformidad con la legislación vigente en la República del Perú y las directrices internacionales de transparencia digital, se informa la identidad del titular y responsable del tratamiento de los datos personales:',
+    content: 'De conformidad con la legislación vigente en la República del Perú (Ley N° 29733 y Código de Protección y Defensa del Consumidor - Ley N° 29571), se informa la identidad del titular:',
     bulletPoints: [
-      'Razón comercial: Meraki Spa Beauty (Liderado por la cosmetóloga y manicurista profesional Ana Maria Díaz).',
-      'Domicilio físico del estudio: Calle Agustín Gamarra 515, Pueblo Libre, Lima, Perú.',
-      'Canal formal de contacto y privacidad: contacto@meraki.spa.pe',
-      'Atención directa y WhatsApp oficial: +51 993 067 291',
-      'Ámbito de aplicación: El presente documento rige en el sitio web institucional (web-meraki-14bc4.web.app), en las landing pages y formularios vinculados (incluyendo la página de talleres y workshops en /workshop), así como en toda coordinación realizada a través de nuestros canales de mensajería oficial.'
-    ]
+      `Denominación y Titular: ${SPA_INFO.legalBusinessName}.`,
+      `Registro Tributario: ${SPA_INFO.rucDisplay}.`,
+      `Domicilio físico del estudio: ${SPA_INFO.studioAddress}.`,
+      `Canal formal de privacidad y atención: ${SPA_INFO.email}`,
+      `Atención directa y WhatsApp oficial: ${SPA_INFO.whatsappDisplay}`,
+      `Ámbito de aplicación: El presente documento rige en el sitio web oficial (${SPA_INFO.siteUrl}), sus rutas informativas y de reserva, así como en la coordinación de talleres y mensajería oficial.`,
+    ],
   },
   {
     id: 'marco-legal',
@@ -53,11 +56,11 @@ const privacySections: PrivacySection[] = [
     content: 'El tratamiento de datos personales en Meraki Spa se encuentra estrictamente subordinado a las disposiciones de la Ley N° 29733 (Ley de Protección de Datos Personales de la República del Perú) y su Reglamento aprobado mediante el Decreto Supremo N° 003-2013-JUS.',
     bulletPoints: [
       'Principio de Legalidad: El tratamiento de datos se realiza con estricto apego a las leyes peruanas aplicables.',
-      'Principio de Consentimiento: Los datos se recopilan previo consentimiento libre, previo, expreso, informado e inequívoco del titular.',
+      'Principio de Consentimiento: Los datos se recopilan previo consentimiento libre, previo, expreso, informado e inequívoco mediante casilla de verificación en nuestros formularios.',
       'Principio de Finalidad: Los datos recopilados no serán utilizados para propósitos distintos a los informados y consentidos.',
-      'Principio de Proporcionalidad: Solo solicitamos los datos estrictamente necesarios y pertinentes para coordinar y prestar nuestros servicios estéticos y formativos.',
-      'Principio de Seguridad: Aplicamos medidas técnicas, organizativas y humanas destinadas a evitar la alteración, pérdida o acceso no autorizado a la información.'
-    ]
+      'Principio de Proporcionalidad: Solo solicitamos los datos estrictamente necesarios para coordinar y prestar nuestros servicios estéticos y formativos.',
+      'Principio de Seguridad: Aplicamos reglas estrictas de acceso autenticado para proteger la información de citas y clientas.',
+    ],
   },
   {
     id: 'datos-recopilados',
@@ -66,14 +69,14 @@ const privacySections: PrivacySection[] = [
     badge: 'Información Capturada',
     content: 'Recopilamos únicamente los datos indispensables para la cotización, reserva, ejecución segura y seguimiento de nuestras experiencias de spa y talleres:',
     bulletPoints: [
-      'Datos de Identificación y Contacto: Nombres y apellidos completos, número de teléfono celular (WhatsApp) y correo electrónico voluntariamente remitido en nuestros formularios o chats.',
-      'Datos de Ubicación para Atención a Domicilio: Dirección exacta, referencias urbanas, número interior o departamento en distritos de Lima Metropolitana para el traslado seguro y oportuno de nuestro equipo profesional.',
-      'Datos Estéticos y de Bioseguridad: Observaciones sobre alergias previas a cosméticos, solventes, esmaltes semipermanentes, acrílicos o geles, tipo de piel o sensibilidades particulares para adaptar los protocolos de bioseguridad.'
+      'Datos de Identificación y Contacto: Nombres completos, número de teléfono celular (WhatsApp) y correo electrónico voluntariamente remitido en nuestros formularios.',
+      'Datos de Ubicación para Atención a Domicilio: Distrito, dirección exacta y referencias urbanas en Lima Metropolitana para la logística y ruta de nuestro equipo profesional.',
+      'Datos Estéticos y de Bioseguridad: Observaciones sobre alergias previas a cosméticos, solventes, acrílicos o sensibilidad cutánea para adaptar los protocolos de bioseguridad.',
     ],
     callout: {
       type: 'info',
-      text: 'No solicitamos ni almacenamos números de tarjetas de crédito o débito ni datos financieros sensibles a través de nuestra página web.'
-    }
+      text: 'Meraki Spa jamás solicita ni almacena claves secretas de billeteras digitales (Yape), códigos OTP de seguridad ni datos crudos de tarjetas bancarias.',
+    },
   },
   {
     id: 'finalidad-tratamiento',
@@ -82,128 +85,122 @@ const privacySections: PrivacySection[] = [
     badge: 'Uso Legítimo',
     content: 'La información personal capturada se destina de forma exclusiva a las siguientes finalidades:',
     bulletPoints: [
-      'Coordinación de citas: Verificar disponibilidad de agenda en nuestro estudio en Pueblo Libre o programar la ruta de atención a domicilio u oficina en Lima.',
-      'Inscripción a Talleres y Workshops: Gestionar cupos limitados, preparar kits de materiales individuales y emitir las constancias de participación.',
-      'Comprobación de pagos: Registrar y conciliar el voucher de adelanto (40% para servicios de spa o S/ 50 para el workshop).',
-      'Atención al cliente y soporte: Responder inquietudes sobre tarifas, preparativos previos al servicio y recomendaciones de cuidado posterior.'
-    ]
+      'Coordinación de citas y rutas: Verificar disponibilidad en estudio (Pueblo Libre) o planificar traslados a domicilio u oficina en Lima entre las 06:00 y 20:00.',
+      'Confirmación documental: Emitir la constancia de reserva digital con código único y enviar el resumen automático por correo electrónico.',
+      'Inscripción a Club VIP y Talleres: Gestionar tarjetas digitales de sellos de fidelidad y cupos de workshops.',
+      'Comprobación de pagos: Conciliar el adelanto del 40% por Yape o pasarela de pago autorizada.',
+    ],
   },
   {
     id: 'no-comercializacion',
     category: 'Protección de Datos',
     title: 'Garantía Expresa de No Venta ni Cesión de Datos',
-    badge: 'Cumplimiento Google Ads',
-    content: 'En estricto cumplimiento con las políticas de privacidad exigidas por Google Ads, Meta y la autoridad de protección de datos de Perú, asumimos un compromiso inquebrantable de confidencialidad:',
+    badge: 'Cumplimiento Publicitario',
+    content: 'Asumimos un compromiso inquebrantable de confidencialidad respecto a tu información:',
     bulletPoints: [
-      'NO venta de datos: Meraki Spa NO comercializa, no vende, no alquila ni cede bajo ninguna modalidad tus datos personales a empresas de terceros.',
-      'NO bases de datos externas: Tu información jamás será incorporada en listas de comercialización masiva o spam de terceros.',
-      'Acceso restringido: Solo el personal debidamente autorizado de Meraki Spa accede a tus datos para la ejecución operativa de tu atención.'
+      'NO venta de datos: Meraki Spa NO comercializa, no vende, no alquila ni cede bajo ninguna modalidad tus datos personales a terceros.',
+      'NO bases de datos externas: Tu información jamás será incorporada en listas de spam comercial.',
+      'Acceso restringido: Únicamente la dirección general y el personal operativo expresamente autorizado acceden a los datos para ejecutar tu atención.',
     ],
     callout: {
       type: 'success',
-      text: 'Garantía total de privacidad: Tus datos personales pertenecen únicamente a ti y solo se emplean para atender tu solicitud.'
-    }
+      text: 'Garantía total de privacidad: Tus datos personales solo se emplean para gestionar tu atención y beneficios en Meraki Spa.',
+    },
   },
   {
     id: 'politica-cookies',
     category: 'Cookies & Rastreo',
     title: 'Política de Cookies y Tecnologías de Seguimiento',
     badge: 'Transparencia Digital',
-    content: 'Este sitio web utiliza cookies técnicas, analíticas y de medición publicitaria para proporcionar una navegación segura, optimizada y fluida:',
+    content: 'Este sitio web utiliza cookies técnicas, analíticas y de medición publicitaria para proporcionar una navegación segura y fluida:',
     bulletPoints: [
-      'Cookies Técnicas (Esenciales): Necesarias para permitir la navegación por el sitio, mantener la estabilidad de la sesión y cargar correctamente los elementos multimedia y tipografías.',
-      'Cookies de Análisis y Rendimiento (Google Analytics 4 / Google Tag Manager): Recopilan datos anónimos y agregados sobre páginas visitadas, tiempos de permanencia y patrones de navegación. Estas estadísticas nos permiten mejorar continuamente el diseño sin identificar individualmente a ningún usuario.',
-      'Cookies de Publicidad y Conversión (Google Ads / Meta Pixel): Permiten cuantificar el interés en nuestros servicios y evaluar la efectividad de campañas publicitarias digitales. No transmiten datos personales directos como nombres o teléfonos a los proveedores de anuncios.',
-      'Desactivación y Gestión de Cookies: El usuario puede en todo momento rechazar, bloquear o eliminar las cookies configurando las preferencias de privacidad de su navegador (Google Chrome, Mozilla Firefox, Apple Safari, Microsoft Edge). La desactivación no restringe el acceso al contenido principal del sitio web.'
+      'Cookies Técnicas (Esenciales): Necesarias para el funcionamiento de la sesión de fidelidad VIP y la estabilidad de la plataforma.',
+      'Cookies de Análisis y Rendimiento (Google Analytics 4 / Tag Manager): Recopilan métricas agregadas sobre páginas visitadas y tiempos de carga sin identificar personalmente al visitante.',
+      'Cookies de Conversión (Google Ads / Meta / TikTok): Permiten medir la efectividad de nuestras campañas informativas.',
+      'Gestión de Cookies: Puedes bloquear o eliminar las cookies desde la configuración de tu navegador en cualquier momento.',
     ],
-    callout: {
-      type: 'info',
-      text: 'Al navegar en nuestra web sin desactivar las cookies en tu navegador, consientes su uso de acuerdo con la presente política.'
-    }
   },
   {
     id: 'derechos-arco',
     category: 'Protección de Datos',
     title: 'Ejercicio de Derechos ARCO (Ley N° 29733)',
     badge: 'Tus Derechos',
-    content: 'Como titular de tus datos personales, puedes ejercer en cualquier momento los derechos de Acceso, Rectificación, Cancelación y Oposición garantizados por la ley peruana:',
+    content: 'Como titular de tus datos personales, puedes ejercer en cualquier momento los derechos de Acceso, Rectificación, Cancelación y Oposición:',
     bulletPoints: [
-      'Derecho de Acceso: Conocer qué datos personales tuyos están registrados y la finalidad para la cual se mantienen.',
-      'Derecho de Rectificación: Solicitar la actualización o corrección de información desactualizada, incompleta o errónea.',
-      'Derecho de Cancelación: Solicitar la supresión o eliminación de tus datos cuando hayan dejado de ser necesarios para la atención brindada.',
-      'Derecho de Oposición: Oponerte al tratamiento de tus datos para finalidades no indispensables.',
-      'Canal de tramitación: Envía tu requerimiento por escrito a contacto@meraki.spa.pe con el asunto "Derechos ARCO" o mediante nuestro WhatsApp oficial +51 993 067 291. Tu solicitud será atendida en los plazos previstos por el marco legal peruano.'
-    ]
+      'Acceso y Rectificación: Conocer qué datos personales tuyos se conservan y solicitar su corrección.',
+      'Cancelación y Oposición: Solicitar la supresión de tus registros cuando hayan dejado de ser necesarios.',
+      `Canal de tramitación: Envía tu solicitud escrita a ${SPA_INFO.email} con el asunto "Derechos ARCO" o mediante WhatsApp al ${SPA_INFO.whatsappDisplay}. Atenderemos tu requerimiento dentro de los plazos legales peruanos.`,
+    ],
   },
   {
     id: 'terminos-reserva',
     category: 'Términos del Servicio',
-    title: 'Políticas de Reserva y Adelanto del 40%',
-    badge: 'Condiciones de Agenda',
-    content: 'Para garantizar la excelencia y la exclusividad del servicio profesional:',
+    title: 'Políticas de Reserva, Adelanto del 40% y Medios de Pago',
+    badge: 'Pagos & Condiciones',
+    content: 'Condiciones aplicables para formalizar toda experiencia de belleza y bienestar en Meraki Spa:',
     bulletPoints: [
-      'Confirmación con anticipo: Toda cita de spa (en estudio o a domicilio) se confirma únicamente con el abono del 40% del valor total del servicio.',
-      'Workshops y Talleres: La pre-reserva en el taller de manicura se formaliza con el abono inicial de S/ 50, abonándose el saldo el día de la clase.',
-      'Validación de pago: Una vez efectuado el abono por billetera digital (Yape, Plin) o transferencia bancaria, el cliente debe remitir la captura del comprobante junto con su nombre completo al WhatsApp oficial para asegurar el horario en agenda.',
-      'Sin cobro automático: Meraki Spa no realiza cargos automáticos ni suscripciones recurrentes no autorizadas.'
-    ]
+      'Confirmación con anticipo del 40%: Toda cita registrada en el sitio web requiere abonar el 40% de adelanto mediante Yape oficial a Ana Díaz (+51 993 067 291) o mediante la pasarela digital habilitada (como Culqi o Mercado Pago cuando esté activa).',
+      'Validación por WhatsApp en modo manual: Mientras esté vigente la verificación manual por Yape, la clienta debe remitir su ficha y captura al WhatsApp oficial para validar el abono y confirmar la reserva en firme.',
+      'Pagos por pasarela digital: En caso de utilizar checkout autorizado con tarjeta o Yape por Internet, la autorización bancaria se procesará directamente en los servidores encriptados (PCI-DSS) del procesador de pagos externo; Meraki Spa solo recibe el código de operación y confirmación del abono.',
+      'Saldo restante: El 60% restante se cancela al concluir el servicio presencial.',
+    ],
   },
   {
     id: 'terminos-cancelaciones',
     category: 'Términos del Servicio',
-    title: 'Política de Cancelaciones, Reprogramaciones y Puntualidad',
+    title: 'Política de Cancelaciones, Reprogramaciones y Devoluciones',
     badge: 'Puntualidad & Cambios',
-    content: 'Establecemos lineamientos claros para coordinar los tiempos de nuestro equipo y de todas las clientas:',
+    content: 'Lineamientos transparentes para coordinar cambios tanto de la clienta como del estudio:',
     bulletPoints: [
-      'Reprogramación de citas de spa: Se puede solicitar la reprogramación de fecha u hora con un mínimo de 24 horas de anticipación sin penalidad alguna.',
-      'Cancelaciones tardías o inasistencias: Ante cancelaciones notificadas con menos de 24 horas o inasistencias injustificadas, el anticipo del 40% no será reembolsable, toda vez que el bloque horario, transporte y personal fueron reservados en exclusiva.',
-      'Tolerancia en citas: Se otorga una tolerancia máxima de 15 minutos de espera. Pasado este tiempo, el procedimiento podrá adaptarse en tiempo para no perjudicar a las siguientes clientas programadas.',
-      'Transferencia de cupos en talleres: En caso de no poder asistir al workshop de uñas, el cupo podrá ser transferido a otra persona designada notificándolo con un mínimo de 48 horas de anticipación.'
+      'Reprogramación de la clienta: Puedes solicitar reprogramar tu fecha u hora con al menos 24 horas de anticipación sin penalidad.',
+      'Cancelación tardía o inasistencia: Ante cancelaciones con menos de 24 horas o inasistencia sin aviso previo, el anticipo del 40% no es reembolsable debido a la reserva exclusiva del bloque horario y traslado.',
+      'Reprogramación o cancelación atribuible a Meraki Spa: Si por fuerza mayor o contingencia operativa Meraki Spa debiera reprogramar una cita confirmada y el nuevo horario no se ajustara a tu disponibilidad, podrás solicitar la reprogramación preferente o la devolución del 100% del adelanto abonado mediante el mismo medio de pago en un plazo máximo de 48 horas hábiles.',
+      'Tolerancia de espera: Se otorga una tolerancia máxima de 15 minutos respecto a la hora pactada.',
     ],
     callout: {
       type: 'warning',
-      text: 'El adelanto cubre el costo de reserva exclusiva de agenda y movilización en Lima.'
-    }
+      text: 'El adelanto garantiza la exclusividad de tu bloque horario entre las 06:00 y 20:00.',
+    },
   },
   {
     id: 'terminos-bioseguridad',
     category: 'Términos del Servicio',
     title: 'Protocolos de Bioseguridad y Calidad Sanitaria',
     badge: 'Higiene & Cuidado',
-    content: 'La seguridad dermatológica y la salud de nuestras clientas es el principio rector de Meraki Spa:',
+    content: 'La seguridad dermatológica y salud de nuestras clientas es prioritaria en cada atención:',
     bulletPoints: [
-      'Esterilización de herramientas: Todo instrumental metálico (alicates, repujadores) pasa por un riguroso proceso de desinfección y esterilización en calor seco de grado clínico.',
-      'Materiales descartables: Limas, tacos pulidores, separadores y campos de trabajo son individuales y descartables para cada clienta.',
-      'Salud ungueal: Nos reservamos el derecho de abstenernos de realizar extensiones acrílicas o esmaltado en uñas que presenten sospecha de micosis activa (hongos), heridas abiertas o infecciones, orientando responsablemente a la clienta hacia atención médica especializada.'
-    ]
+      'Esterilización de herramientas: Todo instrumental metálico pasa por limpieza ultrasónica, desinfección y esterilización en calor seco.',
+      'Materiales descartables: Limas, tacos pulidores y protectores son de un solo uso por clienta.',
+      'Evaluación previa: Nos reservamos el derecho de abstenernos de aplicar sistemas acrílicos o semipermanentes ante signos de micosis activa o heridas abiertas, priorizando la salud ungueal.',
+    ],
   },
   {
     id: 'terminos-redes-sociales',
     category: 'Términos del Servicio',
-    title: 'Uso de Material Audiovisual en Redes Sociales',
-    badge: 'Difusión de Portafolio',
-    content: 'Como parte del arte estético y la exhibición de resultados profesionales:',
+    title: 'Uso de Material Audiovisual y Club VIP',
+    badge: 'Portafolio & Beneficios',
+    content: 'Disposiciones sobre contenido visual y beneficios de fidelidad:',
     bulletPoints: [
-      'Registro fotográfico de manicura y estética: Podrán capturarse fotografías o videos de las uñas, manos o resultados finales para su difusión en nuestras cuentas oficiales (@meraki.spa.pe).',
-      'Derecho de objeción: Si prefieres que tus manos o procedimientos no sean fotografiados o publicados, solo debes comunicárselo previamente a Ana Maria Díaz o al personal al inicio de la sesión, y tu voluntad será respetada de manera inmediata.'
-    ]
+      `Registro fotográfico: Podrán capturarse fotografías de los trabajos terminados para exhibición en ${SPA_INFO.instagram}. Si prefieres que no se publiquen imágenes de tu servicio, solo debes indicarlo antes de iniciar.`,
+      'Club VIP Meraki: Los sellos digitales son personales, intransferibles y equivalen a una sesión concluida conforme al programa vigente.',
+    ],
   },
   {
-    id: 'terminos-actualizaciones',
+    id: 'libro-reclamaciones-jurisdiccion',
     category: 'Términos del Servicio',
-    title: 'Vigencia, Jurisdicción y Actualizaciones de la Política',
-    badge: 'Disposiciones Finales',
-    content: 'Disposiciones normativas que rigen el presente acuerdo:',
+    title: 'Libro de Reclamaciones Virtual y Jurisdicción',
+    badge: 'INDECOPI Perú',
+    content: 'Conforme al Código de Protección y Defensa del Consumidor (Ley N° 29571) y su Reglamento (D.S. N° 011-2011-PCM):',
     bulletPoints: [
-      'Vigencia: Este documento entra en vigor a partir del 22 de septiembre de 2026 y sustituye cualquier versión previa.',
-      'Modificaciones: Meraki Spa se reserva la facultad de actualizar estos términos para reflejar reformas legales, directrices de plataformas como Google Ads o mejoras operativas. Las modificaciones se publicarán en esta misma dirección web.',
-      'Jurisdicción: Para cualquier discrepancia o controversia derivada de la interpretación de este documento, las partes se someten a la competencia territorial de los jueces y tribunales del Distrito Judicial de Lima, República del Perú.'
-    ]
-  }
+      'Meraki Spa pone a disposición de sus clientas y usuarias el Libro de Reclamaciones Virtual accesible permanentemente en el pie de página de este sitio web.',
+      'Toda queja o reclamo registrado genera un código único de seguimiento y será atendido dentro del plazo legal máximo de quince (15) días hábiles.',
+      'Vigencia y Jurisdicción: Documento vigente en Lima, Perú, sometido a la competencia de las autoridades administrativas y jurisdiccionales de Lima Metropolitana.',
+    ],
+  },
 ];
 
 function SectionNumber({ index }: { index: number }) {
-  return String(index + 1).padStart(2, '0');
+  return <>{String(index + 1).padStart(2, '0')}</>;
 }
 
 export function Privacy() {
@@ -221,11 +218,11 @@ export function Privacy() {
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#D5A688]/20 text-[#8C5835] text-xs font-semibold tracking-wider uppercase">
                 <Lock className="w-3.5 h-3.5" />
-                Google Ads Compliant
+                Ley N° 29571 INDECOPI
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/70 text-[#111111]/70 text-xs font-semibold tracking-wider uppercase border border-[#5E765E]/15">
                 <Cookie className="w-3.5 h-3.5" />
-                Cookies &amp; Analítica
+                Cookies &amp; Pagos
               </span>
             </div>
 
@@ -235,7 +232,7 @@ export function Privacy() {
             </h1>
 
             <p className="font-['Montserrat',sans-serif] text-xs sm:text-sm text-[#111111]/75 max-w-3xl leading-relaxed mt-5">
-              Transparencia integral en el tratamiento de tus datos personales, política de cookies bajo estándares de Google Ads y condiciones contractuales de reserva para experiencias en estudio, a domicilio y talleres en Meraki Spa.
+              Transparencia integral en el tratamiento de tus datos personales, pagos digitales, devoluciones y condiciones de atención en estudio o a domicilio en Meraki Spa.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 pt-8 border-t border-[#5E765E]/15 text-xs text-[#111111]/80">
@@ -253,7 +250,7 @@ export function Privacy() {
               </div>
               <div className="flex items-center gap-2.5">
                 <Scale className="w-4 h-4 text-[#5E765E] shrink-0" />
-                <span><strong>Marco:</strong> Ley 29733 / D.S. 003-2013-JUS</span>
+                <span><strong>Marco:</strong> Ley 29733 / Ley 29571</span>
               </div>
             </div>
           </div>
@@ -263,24 +260,22 @@ export function Privacy() {
         <section className="py-16 md:py-24">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 text-left">
-              
-              {/* Sidebar Navigation */}
               <aside className="lg:col-span-4" aria-label="Índice de Políticas">
                 <div className="sticky top-28 space-y-6">
                   <div className="bg-[#FFFFFF] p-6 rounded-2xl border border-[#5E765E]/15 shadow-sm">
-                    <h3 className="text-xs font-bold uppercase tracking-[0.2em] text-[#5E765E] mb-4 flex items-center justify-between">
+                    <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-[#5E765E] mb-4 flex items-center justify-between">
                       <span>Índice del Documento</span>
-                      <span className="text-[11px] font-mono text-[#D5A688]">12 Secciones</span>
-                    </h3>
+                      <span className="text-[11px] font-mono text-[#D5A688]">{privacySections.length} Secciones</span>
+                    </h2>
 
-                    <nav className="flex flex-col gap-1.5 max-h-[55vh] overflow-y-auto pr-1">
+                    <nav className="flex flex-col gap-1.5 max-h-[52vh] overflow-y-auto pr-1">
                       {privacySections.map((section, index) => (
                         <a
                           href={`#${section.id}`}
                           key={section.id}
                           className="flex items-start gap-2.5 text-xs text-[#111111]/75 hover:text-[#5E765E] py-1.5 px-2 rounded-lg hover:bg-[#FFF2DE]/50 transition-colors"
                         >
-                          <span className="font-mono text-[11px] text-[#D5A688] font-semibold shrink-0 mt-0.5">
+                          <span className="font-mono text-[11px] text-[#9A6342] font-semibold shrink-0 mt-0.5">
                             <SectionNumber index={index} />
                           </span>
                           <span className="leading-snug">{section.title}</span>
@@ -289,23 +284,42 @@ export function Privacy() {
                     </nav>
                   </div>
 
+                  {/* Libro de Reclamaciones Card */}
+                  <div className="bg-[#FFFDF9] p-6 rounded-2xl border border-[#D5A688]/45 shadow-sm space-y-3">
+                    <div className="flex items-center gap-2 text-[#5E765E]">
+                      <BookOpen className="w-4 h-4 text-[#9A6342]" />
+                      <h3 className="text-xs font-bold uppercase tracking-wider">
+                        Libro de Reclamaciones
+                      </h3>
+                    </div>
+                    <p className="text-xs text-[#111111]/75 leading-relaxed font-light">
+                      ¿Deseas registrar una queja o reclamo formal conforme a INDECOPI? Accede directamente a nuestro canal virtual.
+                    </p>
+                    <Link
+                      to="/libro-reclamaciones"
+                      className="inline-flex items-center justify-center w-full gap-2 px-4 py-2.5 rounded-xl bg-[#5E765E] text-[#FFF2DE] text-xs font-semibold uppercase tracking-wider hover:bg-[#4d634d] transition-colors"
+                    >
+                      <span>Abrir Libro de Reclamaciones</span>
+                    </Link>
+                  </div>
+
                   {/* Quick ARCO Callout */}
                   <div className="bg-[#5E765E] text-[#FFF2DE] p-6 rounded-2xl shadow-sm border border-[#D5A688]/30">
                     <div className="flex items-center gap-2 mb-2">
                       <Scale className="w-4 h-4 text-[#D5A688]" />
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-[#D5A688]">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-[#D5A688]">
                         ¿Consultas sobre tus datos?
-                      </h4>
+                      </h3>
                     </div>
                     <p className="text-xs leading-relaxed text-[#FFF2DE]/85 mb-4 font-light">
-                      Puedes ejercer tus derechos de Acceso, Rectificación o Eliminación escribiéndonos directamente:
+                      Ejerce tus derechos de Acceso, Rectificación o Eliminación escribiendo directamente:
                     </p>
                     <div className="space-y-2 text-xs">
                       <a
                         href={`mailto:${SPA_INFO.email}?subject=Consulta%20de%20Privacidad%20ARCO`}
-                        className="flex items-center gap-2 text-[#FFF2DE] hover:text-[#D5A688] transition-colors"
+                        className="flex items-center gap-2 text-[#FFF2DE] hover:text-[#D5A688] transition-colors break-all"
                       >
-                        <Mail className="w-3.5 h-3.5 text-[#D5A688]" />
+                        <Mail className="w-3.5 h-3.5 text-[#D5A688] shrink-0" />
                         <span className="underline">{SPA_INFO.email}</span>
                       </a>
                       <a
@@ -314,7 +328,7 @@ export function Privacy() {
                         rel="noopener noreferrer"
                         className="flex items-center gap-2 text-[#FFF2DE] hover:text-[#D5A688] transition-colors"
                       >
-                        <Phone className="w-3.5 h-3.5 text-[#D5A688]" />
+                        <Phone className="w-3.5 h-3.5 text-[#D5A688] shrink-0" />
                         <span>WhatsApp: {SPA_INFO.whatsappDisplay}</span>
                       </a>
                     </div>
@@ -331,7 +345,7 @@ export function Privacy() {
                     className="bg-[#FFFFFF] p-8 sm:p-10 rounded-2xl border border-[#5E765E]/15 shadow-sm scroll-mt-28 transition-all hover:border-[#5E765E]/30"
                   >
                     <div className="flex flex-wrap items-center justify-between gap-2 mb-3">
-                      <span className="font-mono text-xs text-[#D5A688] font-semibold tracking-widest">
+                      <span className="font-mono text-xs text-[#9A6342] font-semibold tracking-widest">
                         SECCIÓN <SectionNumber index={index} />
                       </span>
                       <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-[#FFF2DE] text-[#5E765E] font-medium border border-[#5E765E]/15">
@@ -364,8 +378,8 @@ export function Privacy() {
                           section.callout.type === 'success'
                             ? 'bg-[#5E765E]/10 border-[#5E765E]/30 text-[#2B3D2B]'
                             : section.callout.type === 'warning'
-                            ? 'bg-amber-50 border-amber-200 text-amber-900'
-                            : 'bg-[#FFF2DE] border-[#D5A688]/30 text-[#6B4B32]'
+                              ? 'bg-amber-50 border-amber-200 text-amber-900'
+                              : 'bg-[#FFF2DE] border-[#D5A688]/30 text-[#6B4B32]'
                         }`}
                       >
                         <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-[#5E765E]" />
@@ -396,16 +410,15 @@ export function Privacy() {
                       <span>Conversar por WhatsApp</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
-                    <a
-                      href="/"
+                    <Link
+                      to="/"
                       className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-semibold tracking-wider transition-all border border-white/20"
                     >
                       <span>Volver al Inicio</span>
-                    </a>
+                    </Link>
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>

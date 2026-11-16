@@ -11,7 +11,7 @@ import {
   ShieldCheck,
   Calendar,
   ArrowRight,
-  Star
+  Star,
 } from 'lucide-react';
 
 export function Nosotros() {
@@ -28,16 +28,10 @@ export function Nosotros() {
           >
             <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
             <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
-            <img
-              src="/assets/brand/meraki-monogram.svg"
-              alt=""
-              className="absolute -right-14 top-1/2 -translate-y-1/2 w-72 sm:w-96 h-72 sm:h-96 opacity-[0.045] -rotate-6"
-            />
           </div>
 
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              
               <div className="lg:col-span-7">
                 <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[#5E765E] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
                   <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
@@ -59,7 +53,7 @@ export function Nosotros() {
                 <div className="flex flex-wrap gap-4">
                   <Link
                     to="/catalogo"
-                    className="bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md inline-flex items-center gap-2"
+                    className="meraki-btn-fluid bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest shadow-md inline-flex items-center gap-2"
                   >
                     <span>Ver Catálogo de Servicios</span>
                     <ArrowRight className="w-4 h-4 text-[#D5A688]" />
@@ -80,17 +74,17 @@ export function Nosotros() {
               <div className="lg:col-span-5">
                 <div className="theme-card-surface rounded-3xl p-8 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#D5A688]/15 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-                  
+
                   <div className="w-20 h-20 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-3xl font-bold mb-6 shadow-md">
                     AMD
                   </div>
 
-                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#D5A688] block mb-1">
+                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#9A6342] block mb-1">
                     Fundadora &amp; Especialista
                   </span>
-                  <h3 className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111] mb-2">
+                  <h2 className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111] mb-2">
                     Ana Maria Díaz
-                  </h3>
+                  </h2>
                   <p className="text-xs text-[#5E765E] font-semibold mb-4">
                     Más de 10 años de trayectoria profesional
                   </p>
@@ -111,7 +105,6 @@ export function Nosotros() {
                   </div>
                 </div>
               </div>
-
             </div>
           </div>
         </section>
@@ -206,7 +199,7 @@ export function Nosotros() {
                     <span className="text-[11px] text-[#5E765E] block">
                       {t.role} • {t.location}
                     </span>
-                    <span className="text-[10px] text-[#111111]/50 block mt-1">
+                    <span className="text-[10px] text-[#111111]/55 block mt-1">
                       Servicio: {t.service}
                     </span>
                   </div>

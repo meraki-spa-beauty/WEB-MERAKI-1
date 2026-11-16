@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
-import { 
-  ShieldCheck, 
-  Clock, 
-  Sparkles, 
-  MapPin 
+import { Link } from 'react-router-dom';
+import {
+  ShieldCheck,
+  Clock,
+  Sparkles,
+  MapPin,
+  ArrowRight,
 } from 'lucide-react';
 import { HomeHeroCenterpieceSkeleton } from '../ui/Skeleton';
 
@@ -31,7 +33,6 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
 
   useEffect(() => {
     try {
-      // Clear any legacy test background caches to guarantee official Drive assets are displayed
       localStorage.removeItem('meraki_bg_desktop');
       localStorage.removeItem('meraki_bg_mobile');
     } catch (e) {
@@ -61,20 +62,8 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
       const apply = (target: 'desktop' | 'mobile') => {
         if (target === 'desktop') {
           setCustomDesktopBg(result);
-
-          try {
-            localStorage.setItem('meraki_bg_desktop', result);
-          } catch {
-            // ignore quota errors
-          }
         } else {
           setCustomMobileBg(result);
-
-          try {
-            localStorage.setItem('meraki_bg_mobile', result);
-          } catch {
-            // ignore quota errors
-          }
         }
       };
 
@@ -109,12 +98,11 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
   };
 
   return (
-    <section 
+    <section
       onDragOver={(e) => e.preventDefault()}
       onDrop={handleDrop}
       className="relative overflow-hidden min-h-[82vh] lg:min-h-[88vh] flex flex-col justify-between text-white select-none"
     >
-      {/* Background with responsive Desktop & Mobile sources */}
       <div className="absolute inset-0 z-0 overflow-hidden bg-[#232A23]">
         {!showHeroBg && (
           <div
@@ -125,11 +113,8 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
           </div>
         )}
         <picture className="w-full h-full block">
-          {/* Mobile background (< 768px) */}
           <source media="(max-width: 767px)" srcSet={mobileBgSrc} />
-          {/* Desktop background (>= 768px) */}
           <source media="(min-width: 768px)" srcSet={desktopBgSrc} />
-          {/* Fallback image - Natural on mobile, subdued on desktop */}
           <img
             ref={handleHeroImgRef}
             src={desktopBgSrc}
@@ -145,19 +130,16 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
           />
         </picture>
 
-        {/* Mobile scrim (Natural lighting with subtle bottom gradient for trust badges) */}
         <div className="block md:hidden absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/15 pointer-events-none" />
-
-        {/* Desktop scrim (Deeper, richer scrim for seamless desktop header integration) */}
         <div className="hidden md:block absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/65 pointer-events-none" />
       </div>
 
-      {/* Main Hero Content: Original padding on mobile, extended on desktop */}
-      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-36 flex flex-col items-center justify-center text-center flex-1">
+      {/* Main Minimalist Hero Centerpiece + Single Coherent CTA */}
+      <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-20 sm:py-28 md:pt-44 md:pb-32 flex flex-col items-center justify-center text-center flex-1">
         <h1 className="sr-only">
-          Meraki — Especialistas en uñas, nails, manicura y rituales de spa en Pueblo Libre y a domicilio en Lima
+          Meraki Spa — Especialistas en uñas, nails, manicura y rituales de spa en Pueblo Libre y a domicilio en Lima
         </h1>
-        <div className="flex flex-col items-center justify-center relative">
+        <div className="flex flex-col items-center justify-center relative gap-8">
           {!showLogo && <HomeHeroCenterpieceSkeleton />}
           <img
             ref={handleLogoImgRef}
@@ -172,6 +154,14 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
             }`}
             referrerPolicy="no-referrer"
           />
+
+          <Link
+            to="/catalogo"
+            className="meraki-glass-cta meraki-animate-enter group inline-flex items-center gap-2.5 text-white px-7 py-3.5 rounded-full text-xs font-['Montserrat',sans-serif] font-semibold uppercase tracking-[0.18em] cursor-pointer"
+          >
+            <span className="drop-shadow-xs">Explorar Catálogo de Servicios</span>
+            <ArrowRight className="w-4 h-4 text-[#D5A688] transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
         </div>
       </div>
 
@@ -194,63 +184,61 @@ export function EditorialHeroFeed({ onOpenBooking: _onOpenBooking }: EditorialHe
           </div>
         ) : (
           <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-left">
-          
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
-              <Clock className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
+                <Clock className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
+                  Puntualidad
+                </span>
+                <span className="text-[11px] text-white/75 font-light block leading-tight">
+                  Horarios garantizados
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
-                Puntualidad
-              </span>
-              <span className="text-[11px] text-white/75 font-light block leading-tight">
-                Horarios garantizados
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
-              <MapPin className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
+                <MapPin className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
+                  100% Móvil
+                </span>
+                <span className="text-[11px] text-white/75 font-light block leading-tight">
+                  En tu casa u oficina en Lima
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
-                100% Móvil
-              </span>
-              <span className="text-[11px] text-white/75 font-light block leading-tight">
-                En tu casa u oficina en Lima
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
-              <ShieldCheck className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
+                  Bioseguridad
+                </span>
+                <span className="text-[11px] text-white/75 font-light block leading-tight">
+                  Material esterilizado
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
-                Bioseguridad
-              </span>
-              <span className="text-[11px] text-white/75 font-light block leading-tight">
-                Material esterilizado
-              </span>
-            </div>
-          </div>
 
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
-              <Sparkles className="w-4 h-4" />
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-[#D5A688] shrink-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div>
+                <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
+                  Productos Premium
+                </span>
+                <span className="text-[11px] text-white/75 font-light block leading-tight">
+                  Marcas líderes y aceites puros
+                </span>
+              </div>
             </div>
-            <div>
-              <span className="font-['Montserrat',sans-serif] text-xs font-semibold text-white tracking-wide block uppercase">
-                Productos Premium
-              </span>
-              <span className="text-[11px] text-white/75 font-light block leading-tight">
-                Marcas líderes y aceites puros
-              </span>
-            </div>
-          </div>
-
           </div>
         )}
       </div>

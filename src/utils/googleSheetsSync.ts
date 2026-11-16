@@ -1,13 +1,14 @@
 /**
- * Unified Google Sheets sync service for Meraki Spa & Beauty
- * Automatically captures leads from Workshop, Spa Booking, and Contact forms,
- * including client traffic attribution (ads, video, campaigns, referral).
+ * Unified Google Sheets & Automated Dual-Email Sync Service for Meraki Spa
+ * Captures leads from Booking Wizard, Contact Form, Workshop, and Libro de Reclamaciones,
+ * including automatic email notification targets (meraki.spa.pe@gmail.com + client email).
  */
 
+import { CENTRAL_OWNER_EMAIL } from '../data/spaData';
 import { getTrafficSource } from './trafficSource';
 
 export interface LeadSyncPayload {
-  formulario: 'Workshop Press On' | 'Cita Spa' | 'Contacto Web';
+  formulario: 'Workshop Press On' | 'Cita Spa' | 'Contacto Web' | 'Libro de Reclamaciones';
   cliente: string;
   whatsapp: string;
   email?: string;
@@ -21,6 +22,8 @@ export interface LeadSyncPayload {
   monto_total?: string;
   codigo_reserva?: string;
   mensaje_notas?: string;
+  estado_pago?: string;
+  codigo_yape?: string;
 }
 
 export interface StoredLeadRecord {
@@ -30,6 +33,9 @@ export interface StoredLeadRecord {
   cliente: string;
   whatsapp: string;
   email: string;
+  admin_notify_email: string;
+  send_client_email: boolean;
+  send_admin_email: boolean;
   servicio: string;
   modalidad: string;
   distrito: string;
@@ -38,6 +44,8 @@ export interface StoredLeadRecord {
   hora_preferida: string;
   adelanto: string;
   total: string;
+  estado_pago: string;
+  codigo_yape: string;
   notas: string;
   origen_resumen: string;
   origen_tipo: string;
@@ -58,9 +66,6 @@ const GOOGLE_SHEETS_WEBHOOK_URL =
   import.meta.env.VITE_WORKSHOP_SHEETS_URL ||
   DEFAULT_WEBHOOK_URL;
 
-/**
- * Envia el lead a Google Sheets y lo respalda en localStorage de inmediato
- */
 export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<void> {
   const traffic = getTrafficSource();
 
@@ -74,13 +79,19 @@ export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<
     second: '2-digit',
   });
 
+  const cleanClientEmail = (payload.email || '').trim();
+  const hasValidClientEmail = cleanClientEmail.includes('@');
+
   const record: StoredLeadRecord = {
     fecha: limaDate,
     formulario: payload.formulario,
     codigo: payload.codigo_reserva || 'MRK-LEAD',
     cliente: payload.cliente,
     whatsapp: payload.whatsapp,
-    email: payload.email || 'No proporcionado',
+    email: hasValidClientEmail ? cleanClientEmail : 'No proporcionado',
+    admin_notify_email: CENTRAL_OWNER_EMAIL,
+    send_client_email: hasValidClientEmail,
+    send_admin_email: true,
     servicio: payload.servicio_detalle || 'N/A',
     modalidad: payload.modalidad || 'N/A',
     distrito: payload.distrito || 'N/A',
@@ -89,6 +100,8 @@ export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<
     hora_preferida: payload.hora_preferida || 'N/A',
     adelanto: payload.monto_adelanto || 'N/A',
     total: payload.monto_total || 'N/A',
+    estado_pago: payload.estado_pago || 'Pendiente de abono',
+    codigo_yape: payload.codigo_yape || 'N/A',
     notas: payload.mensaje_notas || 'N/A',
     origen_resumen: traffic.resumen_origen,
     origen_tipo: traffic.tipo,
@@ -98,43 +111,21 @@ export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<
     origen_medio: traffic.medio,
     click_id: traffic.click_id,
     landing_url: traffic.landing_page,
-    estado: 'Pre-reserva generada en web',
+    estado: 'Registrado en web',
   };
 
-  // 1. Respaldo inmediato en localStorage del navegador
   try {
     const existingRaw = localStorage.getItem('meraki_all_leads');
 
-    // SAFETY: Parsed from localStorage containing previous lead records formatted by this module
+    // SAFETY: Parsed from browser localStorage written by this module
     const existing = existingRaw ? (JSON.parse(existingRaw) as StoredLeadRecord[]) : [];
 
     existing.push(record);
-    localStorage.setItem('meraki_all_leads', JSON.stringify(existing));
-
-    // Si es del workshop, mantener sincronizado el key histórico 'meraki_workshop_leads'
-    if (payload.formulario === 'Workshop Press On') {
-      const wsHistoryRaw = localStorage.getItem('meraki_workshop_leads');
-      const wsHistory = wsHistoryRaw ? JSON.parse(wsHistoryRaw) : [];
-
-      wsHistory.push({
-        fecha: record.fecha,
-        codigo: record.codigo,
-        nombre: record.cliente,
-        whatsapp: record.whatsapp,
-        email: record.email,
-        adelanto: record.adelanto,
-        total: record.total,
-        estado: record.estado,
-        origen: record.origen_resumen,
-      });
-
-      localStorage.setItem('meraki_workshop_leads', JSON.stringify(wsHistory));
-    }
+    localStorage.setItem('meraki_all_leads', JSON.stringify(existing.slice(-50)));
   } catch (err) {
     console.warn('[Meraki Leads] No se pudo guardar en almacenamiento local:', err);
   }
 
-  // 2. Transmisión a Google Sheets vía Webhook (Google Apps Script)
   if (GOOGLE_SHEETS_WEBHOOK_URL) {
     try {
       await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
@@ -145,10 +136,8 @@ export async function syncLeadToGoogleSheets(payload: LeadSyncPayload): Promise<
         },
         body: JSON.stringify(record),
       });
-
-      console.log('[Meraki Leads] Lead sincronizado exitosamente con Google Sheets');
     } catch (err) {
-      console.error('[Meraki Leads] Error al enviar a Google Sheets:', err);
+      console.error('[Meraki Leads] Error al sincronizar:', err);
     }
   }
 }

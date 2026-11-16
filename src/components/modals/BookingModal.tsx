@@ -1,7 +1,25 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
-import { SPA_INFO } from '../../data/spaData';
-import type { ServicePriceOption } from '../../types';
+import { CENTRAL_OWNER_EMAIL, SPA_INFO } from '../../data/spaData';
+import type {
+  BookingServiceLine,
+  MerakiBooking,
+  ScheduleConfig,
+  ServicePriceOption,
+  SlotLockEntry,
+} from '../../types';
+import {
+  DEFAULT_SCHEDULE_CONFIG,
+  LIMA_DISTRICT_NAMES,
+  evaluateDaySchedule,
+} from '../../utils/scheduleEngine';
+import {
+  createAtomicBooking,
+  fetchActiveSlotLocksForDate,
+  fetchScheduleConfig,
+} from '../../services/merakiFirestore';
+import { useAuth } from '../../context/AuthContext';
 import { trackMetaLead, trackMetaSchedule } from '../../utils/metaPixel';
 import { trackTikTokSubmitForm, trackTikTokCompleteRegistration } from '../../utils/tiktokPixel';
 import { syncLeadToGoogleSheets } from '../../utils/googleSheetsSync';
@@ -26,13 +44,18 @@ import {
   Phone,
   Mail,
   FileText,
-  Smartphone
+  Smartphone,
+  AlertCircle,
+  Download,
+  Printer,
+  CreditCard,
 } from 'lucide-react';
 
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
   preselectedServiceId?: string;
+  preselectedOptionIndex?: number;
 }
 
 export interface SelectedServiceItem {
@@ -41,55 +64,33 @@ export interface SelectedServiceItem {
   optionIndex: number;
 }
 
-const LIMA_DISTRICTS = [
-  'Miraflores',
-  'San Isidro',
-  'Santiago de Surco',
-  'San Borja',
-  'La Molina',
-  'Barranco',
-  'Magdalena del Mar',
-  'Jesús María',
-  'San Miguel',
-  'Lince',
-  'Pueblo Libre',
-  'Surquillo',
-  'San Luis',
-  'Chorrillos',
-  'Breña',
-  'Cercado de Lima',
-  'Ate',
-  'Los Olivos',
-  'San Juan de Miraflores',
-  'Otro distrito en Lima'
-];
+export function BookingModal({
+  isOpen,
+  onClose,
+  preselectedServiceId,
+  preselectedOptionIndex,
+}: BookingModalProps) {
+  const { user } = useAuth();
 
-const TIME_SLOTS = [
-  '09:00',
-  '10:30',
-  '12:00',
-  '13:30',
-  '15:00',
-  '16:30',
-  '18:00',
-  '19:30'
-];
-
-export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingModalProps) {
-  // Wizard 4-Step State: 1 = Servicios, 2 = Modalidad & Fecha, 3 = Datos, 4 = Cómo Reservar & Adelanto Yape
+  // Wizard 4-Step State
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
   const [isYapeCopied, setIsYapeCopied] = useState<boolean>(false);
 
+  // Schedule config & slot locks from Firestore
+  const [scheduleConfig, setScheduleConfig] = useState<ScheduleConfig>(DEFAULT_SCHEDULE_CONFIG);
+  const [activeLocks, setActiveLocks] = useState<SlotLockEntry[]>([]);
+  const [loadingAgenda, setLoadingAgenda] = useState<boolean>(false);
+
   // Multi-Service Cart State
   const [selectedServices, setSelectedServices] = useState<SelectedServiceItem[]>(() => {
-    const initialId = preselectedServiceId || CATALOG_SERVICES[0]?.id || 'manos-esmalte-gel';
+    const initialId = preselectedServiceId || CATALOG_SERVICES[0]?.id || 'manos-basica';
 
     return [
       {
         instanceId: `item-${Date.now()}-1`,
         serviceId: initialId,
-        optionIndex: 0
-      }
+        optionIndex: preselectedOptionIndex ?? 0,
+      },
     ];
   });
 
@@ -104,44 +105,93 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
   const [address, setAddress] = useState<string>('');
 
   // Date and Time state (Step 2)
+  const todayIso = new Date().toISOString().split('T')[0];
+
   const [date, setDate] = useState<string>(() => {
     const d = new Date();
+
     d.setDate(d.getDate() + 1);
 
     return d.toISOString().split('T')[0];
   });
 
-  const [timeSlot, setTimeSlot] = useState<string>('15:00');
+  const [timeSlot, setTimeSlot] = useState<string>('11:00');
 
-  // Client Details state (Step 3)
+  // Client Details & Consent state (Step 3)
   const [clientName, setClientName] = useState<string>('');
   const [clientPhone, setClientPhone] = useState<string>('');
   const [clientEmail, setClientEmail] = useState<string>('');
   const [specialNotes, setSpecialNotes] = useState<string>('');
+  const [privacyAccepted, setPrivacyAccepted] = useState<boolean>(false);
+
+  // Payment confirmation input (Step 4)
+  const [yapeOperationCode, setYapeOperationCode] = useState<string>('');
 
   // Submission & UI feedback state
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [confirmedBookingCode, setConfirmedBookingCode] = useState<string>('');
   const [isCopied, setIsCopied] = useState<boolean>(false);
   const [stepError, setStepError] = useState<string | null>(null);
 
   // Reset or initialize on open
   useEffect(() => {
-    if (isOpen) {
-      setCurrentStep(1);
-      setIsSubmitted(false);
-      setStepError(null);
+    if (!isOpen) return;
 
-      if (preselectedServiceId) {
-        setSelectedServices([
-          {
-            instanceId: `item-${Date.now()}-initial`,
-            serviceId: preselectedServiceId,
-            optionIndex: 0
-          }
-        ]);
+    setCurrentStep(1);
+    setIsSubmitted(false);
+    setConfirmedBookingCode('');
+    setYapeOperationCode('');
+    setStepError(null);
+
+    if (user) {
+      if (!clientName && user.displayName) {
+        setClientName(user.displayName);
+      }
+
+      if (!clientEmail && user.email) {
+        setClientEmail(user.email);
       }
     }
-  }, [isOpen, preselectedServiceId]);
+
+    if (preselectedServiceId) {
+      setSelectedServices([
+        {
+          instanceId: `item-${Date.now()}-initial`,
+          serviceId: preselectedServiceId,
+          optionIndex: preselectedOptionIndex ?? 0,
+        },
+      ]);
+    }
+  }, [isOpen, preselectedServiceId, preselectedOptionIndex, user]);
+
+  // Load real-time schedule config & date slotLocks when modal is open or date changes
+  useEffect(() => {
+    if (!isOpen || !date) return;
+
+    let cancelled = false;
+
+    const loadAgenda = async () => {
+      setLoadingAgenda(true);
+
+      const [cfg, locks] = await Promise.all([
+        fetchScheduleConfig(),
+        fetchActiveSlotLocksForDate(date),
+      ]);
+
+      if (!cancelled) {
+        setScheduleConfig(cfg);
+        setActiveLocks(locks);
+        setLoadingAgenda(false);
+      }
+    };
+
+    void loadAgenda();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, date]);
 
   // Handle ESC and body scroll lock
   useEffect(() => {
@@ -160,7 +210,6 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     };
   }, [isOpen, onClose]);
 
-  // Calculation helpers for service items
   const getItemDetails = (item: SelectedServiceItem) => {
     const service = CATALOG_SERVICES.find((s) => s.id === item.serviceId) || CATALOG_SERVICES[0];
     let price = service.pricePEN || 0;
@@ -168,6 +217,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
     if (service.priceOptions && service.priceOptions.length > 0) {
       const opt = service.priceOptions[item.optionIndex] || service.priceOptions[0];
+
       price = opt.pricePEN;
       optionLabel = opt.label;
     }
@@ -181,13 +231,13 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     return { service, price, optionLabel, formattedPrice };
   };
 
-  // Consolidated financial totals for all selected services
   const financialTotals = useMemo(() => {
     let totalPrice = 0;
     let hasUnpriced = false;
 
     const itemsDetailed = selectedServices.map((item) => {
       const details = getItemDetails(item);
+
       totalPrice += details.price;
 
       if (details.price === 0 || details.service.priceNote) {
@@ -196,12 +246,13 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
       return {
         ...item,
-        ...details
+        ...details,
       };
     });
 
     const advancePayment = Math.round(totalPrice * 0.4);
     const balanceRemaining = totalPrice - advancePayment;
+    const estimatedDurationMin = Math.min(300, Math.max(75, selectedServices.length * 75));
 
     return {
       totalPrice,
@@ -209,11 +260,49 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       balanceRemaining,
       itemsDetailed,
       hasUnpriced,
-      count: selectedServices.length
+      estimatedDurationMin,
+      count: selectedServices.length,
     };
   }, [selectedServices]);
 
-  // Services available for the "add service" selector
+  // Evaluate 06:00-20:00 schedule availability in real time
+  const slotEvaluations = useMemo(() => {
+    return evaluateDaySchedule({
+      date,
+      locationType,
+      district: locationType === 'estudio' ? 'Pueblo Libre' : district,
+      totalPEN: financialTotals.totalPrice,
+      estimatedDurationMin: financialTotals.estimatedDurationMin,
+      config: scheduleConfig,
+      activeLocks,
+    });
+  }, [
+    date,
+    locationType,
+    district,
+    financialTotals.totalPrice,
+    financialTotals.estimatedDurationMin,
+    scheduleConfig,
+    activeLocks,
+  ]);
+
+  const selectedSlotEval = useMemo(() => {
+    return slotEvaluations.find((ev) => ev.timeSlot === timeSlot) || slotEvaluations[0];
+  }, [slotEvaluations, timeSlot]);
+
+  // Keep selected slot aligned to an available slot if rules/date/district changed
+  useEffect(() => {
+    const current = slotEvaluations.find((ev) => ev.timeSlot === timeSlot);
+
+    if (!current || !current.available) {
+      const firstAvailable = slotEvaluations.find((ev) => ev.available);
+
+      if (firstAvailable && firstAvailable.timeSlot !== timeSlot) {
+        setTimeSlot(firstAvailable.timeSlot);
+      }
+    }
+  }, [slotEvaluations, timeSlot]);
+
   const availableServicesToAdd = useMemo(() => {
     if (addCategoryFilter === 'todos') {
       return CATALOG_SERVICES;
@@ -222,19 +311,16 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     return CATALOG_SERVICES.filter((s) => s.category === addCategoryFilter);
   }, [addCategoryFilter]);
 
-  // Cart actions
   const handleAddService = () => {
-    if (!serviceToAddId) {
-      return;
-    }
+    if (!serviceToAddId) return;
 
     setSelectedServices((prev) => [
       ...prev,
       {
         instanceId: `item-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
         serviceId: serviceToAddId,
-        optionIndex: 0
-      }
+        optionIndex: 0,
+      },
     ]);
     setShowAddServiceBox(false);
   };
@@ -253,22 +339,19 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
   const handleUpdateOptionIndex = (instanceId: string, newOptionIndex: number) => {
     setSelectedServices((prev) =>
       prev.map((item) =>
-        item.instanceId === instanceId ? { ...item, optionIndex: newOptionIndex } : item
-      )
+        item.instanceId === instanceId ? { ...item, optionIndex: newOptionIndex } : item,
+      ),
     );
   };
 
   const handleUpdateServiceId = (instanceId: string, newServiceId: string) => {
     setSelectedServices((prev) =>
       prev.map((item) =>
-        item.instanceId === instanceId
-          ? { ...item, serviceId: newServiceId, optionIndex: 0 }
-          : item
-      )
+        item.instanceId === instanceId ? { ...item, serviceId: newServiceId, optionIndex: 0 } : item,
+      ),
     );
   };
 
-  // Step 1 Validation & Next
   const handleProceedToStep2 = () => {
     if (selectedServices.length === 0) {
       setStepError('Por favor selecciona al menos un servicio para continuar.');
@@ -280,10 +363,9 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
     setCurrentStep(2);
   };
 
-  // Step 2 Validation & Next
   const handleProceedToStep3 = () => {
     if (!date) {
-      setStepError('Por favor selecciona la fecha sugerida para tu cita.');
+      setStepError('Por favor selecciona la fecha deseada para tu cita.');
 
       return;
     }
@@ -294,15 +376,21 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       return;
     }
 
+    if (!selectedSlotEval || !selectedSlotEval.available) {
+      setStepError(
+        selectedSlotEval?.reasonText ||
+          'El horario elegido no se encuentra disponible. Selecciona otra franja o atiende en estudio.',
+      );
+
+      return;
+    }
+
     setStepError(null);
     setCurrentStep(3);
   };
 
-  // Step 3 Validation & Next to Step 4 (Explicación y Coordinación de Reserva)
   const handleProceedToStep4 = (e?: React.FormEvent) => {
-    if (e) {
-      e.preventDefault();
-    }
+    if (e) e.preventDefault();
 
     if (!clientName.trim()) {
       setStepError('Por favor ingresa tu nombre y apellidos.');
@@ -310,8 +398,14 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       return;
     }
 
-    if (!clientPhone.trim()) {
+    if (!clientPhone.trim() || clientPhone.trim().length < 7) {
       setStepError('Por favor ingresa tu número de WhatsApp para contactarte.');
+
+      return;
+    }
+
+    if (!privacyAccepted) {
+      setStepError('Debes aceptar la Política de Privacidad y condiciones de cancelación.');
 
       return;
     }
@@ -326,54 +420,56 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       setIsYapeCopied(true);
       setTimeout(() => setIsYapeCopied(false), 2500);
     } catch {
-      // Fallback
+      // Ignore clipboard failures
     }
   };
 
-  // Build WhatsApp consolidated message text
-  const buildConsolidatedMessage = () => {
+  const buildConsolidatedMessage = (codeOverride?: string) => {
     const isStudio = locationType === 'estudio';
-    const hasSculpted = selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida');
-    const hasPressOn = selectedServices.some((s) => s.serviceId === 'manos-press-on-nails');
+    const bookingRef = codeOverride || confirmedBookingCode || 'POR-GENERAR';
 
-    const servicesListText = financialTotals.itemsDetailed
-      .map((it, idx) => {
-        if (it.service.id === 'manos-press-on-nails') {
-          return `  ${idx + 1}. *${it.service.name}* — Bajo pedido / A cotizar (diseño personalizado)`;
-        }
+    const serviceLines: string[] = [];
 
+    for (let idx = 0; idx < financialTotals.itemsDetailed.length; idx++) {
+      const it = financialTotals.itemsDetailed[idx];
+
+      if (it.service.id === 'manos-press-on-nails') {
+        serviceLines.push(`  ${idx + 1}. *${it.service.name}* — Bajo pedido / A cotizar`);
+      } else {
         const optText = it.optionLabel ? ` (${it.optionLabel})` : '';
-        const priceText = it.price > 0 ? `S/ ${it.price}` : (it.service.priceNote || 'Bajo pedido');
+        const priceText = it.price > 0 ? `S/ ${it.price}` : it.service.priceNote || 'Bajo pedido';
 
-        return `  ${idx + 1}. *${it.service.name}*${optText} — ${priceText}`;
-      })
-      .join('\n');
+        serviceLines.push(`  ${idx + 1}. *${it.service.name}*${optText} — ${priceText}`);
+      }
+    }
 
     const totalText = financialTotals.hasUnpriced
       ? financialTotals.totalPrice > 0
-        ? `S/ ${financialTotals.totalPrice} (+ servicio bajo pedido por cotizar)`
+        ? `S/ ${financialTotals.totalPrice} (+ servicio bajo pedido)`
         : 'A cotizar bajo pedido'
       : `S/ ${financialTotals.totalPrice}`;
 
-    const advanceText = financialTotals.advancePayment > 0
-      ? `S/ ${financialTotals.advancePayment} (Yape al 993 067 291 - Ana Díaz)`
-      : 'A coordinar por WhatsApp al definir el set (Yape al 993 067 291 - Ana Díaz)';
+    const advanceText =
+      financialTotals.advancePayment > 0
+        ? `S/ ${financialTotals.advancePayment} (Yape al 993 067 291 - Ana Díaz)`
+        : 'A coordinar por WhatsApp';
 
-    const balanceText = financialTotals.balanceRemaining > 0
-      ? `S/ ${financialTotals.balanceRemaining}`
-      : 'A definir tras cotización';
+    const paymentDetail =
+      scheduleConfig.paymentMode === 'gateway_checkout'
+        ? 'Pasarela Online Validada'
+        : yapeOperationCode.trim()
+          ? `Yape Operación #${yapeOperationCode.trim()}`
+          : 'Pendiente de abono / envío de captura';
 
-    const lines = [
-      '🌿 *SOLICITUD DE RESERVA — MERAKI SPA* 🌿',
+    const lines: string[] = [
+      `🌿 *FICHA DE RESERVA MERAKI SPA (${bookingRef})* 🌿`,
       '━━━━━━━━━━━━━━━━━━━━',
-      `✨ *Servicios a agendar (${financialTotals.count}):*`,
-      servicesListText,
-      hasSculpted ? '⚠️ *Nota Uñas Esculpidas:* El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.' : '',
-      hasPressOn ? '💅 *Nota Press On Nails:* Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por este chat.' : '',
+      `✨ *Servicios (${financialTotals.count}):*`,
+      serviceLines.join('\n'),
       '━━━━━━━━━━━━━━━━━━━━',
-      `💰 *Inversión Total:* ${totalText}`,
-      `💳 *Adelanto de confirmación (40%):* ${advanceText}`,
-      financialTotals.balanceRemaining > 0 ? `💵 *Saldo al finalizar atención (60%):* ${balanceText}` : '',
+      `💰 *Total:* ${totalText}`,
+      `💳 *Adelanto (40%):* ${advanceText}`,
+      `🧾 *Estado del abono:* ${paymentDetail}`,
       '━━━━━━━━━━━━━━━━━━━━',
       `📍 *Modalidad:* ${
         isStudio
@@ -383,110 +479,179 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
             : 'En Oficina / Trabajo'
       }`,
       isStudio
-        ? '🏠 *Dirección del Estudio:* Calle Agustín Gamarra 515, Pueblo Libre, Lima'
-        : `📌 *Distrito en Lima:* ${district}`,
-      !isStudio
-        ? address.trim()
-          ? `🏠 *Dirección/Ref:* ${address.trim()}`
-          : '🏠 *Dirección/Ref:* Por coordinar en chat'
-        : '',
-      `📅 *Fecha deseada:* ${date}`,
-      `⏰ *Horario preferido:* ${timeSlot} hrs`,
+        ? `🏠 *Dirección Estudio:* ${SPA_INFO.studioAddress}`
+        : `📌 *Distrito:* ${district}`,
+      !isStudio ? `🏠 *Dirección/Ref:* ${address.trim() || 'Por coordinar'}` : '',
+      `📅 *Fecha:* ${date}`,
+      `⏰ *Bloque horario:* ${timeSlot} hrs`,
       '━━━━━━━━━━━━━━━━━━━━',
-      `👤 *Cliente:* ${clientName.trim()}`,
+      `👤 *Clienta:* ${clientName.trim()}`,
       `📱 *WhatsApp:* ${clientPhone.trim()}`,
-      clientEmail.trim() ? `📧 *Correo:* ${clientEmail.trim()}` : '📧 *Correo:* No especificado',
-      specialNotes.trim() ? `📝 *Observaciones/Alergias:* ${specialNotes.trim()}` : '',
+      clientEmail.trim() ? `📧 *Correo:* ${clientEmail.trim()}` : '',
+      specialNotes.trim() ? `📝 *Notas/Alergias:* ${specialNotes.trim()}` : '',
       '━━━━━━━━━━━━━━━━━━━━',
-      isStudio
-        ? `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita presencial en su estudio (Calle Agustín Gamarra 515, Pueblo Libre) para verificar disponibilidad. Coordinamos los detalles por WhatsApp.`
-        : `¡Hola Ana Díaz / Meraki! Adjunto mi solicitud de cita a domicilio para verificar disponibilidad de agenda y movilidad. Coordinamos los detalles por WhatsApp.`
-    ].filter(Boolean);
+      '¡Hola Ana Díaz / Meraki! Envío mi ficha de reserva registrada en la web para coordinar detalles y confirmar mi cita.',
+    ];
 
-    return lines.join('\n');
+    const nonEmpty: string[] = [];
+
+    for (const ln of lines) {
+      if (ln) nonEmpty.push(ln);
+    }
+
+    return nonEmpty.join('\n');
   };
 
   const leadTrackedRef = useRef<boolean>(false);
 
   const triggerBookingConversion = () => {
-    if (leadTrackedRef.current) {
-      return;
-    }
+    if (leadTrackedRef.current) return;
 
     leadTrackedRef.current = true;
 
-    const mainTitle = financialTotals.itemsDetailed
-      .map((it) => `${it.service.name}${it.optionLabel ? ` (${it.optionLabel})` : ''}`)
-      .join(' + ');
+    const titles: string[] = [];
+
+    for (const it of financialTotals.itemsDetailed) {
+      titles.push(`${it.service.name}${it.optionLabel ? ` (${it.optionLabel})` : ''}`);
+    }
+
+    const mainTitle = titles.join(' + ');
 
     trackMetaLead({
       content_name: `Cita Spa (${financialTotals.count} servicios) - ${mainTitle}`,
       content_category: 'Cita Spa',
       value: financialTotals.totalPrice,
-      currency: 'PEN'
+      currency: 'PEN',
     });
 
     trackMetaSchedule({
       content_name: `Cita Spa - ${mainTitle}`,
       value: financialTotals.totalPrice,
-      currency: 'PEN'
+      currency: 'PEN',
     });
 
     trackTikTokSubmitForm({
       content_name: `Cita Spa - ${mainTitle}`,
       content_category: 'Cita Spa',
       value: financialTotals.totalPrice,
-      currency: 'PEN'
+      currency: 'PEN',
     });
 
     trackTikTokCompleteRegistration({
       content_name: `Cita Spa - ${mainTitle}`,
       content_category: 'Cita Spa',
       value: financialTotals.totalPrice,
-      currency: 'PEN'
+      currency: 'PEN',
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!clientName.trim()) {
-      setStepError('Por favor ingresa tu nombre completo.');
+  const handleConfirmBookingInWeb = async () => {
+    if (!clientName.trim() || !clientPhone.trim()) {
+      setStepError('Completa tu nombre y WhatsApp en el Paso 3.');
 
       return;
     }
 
-    if (!clientPhone.trim()) {
-      setStepError('Por favor ingresa tu número de WhatsApp para contactarte.');
+    if (!selectedSlotEval || !selectedSlotEval.available) {
+      setStepError('El bloque horario seleccionado ya no está disponible.');
 
       return;
     }
 
     setStepError(null);
-    triggerBookingConversion();
+    setIsSubmitting(true);
 
-    const servicesSummaryString = financialTotals.itemsDetailed
-      .map((it) => `${it.service.name}${it.optionLabel ? ` [${it.optionLabel}]` : ''} (S/ ${it.price})`)
-      .join(' + ');
+    const newCode = `MRK-SPA-${Math.floor(10000 + Math.random() * 90000)}`;
+    const hasYapeCode = Boolean(yapeOperationCode.trim());
+    const isGateway = scheduleConfig.paymentMode === 'gateway_checkout';
 
-    syncLeadToGoogleSheets({
-      formulario: 'Cita Spa',
-      cliente: clientName.trim(),
-      whatsapp: clientPhone.trim(),
-      email: clientEmail.trim() || undefined,
-      servicio_detalle: servicesSummaryString,
-      modalidad: locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : 'A Domicilio / Oficina',
-      distrito: locationType === 'estudio' ? 'Pueblo Libre' : district,
-      direccion: locationType === 'estudio' ? SPA_INFO.studioAddress : address.trim() || undefined,
-      fecha_preferida: date || 'A coordinar',
-      hora_preferida: timeSlot || 'A coordinar',
-      monto_total: `S/ ${financialTotals.totalPrice}`,
-      monto_adelanto: `S/ ${financialTotals.advancePayment} (40%)`,
-      codigo_reserva: `MRK-SPA-${Math.floor(1000 + Math.random() * 9000)}`,
-      mensaje_notas: specialNotes.trim() || undefined
-    });
+    const serviceLines: BookingServiceLine[] = [];
+    const summaryParts: string[] = [];
 
-    setIsSubmitted(true);
+    for (const it of financialTotals.itemsDetailed) {
+      serviceLines.push({
+        serviceId: it.service.id,
+        serviceName: it.service.name,
+        optionLabel: it.optionLabel || 'Estándar',
+        pricePEN: it.price,
+      });
+      summaryParts.push(
+        `${it.service.name}${it.optionLabel ? ` [${it.optionLabel}]` : ''} (S/ ${it.price})`,
+      );
+    }
+
+    const servicesSummaryString = summaryParts.join(' + ');
+    const resolvedDistrict = locationType === 'estudio' ? 'Pueblo Libre' : district;
+
+    const bookingPayload: MerakiBooking = {
+      bookingCode: newCode,
+      uid: user?.uid || 'guest',
+      clientName: clientName.trim(),
+      clientPhone: clientPhone.trim(),
+      clientEmail: clientEmail.trim(),
+      specialNotes: specialNotes.trim(),
+      services: serviceLines,
+      servicesSummary: servicesSummaryString,
+      locationType,
+      district: resolvedDistrict,
+      address: locationType === 'estudio' ? SPA_INFO.studioAddress : address.trim(),
+      date,
+      timeSlot,
+      estimatedDurationMin: financialTotals.estimatedDurationMin,
+      totalPEN: financialTotals.totalPrice,
+      advancePEN: financialTotals.advancePayment,
+      paymentMode: scheduleConfig.paymentMode,
+      paymentStatus: isGateway
+        ? 'gateway_paid'
+        : hasYapeCode
+          ? 'manual_code_submitted'
+          : 'pending_yape',
+      yapeOperationCode: isGateway ? 'GATEWAY-OK' : yapeOperationCode.trim(),
+      status: isGateway
+        ? 'confirmed'
+        : hasYapeCode
+          ? 'manual_code_submitted'
+          : 'pending_yape',
+      privacyAccepted: true,
+    };
+
+    try {
+      await createAtomicBooking(bookingPayload);
+      triggerBookingConversion();
+
+      await syncLeadToGoogleSheets({
+        formulario: 'Cita Spa',
+        cliente: clientName.trim(),
+        whatsapp: clientPhone.trim(),
+        email: clientEmail.trim() || undefined,
+        servicio_detalle: servicesSummaryString,
+        modalidad:
+          locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : `A Domicilio (${resolvedDistrict})`,
+        distrito: resolvedDistrict,
+        direccion: locationType === 'estudio' ? SPA_INFO.studioAddress : address.trim() || undefined,
+        fecha_preferida: date,
+        hora_preferida: timeSlot,
+        monto_total: `S/ ${financialTotals.totalPrice}`,
+        monto_adelanto: `S/ ${financialTotals.advancePayment} (40%)`,
+        estado_pago: isGateway
+          ? 'Pagado en Pasarela'
+          : hasYapeCode
+            ? 'Código Yape Registrado (Por Validar)'
+            : 'Pendiente de abono',
+        codigo_yape: yapeOperationCode.trim() || undefined,
+        codigo_reserva: newCode,
+        mensaje_notas: specialNotes.trim() || undefined,
+      });
+
+      setConfirmedBookingCode(newCode);
+      setIsSubmitted(true);
+    } catch {
+      setStepError(
+        'No pudimos registrar este horario (puede haberse reservado hace unos segundos). Recarga los horarios e intenta nuevamente.',
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCopySummary = async () => {
@@ -495,27 +660,42 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2500);
     } catch {
-      // Fallback
+      // Fallback ignored
     }
   };
 
+  const handleDownloadReceipt = () => {
+    const content = buildConsolidatedMessage(confirmedBookingCode);
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = url;
+    link.download = `Constancia-${confirmedBookingCode || 'MerakiSpa'}.txt`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   const whatsappUrl = `https://wa.me/${SPA_INFO.whatsappNumber}?text=${encodeURIComponent(
-    buildConsolidatedMessage()
+    buildConsolidatedMessage(),
   )}`;
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
+
+  const isStudio = locationType === 'estudio';
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm animate-fade-in text-left"
+      className="meraki-overlay-enter fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm text-left"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-booking-title"
+      onClick={onClose}
     >
       <div
-        className="relative w-full max-w-2xl bg-[#FFF2DE] rounded-3xl overflow-hidden shadow-2xl border border-[#5E765E]/20 max-h-[92vh] flex flex-col"
+        className="meraki-modal-panel relative w-full max-w-2xl bg-[#FFF2DE] rounded-3xl overflow-hidden shadow-2xl border border-[#5E765E]/20 max-h-[92vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close Button */}
@@ -533,7 +713,7 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
           <div className="flex items-center gap-2 mb-1">
             <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
             <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-[0.22em] text-[#D5A688]">
-              Agenda tu Experiencia Personalizada
+              Agenda Inteligente Meraki (06:00 – 20:00)
             </span>
           </div>
           <h2
@@ -546,428 +726,242 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
             Atención en estudio (Pueblo Libre) y a domicilio u oficina en Lima
           </p>
 
-          {/* Stepper Progress Bar (Only visible when not submitted) */}
+          {/* Unified 4-Step Progress Bar */}
           {!isSubmitted && (
             <div className="mt-4 pt-3 border-t border-white/15">
               <div className="flex items-center justify-between text-[11px] sm:text-xs font-['Montserrat',sans-serif] mb-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentStep(1)}
-                  className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                    currentStep === 1
-                      ? 'text-white font-bold'
-                      : currentStep > 1
-                        ? 'text-[#D5A688] hover:text-white font-medium'
-                        : 'text-white/50'
-                  }`}
-                >
-                  <span
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] ${
-                      currentStep === 1
-                        ? 'bg-[#D5A688] text-[#111111] font-bold'
-                        : currentStep > 1
-                          ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
-                          : 'bg-white/20 text-white/70'
-                    }`}
-                  >
-                    {currentStep > 1 ? '✓' : '1'}
-                  </span>
-                  <span>1. Servicios</span>
-                  {financialTotals.count > 0 && (
-                    <span className="text-[10px] opacity-75 hidden sm:inline">({financialTotals.count})</span>
-                  )}
-                </button>
-
-                <div className="h-[1px] flex-1 mx-1.5 sm:mx-2 bg-white/20" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (selectedServices.length > 0) setCurrentStep(2);
-                  }}
-                  className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                    currentStep === 2
-                      ? 'text-white font-bold'
-                      : currentStep > 2
-                        ? 'text-[#D5A688] hover:text-white font-medium'
-                        : 'text-white/50'
-                  }`}
-                >
-                  <span
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] ${
-                      currentStep === 2
-                        ? 'bg-[#D5A688] text-[#111111] font-bold'
-                        : currentStep > 2
-                          ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
-                          : 'bg-white/20 text-white/70'
-                    }`}
-                  >
-                    {currentStep > 2 ? '✓' : '2'}
-                  </span>
-                  <span>2. Modalidad</span>
-                </button>
-
-                <div className="h-[1px] flex-1 mx-1.5 sm:mx-2 bg-white/20" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (selectedServices.length > 0 && date) setCurrentStep(3);
-                  }}
-                  className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                    currentStep === 3
-                      ? 'text-white font-bold'
-                      : currentStep > 3
-                        ? 'text-[#D5A688] hover:text-white font-medium'
-                        : 'text-white/50'
-                  }`}
-                >
-                  <span
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] ${
-                      currentStep === 3
-                        ? 'bg-[#D5A688] text-[#111111] font-bold'
-                        : currentStep > 3
-                          ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
-                          : 'bg-white/20 text-white/70'
-                    }`}
-                  >
-                    {currentStep > 3 ? '✓' : '3'}
-                  </span>
-                  <span>3. Datos</span>
-                </button>
-
-                <div className="h-[1px] flex-1 mx-1.5 sm:mx-2 bg-white/20" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (selectedServices.length > 0 && date && clientName.trim() && clientPhone.trim()) {
-                      setCurrentStep(4);
-                    }
-                  }}
-                  className={`flex items-center gap-1 transition-colors cursor-pointer ${
-                    currentStep === 4
-                      ? 'text-white font-bold'
-                      : 'text-white/50'
-                  }`}
-                >
-                  <span
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] sm:text-[11px] ${
-                      currentStep === 4
-                        ? 'bg-[#D5A688] text-[#111111] font-bold'
-                        : 'bg-white/20 text-white/70'
-                    }`}
-                  >
-                    4
-                  </span>
-                  <span>4. Reserva &amp; Yape</span>
-                </button>
+                {[
+                  { step: 1 as const, label: '1. Servicios' },
+                  { step: 2 as const, label: '2. Modalidad' },
+                  { step: 3 as const, label: '3. Datos' },
+                  { step: 4 as const, label: '4. Confirmar' },
+                ].map((item, idx) => (
+                  <div key={item.step} className="flex items-center flex-1 last:flex-initial">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (item.step <= currentStep) {
+                          setStepError(null);
+                          setCurrentStep(item.step);
+                        }
+                      }}
+                      className={`flex items-center gap-1 transition-colors cursor-pointer ${
+                        currentStep === item.step
+                          ? 'text-white font-bold'
+                          : currentStep > item.step
+                            ? 'text-[#D5A688] hover:text-white font-medium'
+                            : 'text-white/55'
+                      }`}
+                    >
+                      <span
+                        className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] ${
+                          currentStep === item.step
+                            ? 'bg-[#D5A688] text-[#111111] font-bold'
+                            : currentStep > item.step
+                              ? 'bg-[#D5A688]/30 text-[#D5A688] font-bold'
+                              : 'bg-white/20 text-white/75'
+                        }`}
+                      >
+                        {currentStep > item.step ? '✓' : item.step}
+                      </span>
+                      <span className="hidden sm:inline">{item.label}</span>
+                    </button>
+                    {idx < 3 && <div className="h-[1px] flex-1 mx-1.5 sm:mx-2 bg-white/20" />}
+                  </div>
+                ))}
               </div>
 
-              {/* Progress Line */}
               <div className="w-full bg-black/20 h-1.5 rounded-full overflow-hidden">
                 <div
                   className="bg-[#D5A688] h-full transition-all duration-300 rounded-full"
-                  style={{
-                    width:
-                      currentStep === 1
-                        ? '25%'
-                        : currentStep === 2
-                          ? '50%'
-                          : currentStep === 3
-                            ? '75%'
-                            : '100%'
-                  }}
+                  style={{ width: `${currentStep * 25}%` }}
                 />
               </div>
             </div>
           )}
         </div>
 
-        {/* Scrollable Form Body */}
+        {/* Scrollable Body */}
         <div className="overflow-y-auto p-5 sm:p-7 flex-1">
-          {/* Step Error Notice */}
           {stepError && (
             <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-              <span className="font-bold shrink-0">!</span>
+              <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{stepError}</span>
             </div>
           )}
 
           {isSubmitted ? (
-            /* =========================================================================
-               CONFIRMATION & WHATSAPP CONSOLIDATED VIEW
-               ========================================================================= */
-            <div className="py-4 space-y-6 animate-fade-in text-center">
+            /* =====================================================================
+               ON-SCREEN OFFICIAL CONFIRMATION + MANDATORY WHATSAPP HANDOFF
+               ===================================================================== */
+            <div className="py-2 space-y-5 animate-fade-in text-center">
               <div className="w-16 h-16 rounded-full bg-[#5E765E]/15 text-[#5E765E] flex items-center justify-center mx-auto ring-8 ring-[#5E765E]/10">
                 <CheckCircle2 className="w-10 h-10 text-[#5E765E]" />
               </div>
 
               <div>
                 <span className="text-[10px] uppercase font-bold tracking-[0.24em] text-[#5E765E] block mb-1">
-                  Paso Final: Envío por WhatsApp
+                  Constancia Registrada • {confirmedBookingCode}
                 </span>
                 <h3 className="font-['Cormorant_Garamond',serif] text-3xl font-normal text-[#111111]">
-                  ¡Consolidado de Cita Listo!
+                  ¡Reserva Registrada en la Web!
                 </h3>
-                <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/75 max-w-md mx-auto mt-2 leading-relaxed">
-                  Gracias, <strong className="font-semibold text-[#111111]">{clientName}</strong>. Hemos preparado el resumen completo de tu solicitud con los <strong className="font-semibold text-[#5E765E]">{financialTotals.count} servicios</strong> seleccionados. Haz clic en el botón a continuación para abrir WhatsApp y confirmar la disponibilidad de tu agenda.
+                <p className="font-['Montserrat',sans-serif] text-xs text-[#111111]/80 max-w-md mx-auto mt-2 leading-relaxed">
+                  Hemos guardado tu cita para el <strong>{date}</strong> a las <strong>{timeSlot} hrs</strong> y enviado notificación automática a <strong>{CENTRAL_OWNER_EMAIL}</strong>
+                  {clientEmail.trim() ? ` y a ${clientEmail.trim()}` : ''}.
                 </p>
               </div>
 
-              {/* Consolidated Summary Card */}
-              <div className="theme-card-surface rounded-2xl p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3.5 max-w-lg mx-auto">
-                <div className="flex items-center justify-between border-b border-[#5E765E]/15 pb-2.5">
-                  <span className="text-[11px] uppercase tracking-wider font-bold text-[#5E765E]">
-                    Resumen de Servicios Agendados ({financialTotals.count})
-                  </span>
-                  <span className="text-[10px] text-[#111111]/60 font-medium">
-                    Lima, Perú
-                  </span>
-                </div>
-
-                <div className="space-y-2 text-[#111111]">
-                  {financialTotals.itemsDetailed.map((it, idx) => (
-                    <div
-                      key={it.instanceId}
-                      className="flex justify-between items-start gap-3 py-1 border-b border-[#5E765E]/10 last:border-b-0"
-                    >
-                      <div className="flex-1">
-                        <span className="font-semibold text-[#111111] block">
-                          {idx + 1}. {it.service.name}
-                        </span>
-                        {it.optionLabel && (
-                          <span className="text-[11px] text-[#5E765E] block font-light">
-                            {it.optionLabel}
-                          </span>
-                        )}
-                      </div>
-                      <span className="font-bold text-[#5E765E] shrink-0">
-                        {it.formattedPrice}
-                      </span>
-                    </div>
-                  ))}
-
-                  {/* Highlights / Special Notes for Confirmation */}
-                  {selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida') && (
-                    <div className="p-2.5 rounded-xl bg-[#FFF2DE] border border-[#D5A688]/40 text-[11px] text-[#111111]/85 flex items-start gap-2">
-                      <AlertCircle className="w-3.5 h-3.5 text-[#D5A688] shrink-0 mt-0.5" />
-                      <span><strong>Extensión Esculpida:</strong> El precio puede variar según el largo y diseño elegido.</span>
-                    </div>
-                  )}
-
-                  {selectedServices.some((s) => s.serviceId === 'manos-press-on-nails') && (
-                    <div className="p-2.5 rounded-xl bg-[#FFF8FA] border border-[#722282]/30 text-[11px] text-[#111111]/85 flex items-start gap-2">
-                      <Sparkles className="w-3.5 h-3.5 text-[#722282] shrink-0 mt-0.5" />
-                      <span><strong>Press On Nails:</strong> Set elaborado a medida bajo pedido. Coordinaremos diseño y medidas por WhatsApp.</span>
-                    </div>
-                  )}
-
-                  <div className="pt-2 border-t border-[#5E765E]/15 space-y-1 text-xs">
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#111111]/60">Modalidad:</span>
-                      <span className="font-medium text-right">
-                        {locationType === 'estudio'
-                          ? 'En Estudio (Pueblo Libre)'
-                          : locationType === 'casa'
-                            ? `A Domicilio • ${district}`
-                            : `En Oficina • ${district}`}
-                      </span>
-                    </div>
-
-                    {locationType === 'estudio' ? (
-                      <div className="flex justify-between items-start gap-3">
-                        <span className="text-[#111111]/60">Dirección Estudio:</span>
-                        <span className="font-semibold text-right max-w-xs text-[#5E765E]">
-                          Calle Agustín Gamarra 515, Pueblo Libre
-                        </span>
-                      </div>
-                    ) : address.trim() ? (
-                      <div className="flex justify-between items-start gap-3">
-                        <span className="text-[#111111]/60">Dirección / Ref:</span>
-                        <span className="font-medium text-right max-w-xs">{address.trim()}</span>
-                      </div>
-                    ) : null}
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#111111]/60">Fecha &amp; Hora sugerida:</span>
-                      <span className="font-semibold text-[#5E765E]">
-                        {date} a las {timeSlot} hrs
-                      </span>
-                    </div>
-
-                    <div className="flex justify-between items-center">
-                      <span className="text-[#111111]/60">Cliente:</span>
-                      <span className="font-medium">
-                        {clientName} ({clientPhone})
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Financial Summary */}
-                <div className="pt-3 border-t border-[#5E765E]/15 bg-[#FFF2DE]/50 -mx-5 -mb-5 p-4 rounded-b-2xl space-y-1.5">
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-[#111111]/70">Inversión total ({financialTotals.count} servicios):</span>
-                    <span className="font-bold text-[#111111] text-sm">
-                      {financialTotals.hasUnpriced
-                        ? financialTotals.totalPrice > 0
-                          ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
-                          : 'A cotizar bajo pedido'
-                        : `S/. ${financialTotals.totalPrice}`}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center text-xs text-[#5E765E] font-medium">
-                    <span>Adelanto de confirmación (40%):</span>
-                    <span className="font-bold">
-                      {financialTotals.advancePayment > 0
-                        ? `S/. ${financialTotals.advancePayment}`
-                        : 'A coordinar por WhatsApp'}
-                    </span>
-                  </div>
-                  {financialTotals.balanceRemaining > 0 && (
-                    <div className="flex justify-between items-center text-[11px] text-[#111111]/60">
-                      <span>Saldo al concluir atención (60%):</span>
-                      <span>S/. {financialTotals.balanceRemaining}</span>
-                    </div>
-                  )}
-                  <p className="text-[10px] text-[#111111]/60 italic pt-1 border-t border-[#5E765E]/10">
-                    * Movilidad sujeta a coordinación según distrito en Lima. La reserva se sella con el abono del 40%.
-                  </p>
-                </div>
-              </div>
-
-              {/* Yape Ana Díaz Quick Payment Card */}
-              <div className="bg-[#FFFDF9] rounded-2xl p-4 border border-[#722282]/30 max-w-lg mx-auto text-left space-y-2.5">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#722282] animate-pulse" />
-                    <span className="text-xs font-bold text-[#111111]">
-                      Adelanto con Yape al Yape de Ana Díaz
-                    </span>
-                  </div>
-                  <span className="text-xs font-bold text-[#722282]">
-                    S/. {financialTotals.advancePayment} (40%)
-                  </span>
-                </div>
-                <div className="flex items-center justify-between bg-white p-2.5 rounded-xl border border-[#722282]/15 text-xs">
+              {/* Mandatory WhatsApp Guidance Box while Manual Yape is active */}
+              <div className="p-4 rounded-2xl bg-[#25D366]/10 border-2 border-[#25D366]/45 max-w-lg mx-auto text-left space-y-3">
+                <div className="flex items-start gap-3">
+                  <MessageCircle className="w-5 h-5 text-[#1A8D45] shrink-0 mt-0.5" />
                   <div>
-                    <span className="text-[10px] text-[#111111]/60 block">Titular: <strong>Ana María Díaz (Ana Díaz)</strong></span>
-                    <span className="font-mono font-bold text-[#722282]">993 067 291</span>
+                    <h4 className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+                      Último Paso Importante: Envía tu Ficha por WhatsApp
+                    </h4>
+                    <p className="text-[11px] text-[#111111]/80 leading-relaxed mt-1">
+                      Para que <strong>Ana Díaz</strong> valide tu abono del 40% (Yape <strong>993 067 291</strong>) y mantenga comunicación directa contigo antes de tu cita, envía ahora tu ficha prellenada por WhatsApp:
+                    </p>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleCopyYapeNumber}
-                    className="px-2.5 py-1 rounded-lg bg-[#722282]/10 hover:bg-[#722282]/20 text-[#722282] text-[11px] font-bold transition-all inline-flex items-center gap-1 cursor-pointer"
-                  >
-                    {isYapeCopied ? (
-                      <>
-                        <Check className="w-3 h-3 text-[#5E765E]" />
-                        <span>¡Copiado!</span>
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>Copiar Número</span>
-                      </>
-                    )}
-                  </button>
                 </div>
-                <p className="text-[10px] text-[#111111]/65 font-light">
-                  Abona el 40% de adelanto y comparte la captura de pantalla por WhatsApp para confirmar tu espacio en la agenda.
-                </p>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-lg mx-auto">
                 <a
                   id="btn-confirm-send-whatsapp"
                   href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  onClick={() => triggerBookingConversion()}
-                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-6 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
+                  className="w-full inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#1EB858] text-white px-6 py-4 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg transition-all cursor-pointer"
                 >
                   <MessageCircle className="w-4 h-4 fill-white" />
-                  <span>Enviar por WhatsApp a Ana Díaz</span>
+                  <span>Enviar Ficha &amp; Comprobante por WhatsApp</span>
                 </a>
+              </div>
 
+              {/* Consolidated Receipt */}
+              <div className="theme-card-surface rounded-2xl p-5 text-left text-xs font-['Montserrat',sans-serif] space-y-3 max-w-lg mx-auto">
+                <div className="flex items-center justify-between border-b border-[#5E765E]/15 pb-2.5">
+                  <span className="text-[11px] uppercase tracking-wider font-bold text-[#5E765E]">
+                    Constancia {confirmedBookingCode}
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FFF2DE] border border-[#D5A688]/40 text-[#9A6342] font-semibold">
+                    {scheduleConfig.paymentMode === 'gateway_checkout'
+                      ? 'Validación Online'
+                      : yapeOperationCode.trim()
+                        ? `Yape #${yapeOperationCode.trim()}`
+                        : 'Pendiente de abono'}
+                  </span>
+                </div>
+
+                <div className="space-y-1.5 text-[#111111]">
+                  {financialTotals.itemsDetailed.map((it, idx) => (
+                    <div key={it.instanceId} className="flex justify-between items-start gap-3">
+                      <span className="font-medium">
+                        {idx + 1}. {it.service.name}
+                        {it.optionLabel ? ` (${it.optionLabel})` : ''}
+                      </span>
+                      <span className="font-bold text-[#5E765E] shrink-0">{it.formattedPrice}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2.5 border-t border-[#5E765E]/15 space-y-1 text-[11px]">
+                  <p>
+                    <strong>Clienta:</strong> {clientName} ({clientPhone})
+                  </p>
+                  <p>
+                    <strong>Modalidad:</strong>{' '}
+                    {isStudio ? `Estudio (${SPA_INFO.studioAddress})` : `Domicilio • ${district} ${address ? `(${address})` : ''}`}
+                  </p>
+                  <p>
+                    <strong>Total:</strong> S/ {financialTotals.totalPrice} •{' '}
+                    <strong className="text-[#5E765E]">Adelanto 40%: S/ {financialTotals.advancePayment}</strong>
+                  </p>
+                </div>
+              </div>
+
+              {/* Download / Print / Copy Row */}
+              <div className="flex flex-wrap items-center justify-center gap-2.5 max-w-lg mx-auto">
+                <button
+                  type="button"
+                  onClick={handleDownloadReceipt}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-semibold cursor-pointer"
+                >
+                  <Download className="w-3.5 h-3.5 text-[#5E765E]" />
+                  <span>Descargar Constancia</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-semibold cursor-pointer"
+                >
+                  <Printer className="w-3.5 h-3.5 text-[#5E765E]" />
+                  <span>Imprimir</span>
+                </button>
                 <button
                   type="button"
                   onClick={handleCopySummary}
-                  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-3.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-semibold cursor-pointer"
                 >
                   {isCopied ? (
                     <>
-                      <Check className="w-4 h-4 text-[#5E765E]" />
+                      <Check className="w-3.5 h-3.5 text-[#5E765E]" />
                       <span>Copiado</span>
                     </>
                   ) : (
                     <>
-                      <Copy className="w-4 h-4 text-[#5E765E]" />
-                      <span>Copiar Texto</span>
+                      <Copy className="w-3.5 h-3.5 text-[#5E765E]" />
+                      <span>Copiar Ficha</span>
                     </>
                   )}
-                </button>
-              </div>
-
-              <div className="pt-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsSubmitted(false);
-                    setCurrentStep(1);
-                  }}
-                  className="inline-flex items-center gap-1.5 text-xs text-[#5E765E] hover:underline font-medium cursor-pointer"
-                >
-                  <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Modificar servicios o datos de la reserva</span>
                 </button>
               </div>
             </div>
           ) : (
             <div>
-              {/* =========================================================================
-                 ETAPA 1: SERVICIOS A AGENDAR (CON INTEGRACIÓN DE MÚLTIPLES SERVICIOS)
-                 ========================================================================= */}
+              {/* STEP 1: SERVICES */}
               {currentStep === 1 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 pb-1 border-b border-[#5E765E]/15">
                     <div>
                       <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                        Fase 1 de 3: Selección de Servicios
+                        Paso 1 de 4: Selección de Servicios
                       </span>
                       <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
                         ¿Qué tratamientos deseas agendar?
                       </h3>
                     </div>
                     <span className="text-[11px] text-[#5E765E] font-medium bg-[#5E765E]/10 px-3 py-1 rounded-full self-start sm:self-auto">
-                      {financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'} en tu cita
+                      {financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'}
                     </span>
                   </div>
 
-                  {/* List of currently selected services */}
                   <div className="space-y-3">
                     {selectedServices.map((item) => {
                       const { service, formattedPrice } = getItemDetails(item);
 
                       return (
-                        <div
-                          key={item.instanceId}
-                          className="theme-card-surface p-4 rounded-2xl space-y-3"
-                        >
+                        <div key={item.instanceId} className="theme-card-surface p-4 rounded-2xl space-y-3">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
-
-                              {/* Dropdown to change this specific service */}
+                              <label htmlFor={`srv-select-${item.instanceId}`} className="sr-only">
+                                Seleccionar servicio
+                              </label>
                               <select
+                                id={`srv-select-${item.instanceId}`}
                                 value={item.serviceId}
                                 onChange={(e) => handleUpdateServiceId(item.instanceId, e.target.value)}
                                 className="w-full text-xs font-semibold text-[#111111] bg-transparent border-0 border-b border-[#5E765E]/20 py-1 focus:outline-none focus:border-[#5E765E] cursor-pointer"
                               >
                                 {CATALOG_SERVICES.map((srv) => (
                                   <option key={srv.id} value={srv.id}>
-                                    {srv.name} — {srv.priceNote || (srv.pricePEN ? `S/. ${srv.pricePEN}` : srv.priceOptions?.[0]?.pricePEN ? `Desde S/. ${srv.priceOptions[0].pricePEN}` : 'Bajo pedido')}
+                                    {srv.name} —{' '}
+                                    {srv.priceNote ||
+                                      (srv.pricePEN
+                                        ? `S/. ${srv.pricePEN}`
+                                        : srv.priceOptions?.[0]?.pricePEN
+                                          ? `Desde S/. ${srv.priceOptions[0].pricePEN}`
+                                          : 'Bajo pedido')}
                                   </option>
                                 ))}
                               </select>
@@ -977,13 +971,11 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                               <span className="text-sm sm:text-base font-bold text-[#5E765E] font-['Montserrat',sans-serif]">
                                 {formattedPrice}
                               </span>
-
                               {selectedServices.length > 1 && (
                                 <button
                                   type="button"
                                   onClick={() => handleRemoveService(item.instanceId)}
                                   className="w-7 h-7 rounded-full text-red-500 hover:bg-red-50 flex items-center justify-center transition-colors cursor-pointer"
-                                  title="Quitar este servicio"
                                   aria-label={`Quitar ${service.name}`}
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />
@@ -992,7 +984,6 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                             </div>
                           </div>
 
-                          {/* Variant / Option selector if available */}
                           {service.priceOptions && service.priceOptions.length > 0 && (
                             <div className="pt-2 border-t border-[#5E765E]/10 space-y-1.5">
                               <span className="block text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]/90">
@@ -1006,13 +997,19 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                                     onClick={() => handleUpdateOptionIndex(item.instanceId, optIdx)}
                                     className={`p-2 rounded-lg text-left text-xs border transition-all cursor-pointer ${
                                       item.optionIndex === optIdx
-                                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-medium shadow-2xs'
+                                        ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-medium'
                                         : 'bg-[#FFF2DE]/40 text-[#111111] border-[#5E765E]/15 hover:border-[#5E765E]/30'
                                     }`}
                                   >
                                     <div className="flex justify-between items-center text-[11px]">
                                       <span>{opt.label}</span>
-                                      <span className={item.optionIndex === optIdx ? 'text-[#D5A688] font-bold' : 'text-[#5E765E] font-bold'}>
+                                      <span
+                                        className={
+                                          item.optionIndex === optIdx
+                                            ? 'text-[#D5A688] font-bold'
+                                            : 'text-[#5E765E] font-bold'
+                                        }
+                                      >
                                         S/. {opt.pricePEN}
                                       </span>
                                     </div>
@@ -1022,15 +1019,10 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                             </div>
                           )}
 
-                          {/* Specific Service Note Callout inside item card */}
                           {service.note && (
-                            <div className="pt-2 border-t border-[#5E765E]/10">
-                              <div className="p-2.5 rounded-xl bg-[#FFF2DE]/90 border border-[#D5A688]/40 text-[11px] text-[#111111]/85 flex items-start gap-2">
-                                <AlertCircle className="w-3.5 h-3.5 text-[#D5A688] shrink-0 mt-0.5" />
-                                <span className="leading-snug">
-                                  <strong className="text-[#5E765E] font-semibold">Nota:</strong> {service.note}
-                                </span>
-                              </div>
+                            <div className="p-2.5 rounded-xl bg-[#FFF2DE]/90 border border-[#D5A688]/40 text-[11px] text-[#111111]/85 flex items-start gap-2">
+                              <AlertCircle className="w-3.5 h-3.5 text-[#9A6342] shrink-0 mt-0.5" />
+                              <span className="leading-snug">{service.note}</span>
                             </div>
                           )}
                         </div>
@@ -1038,52 +1030,21 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                     })}
                   </div>
 
-                  {/* Highlights / Special Notes for Selected Services */}
-                  {selectedServices.some((s) => s.serviceId === 'manos-extension-esculpida') && (
-                    <div className="p-3.5 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/50 text-xs text-[#111111] flex items-start gap-2.5 shadow-2xs">
-                      <AlertCircle className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
-                      <div className="leading-relaxed">
-                        <strong className="text-[#5E765E] font-semibold block mb-0.5">
-                          Extensión de Uña Esculpida (S/ 180):
-                        </strong>
-                        <span>
-                          El precio puede variar dependiendo del largo seleccionado y el diseño en cuestión.
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {selectedServices.some((s) => s.serviceId === 'manos-press-on-nails') && (
-                    <div className="p-3.5 rounded-2xl bg-[#FFF8FA] border border-[#722282]/25 text-xs text-[#111111] flex items-start gap-2.5 shadow-2xs">
-                      <Sparkles className="w-4 h-4 text-[#722282] shrink-0 mt-0.5" />
-                      <div className="leading-relaxed">
-                        <strong className="text-[#722282] font-semibold block mb-0.5">
-                          Press On Nails (Bajo Pedido):
-                        </strong>
-                        <span>
-                          Cada set se elabora de manera personalizada bajo pedido y se debe realizar coordinación directa por WhatsApp (envío de medidas y referencias de diseño).
-                        </span>
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Add another service section */}
                   {showAddServiceBox ? (
-                    <div className="p-4 rounded-2xl bg-white border border-[#5E765E]/30 shadow-sm space-y-3 animate-fade-in">
+                    <div className="p-4 rounded-2xl bg-white border border-[#5E765E]/30 shadow-sm space-y-3">
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold uppercase tracking-wider text-[#5E765E]">
-                          + Selecciona otro servicio para añadir:
+                          + Añadir otro servicio:
                         </span>
                         <button
                           type="button"
                           onClick={() => setShowAddServiceBox(false)}
-                          className="text-xs text-[#111111]/50 hover:text-[#111111]"
+                          className="text-xs text-[#111111]/60 hover:text-[#111111] cursor-pointer"
                         >
                           Cancelar
                         </button>
                       </div>
 
-                      {/* Category quick tabs */}
                       <div className="flex items-center gap-1 overflow-x-auto pb-1 scrollbar-none text-[10px]">
                         {CATEGORIES_DATA.map((cat) => (
                           <button
@@ -1093,12 +1054,10 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                               setAddCategoryFilter(cat.id);
 
                               const match = CATALOG_SERVICES.find(
-                                (s) => cat.id === 'todos' || s.category === cat.id
+                                (s) => cat.id === 'todos' || s.category === cat.id,
                               );
 
-                              if (match) {
-                                setServiceToAddId(match.id);
-                              }
+                              if (match) setServiceToAddId(match.id);
                             }}
                             className={`px-2.5 py-1 rounded-full whitespace-nowrap transition-colors cursor-pointer ${
                               addCategoryFilter === cat.id
@@ -1111,21 +1070,22 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                         ))}
                       </div>
 
-                      {/* Service selector */}
                       <select
                         value={serviceToAddId}
                         onChange={(e) => setServiceToAddId(e.target.value)}
                         className="w-full px-3 py-2.5 rounded-xl border border-[#5E765E]/20 text-xs text-[#111111] bg-white focus:outline-none focus:border-[#5E765E]"
                       >
-                        {availableServicesToAdd.map((srv) => {
-                          const priceDisplay = srv.priceNote || (srv.pricePEN ? `S/. ${srv.pricePEN}` : srv.priceOptions?.[0]?.pricePEN ? `Desde S/. ${srv.priceOptions[0].pricePEN}` : 'Bajo pedido');
-
-                          return (
-                            <option key={srv.id} value={srv.id}>
-                              {srv.name} — {priceDisplay}
-                            </option>
-                          );
-                        })}
+                        {availableServicesToAdd.map((srv) => (
+                          <option key={srv.id} value={srv.id}>
+                            {srv.name} —{' '}
+                            {srv.priceNote ||
+                              (srv.pricePEN
+                                ? `S/. ${srv.pricePEN}`
+                                : srv.priceOptions?.[0]?.pricePEN
+                                  ? `Desde S/. ${srv.priceOptions[0].pricePEN}`
+                                  : 'Bajo pedido')}
+                          </option>
+                        ))}
                       </select>
 
                       <button
@@ -1143,69 +1103,53 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                       className="w-full py-3 px-4 rounded-2xl border-2 border-dashed border-[#5E765E]/30 hover:border-[#5E765E] bg-white/60 hover:bg-white text-[#5E765E] text-xs font-semibold flex items-center justify-center gap-2 transition-all cursor-pointer"
                     >
                       <Plus className="w-4 h-4 text-[#D5A688]" />
-                      <span>+ Agregar otro servicio a la cita (Manicure, Masaje, Facial, etc.)</span>
+                      <span>Agregar otro servicio a la cita</span>
                     </button>
                   )}
 
-                  {/* Summary Bar & Navigation */}
                   <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
                     <div className="text-left w-full sm:w-auto">
                       <div className="flex items-baseline gap-2">
                         <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider font-semibold">
-                          Subtotal Servicios:
+                          Subtotal:
                         </span>
                         <span className="text-lg font-bold font-['Montserrat',sans-serif] text-[#5E765E]">
-                          {financialTotals.hasUnpriced
-                            ? financialTotals.totalPrice > 0
-                              ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
-                              : 'A cotizar bajo pedido'
-                            : `S/. ${financialTotals.totalPrice}`}
+                          S/. {financialTotals.totalPrice}
                         </span>
                       </div>
                       <span className="text-[11px] text-[#5E765E] font-medium block">
-                        {financialTotals.advancePayment > 0 ? (
-                          <>
-                            Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
-                          </>
-                        ) : (
-                          <>
-                            Adelanto: <strong>A coordinar por WhatsApp</strong>
-                          </>
-                        )}
+                        Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
                       </span>
                     </div>
 
                     <button
                       type="button"
                       onClick={handleProceedToStep2}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      className="meraki-btn-fluid w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-bold uppercase tracking-[0.16em] shadow-md cursor-pointer"
                     >
-                      <span>Continuar a Modalidad &amp; Fecha</span>
+                      <span>Continuar a Modalidad &amp; Agenda</span>
                       <ArrowRight className="w-4 h-4 text-[#D5A688]" />
                     </button>
                   </div>
                 </div>
               )}
 
-              {/* =========================================================================
-                 ETAPA 2: MODALIDAD, LUGAR Y FECHA/HORARIO
-                 ========================================================================= */}
+              {/* STEP 2: MODALITY, GEO LOGISTICS & 06:00-20:00 REAL-TIME AGENDA */}
               {currentStep === 2 && (
                 <div className="space-y-5 animate-fade-in">
                   <div className="pb-1 border-b border-[#5E765E]/15">
                     <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                      Fase 2 de 3: Logística &amp; Agenda
+                      Paso 2 de 4: Modalidad &amp; Agenda Inteligente
                     </span>
                     <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
-                      ¿Dónde y cuándo te gustaría atenderte?
+                      ¿Dónde y en qué bloque horario (06:00 – 20:00)?
                     </h3>
                   </div>
 
-                  {/* Modalidad selector: Estudio vs Casa vs Trabajo */}
                   <div className="space-y-3">
-                    <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
+                    <span className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
                       Modalidad de Atención
-                    </label>
+                    </span>
 
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                       <button
@@ -1214,10 +1158,10 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                           setLocationType('estudio');
                           setDistrict('Pueblo Libre');
                         }}
-                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        className={`py-3 px-3 rounded-xl text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer ${
                           locationType === 'estudio'
-                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111]'
                         }`}
                       >
                         <MapPin className="w-4 h-4 text-[#D5A688]" />
@@ -1226,11 +1170,15 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
                       <button
                         type="button"
-                        onClick={() => setLocationType('casa')}
-                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        onClick={() => {
+                          setLocationType('casa');
+
+                          if (district === 'Pueblo Libre') setDistrict('Miraflores');
+                        }}
+                        className={`py-3 px-3 rounded-xl text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer ${
                           locationType === 'casa'
-                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111]'
                         }`}
                       >
                         <HomeIcon className="w-4 h-4 text-[#D5A688]" />
@@ -1239,11 +1187,15 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
 
                       <button
                         type="button"
-                        onClick={() => setLocationType('trabajo')}
-                        className={`py-3 px-3 rounded-xl text-xs font-['Montserrat',sans-serif] border transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                        onClick={() => {
+                          setLocationType('trabajo');
+
+                          if (district === 'Pueblo Libre') setDistrict('San Isidro');
+                        }}
+                        className={`py-3 px-3 rounded-xl text-xs border transition-all flex items-center justify-center gap-2 cursor-pointer ${
                           locationType === 'trabajo'
-                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold shadow-2xs'
-                            : 'bg-white border-[#5E765E]/20 text-[#111111] hover:bg-white/80'
+                            ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] font-semibold'
+                            : 'bg-white border-[#5E765E]/20 text-[#111111]'
                         }`}
                       >
                         <Building className="w-4 h-4 text-[#D5A688]" />
@@ -1251,133 +1203,174 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                       </button>
                     </div>
 
-                    {locationType === 'estudio' ? (
-                      /* Studio details */
+                    {isStudio ? (
                       <div className="bg-[#5E765E]/10 border border-[#5E765E]/25 rounded-2xl p-4 flex items-start gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shrink-0">
-                          <MapPin className="w-5 h-5 text-[#D5A688]" />
-                        </div>
-                        <div className="text-left flex-1">
-                          <div className="flex items-center justify-between flex-wrap gap-1">
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#5E765E]">
-                              Sede Principal Meraki
-                            </span>
-                            <span className="text-[10px] bg-[#5E765E]/15 text-[#5E765E] font-semibold px-2 py-0.5 rounded-full">
-                              Sin costo de movilidad
-                            </span>
-                          </div>
-                          <p className="text-xs font-semibold text-[#111111] mt-1">
-                            Calle Agustín Gamarra 515, Pueblo Libre, Lima
-                          </p>
+                        <MapPin className="w-5 h-5 text-[#5E765E] shrink-0 mt-0.5" />
+                        <div className="text-left text-xs">
+                          <p className="font-semibold text-[#111111]">{SPA_INFO.studioAddress}</p>
                           <p className="text-[11px] text-[#111111]/70 font-light mt-0.5">
-                            Ambiente privado, relajante y equipado con instrumental esterilizado de grado profesional.
+                            Sin costo adicional de movilidad • Cabina privada biosegura.
                           </p>
                         </div>
                       </div>
                     ) : (
-                      /* Home or Office inputs */
-                      <div className="space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                          <div>
-                            <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                              Distrito en Lima *
-                            </label>
-                            <select
-                              value={district}
-                              onChange={(e) => setDistrict(e.target.value)}
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                              required
-                            >
-                              {LIMA_DISTRICTS.map((d) => (
-                                <option key={d} value={d}>
-                                  {d}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          <div>
-                            <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold">
-                              Dirección o Referencia
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="Calle, nro, dpto o referencia..."
-                              value={address}
-                              onChange={(e) => setAddress(e.target.value)}
-                              className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                            />
-                          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label
+                            htmlFor="booking-district"
+                            className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold"
+                          >
+                            Distrito en Lima *
+                          </label>
+                          <select
+                            id="booking-district"
+                            value={district}
+                            onChange={(e) => setDistrict(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
+                          >
+                            {LIMA_DISTRICT_NAMES.map((d) => (
+                              <option key={d} value={d}>
+                                {d}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
-                        <div className="flex items-center gap-2 text-[11px] text-[#5E765E] bg-white/60 p-2.5 rounded-xl border border-[#5E765E]/15">
-                          <MapPin className="w-4 h-4 shrink-0 text-[#D5A688]" />
-                          <span>
-                            El costo de movilidad se calcula de forma transparente según tu distrito y se coordina vía WhatsApp.
-                          </span>
+                        <div>
+                          <label
+                            htmlFor="booking-address"
+                            className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold"
+                          >
+                            Dirección o Referencia
+                          </label>
+                          <input
+                            id="booking-address"
+                            type="text"
+                            placeholder="Calle, número, dpto o referencia..."
+                            value={address}
+                            onChange={(e) => setAddress(e.target.value)}
+                            className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
+                          />
                         </div>
                       </div>
                     )}
                   </div>
 
-                  {/* Date and Time */}
+                  {/* Date & Real-Time Smart Slots (06:00 - 20:00 ONLY) */}
                   <div className="border-t border-[#5E765E]/15 pt-4 space-y-3">
-                    <label className="block text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                      Fecha y Horario Sugerido
-                    </label>
+                    <div className="flex items-center justify-between">
+                      <label
+                        htmlFor="booking-date"
+                        className="text-xs font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E] flex items-center gap-1.5"
+                      >
+                        <Calendar className="w-3.5 h-3.5" />
+                        <span>Fecha de Atención *</span>
+                      </label>
+                      {loadingAgenda && (
+                        <span className="text-[11px] text-[#5E765E]">Verificando agenda...</span>
+                      )}
+                    </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
-                          <Calendar className="w-3.5 h-3.5 text-[#5E765E]" />
-                          <span>Fecha deseada *</span>
-                        </label>
-                        <input
-                          type="date"
-                          value={date}
-                          min={new Date().toISOString().split('T')[0]}
-                          onChange={(e) => setDate(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                          required
-                        />
+                    <input
+                      id="booking-date"
+                      type="date"
+                      value={date}
+                      min={todayIso}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
+                      required
+                    />
+
+                    <div>
+                      <span className="block text-[10px] text-[#111111]/75 uppercase tracking-wider mb-2 font-semibold flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-[#5E765E]" />
+                        <span>Horarios Disponibles (06:00 a 20:00 hrs)</span>
+                      </span>
+
+                      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+                        {slotEvaluations.map((ev) => {
+                          const isSelected = timeSlot === ev.timeSlot && ev.available;
+
+                          return (
+                            <button
+                              key={ev.timeSlot}
+                              type="button"
+                              disabled={!ev.available}
+                              onClick={() => setTimeSlot(ev.timeSlot)}
+                              title={ev.reasonText}
+                              className={`py-2.5 px-2 rounded-xl text-xs font-semibold border transition-all flex flex-col items-center justify-center gap-0.5 ${
+                                !ev.available
+                                  ? 'bg-stone-200/70 border-stone-300/60 text-stone-400 cursor-not-allowed line-through'
+                                  : isSelected
+                                    ? 'bg-[#5E765E] text-[#FFF2DE] border-[#5E765E] shadow-sm cursor-pointer'
+                                    : 'bg-white text-[#111111] border-[#5E765E]/25 hover:border-[#5E765E] cursor-pointer'
+                              }`}
+                            >
+                              <span>{ev.timeSlot}</span>
+                              <span
+                                className={`text-[9px] font-normal ${
+                                  !ev.available
+                                    ? 'text-stone-400 no-underline'
+                                    : isSelected
+                                      ? 'text-[#D5A688]'
+                                      : 'text-[#5E765E]'
+                                }`}
+                              >
+                                {!ev.available
+                                  ? 'No disp.'
+                                  : ev.isConditionalBonus
+                                    ? 'Ruta cercana'
+                                    : 'Disponible'}
+                              </span>
+                            </button>
+                          );
+                        })}
                       </div>
 
-                      <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-[#5E765E]" />
-                          <span>Horario sugerido *</span>
-                        </label>
-                        <select
-                          value={timeSlot}
-                          onChange={(e) => setTimeSlot(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
-                          required
-                        >
-                          {TIME_SLOTS.map((slot) => (
-                            <option key={slot} value={slot}>
-                              {slot} hrs
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+                      {/* Smart guidance when selected/any slot triggers geo or minimum ticket policy */}
+                      {selectedSlotEval && !selectedSlotEval.available && (
+                        <div className="mt-3 p-3 rounded-xl bg-amber-50 border border-amber-200 text-[11px] text-amber-900 space-y-2">
+                          <p>{selectedSlotEval.reasonText}</p>
+                          {!isStudio && selectedSlotEval.reasonCode === 'low_ticket_distant' && (
+                            <div className="flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setLocationType('estudio');
+                                  setDistrict('Pueblo Libre');
+                                }}
+                                className="px-3 py-1.5 rounded-lg bg-[#5E765E] text-white font-semibold cursor-pointer"
+                              >
+                                Cambiar a Estudio (Pueblo Libre)
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCurrentStep(1)}
+                                className="px-3 py-1.5 rounded-lg bg-white border border-amber-300 text-amber-950 font-semibold cursor-pointer"
+                              >
+                                Agregar otro tratamiento
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  {/* Navigation Buttons */}
                   <div className="pt-4 border-t border-[#5E765E]/15 flex items-center justify-between gap-3">
                     <button
                       type="button"
                       onClick={() => setCurrentStep(1)}
-                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider cursor-pointer"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
-                      <span>Volver a Servicios</span>
+                      <span>Volver</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleProceedToStep3}
-                      className="inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      className="meraki-btn-fluid inline-flex items-center gap-2 px-7 py-3 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-bold uppercase tracking-[0.16em] shadow-md cursor-pointer"
                     >
                       <span>Continuar a Tus Datos</span>
                       <ArrowRight className="w-4 h-4 text-[#D5A688]" />
@@ -1386,378 +1379,270 @@ export function BookingModal({ isOpen, onClose, preselectedServiceId }: BookingM
                 </div>
               )}
 
-              {/* =========================================================================
-                 ETAPA 3: DATOS DE CONTACTO Y CONFIRMACIÓN
-                 ========================================================================= */}
-              {/* =========================================================================
-                 ETAPA 3: DATOS DE CONTACTO
-                 ========================================================================= */}
+              {/* STEP 3: CLIENT CONTACT & MANDATORY PRIVACY CONSENT */}
               {currentStep === 3 && (
                 <form onSubmit={handleProceedToStep4} className="space-y-5 animate-fade-in">
                   <div className="pb-1 border-b border-[#5E765E]/15">
                     <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-wider text-[#5E765E]">
-                      Fase 3 de 4: Tus Datos de Contacto
+                      Paso 3 de 4: Tus Datos y Consentimiento
                     </span>
                     <h3 className="font-['Cormorant_Garamond',serif] text-xl sm:text-2xl font-normal text-[#111111]">
-                      Ingresa tus datos para coordinar
+                      Ingresa tus datos para emitir tu ficha de reserva
                     </h3>
                   </div>
 
-                  {/* Mini-Review Box of Chosen Plan */}
-                  <div className="p-3.5 rounded-2xl bg-white/80 border border-[#5E765E]/20 text-xs space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-white/80 border border-[#5E765E]/20 text-xs space-y-1">
                     <div className="flex items-center justify-between text-[#5E765E] font-bold uppercase text-[10px] tracking-wider border-b border-[#5E765E]/10 pb-1.5">
-                      <span>Cita: {financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'}</span>
+                      <span>Cita: {financialTotals.count} servicios</span>
                       <span>Total: S/. {financialTotals.totalPrice}</span>
                     </div>
-                    <div className="text-[11px] text-[#111111]/80 space-y-0.5">
-                      <p>
-                        <strong className="text-[#111111]">Modalidad:</strong>{' '}
-                        {locationType === 'estudio' ? 'Estudio (Pueblo Libre)' : `A Domicilio (${district})`} •{' '}
-                        <strong className="text-[#111111]">Fecha:</strong> {date} ({timeSlot} hrs)
-                      </p>
-                    </div>
+                    <p className="text-[11px] text-[#111111]/80 pt-1">
+                      <strong>Modalidad:</strong> {isStudio ? 'Estudio (Pueblo Libre)' : `Domicilio (${district})`} •{' '}
+                      <strong>Fecha:</strong> {date} ({timeSlot} hrs)
+                    </p>
                   </div>
 
-                  {/* Contact Inputs */}
                   <div className="space-y-3">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                        <label
+                          htmlFor="booking-name"
+                          className="block text-[10px] text-[#111111]/75 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5"
+                        >
                           <User className="w-3.5 h-3.5 text-[#5E765E]" />
                           <span>Nombre y Apellidos *</span>
                         </label>
                         <input
+                          id="booking-name"
                           type="text"
                           placeholder="Tu nombre completo"
                           value={clientName}
                           onChange={(e) => setClientName(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
                           required
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                        <label
+                          htmlFor="booking-phone"
+                          className="block text-[10px] text-[#111111]/75 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5"
+                        >
                           <Phone className="w-3.5 h-3.5 text-[#5E765E]" />
                           <span>WhatsApp / Celular *</span>
                         </label>
                         <input
+                          id="booking-phone"
                           type="tel"
                           placeholder="ej: 993 067 291"
                           value={clientPhone}
                           onChange={(e) => setClientPhone(e.target.value)}
-                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
                           required
                         />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                      <label
+                        htmlFor="booking-email"
+                        className="block text-[10px] text-[#111111]/75 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5"
+                      >
                         <Mail className="w-3.5 h-3.5 text-[#5E765E]" />
-                        <span>Correo Electrónico (opcional)</span>
+                        <span>Correo Electrónico (recibe tu constancia automática)</span>
                       </label>
                       <input
+                        id="booking-email"
                         type="email"
                         placeholder="tu-correo@ejemplo.com"
                         value={clientEmail}
                         onChange={(e) => setClientEmail(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-[10px] text-[#111111]/70 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5">
+                      <label
+                        htmlFor="booking-notes"
+                        className="block text-[10px] text-[#111111]/75 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1.5"
+                      >
                         <FileText className="w-3.5 h-3.5 text-[#5E765E]" />
-                        <span>Observaciones / Requerimientos especiales</span>
+                        <span>Observaciones / Alergias</span>
                       </label>
                       <textarea
+                        id="booking-notes"
                         rows={2}
-                        placeholder="Retiro de sistema acrílico previo, alergias, tipo de piel o indicaciones especiales..."
+                        placeholder="Retiro de sistema previo, alergias o detalles adicionales..."
                         value={specialNotes}
                         onChange={(e) => setSpecialNotes(e.target.value)}
-                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs font-['Montserrat',sans-serif] focus:outline-none focus:border-[#5E765E]"
+                        className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#5E765E]/20 text-[#111111] text-xs focus:outline-none focus:border-[#5E765E]"
                       />
+                    </div>
+
+                    <div className="p-3 rounded-xl bg-white/90 border border-[#5E765E]/20 flex items-start gap-2.5">
+                      <input
+                        id="booking-privacy"
+                        type="checkbox"
+                        checked={privacyAccepted}
+                        onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                        className="mt-0.5 rounded border-[#5E765E]/40 text-[#5E765E]"
+                      />
+                      <label htmlFor="booking-privacy" className="text-[11px] text-[#111111]/80 leading-relaxed">
+                        He leído y acepto la{' '}
+                        <Link to="/privacy" target="_blank" className="underline text-[#5E765E] font-semibold">
+                          Política de Privacidad
+                        </Link>{' '}
+                        y las{' '}
+                        <Link
+                          to="/privacy#terminos-cancelaciones"
+                          target="_blank"
+                          className="underline text-[#5E765E] font-semibold"
+                        >
+                          Condiciones de Reserva y Cancelación (24h)
+                        </Link>
+                        .
+                      </label>
                     </div>
                   </div>
 
-                  {/* Submission Row with financial note */}
                   <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setCurrentStep(2)}
-                        className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
-                      >
-                        <ArrowLeft className="w-3.5 h-3.5" />
-                        <span>Volver</span>
-                      </button>
-
-                      <div className="text-left">
-                        <span className="text-[10px] text-[#111111]/70 uppercase tracking-wider block font-semibold">
-                          Total:{' '}
-                          {financialTotals.hasUnpriced
-                            ? financialTotals.totalPrice > 0
-                              ? `S/. ${financialTotals.totalPrice} (+ bajo pedido)`
-                              : 'A cotizar bajo pedido'
-                            : `S/. ${financialTotals.totalPrice}`}
-                        </span>
-                        <span className="text-[11px] text-[#5E765E] font-medium block">
-                          {financialTotals.advancePayment > 0 ? (
-                            <>
-                              Adelanto 40%: <strong>S/. {financialTotals.advancePayment}</strong>
-                            </>
-                          ) : (
-                            <>
-                              Adelanto: <strong>A coordinar por WhatsApp</strong>
-                            </>
-                          )}
-                        </span>
-                      </div>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setCurrentStep(2)}
+                      className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider cursor-pointer"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Volver</span>
+                    </button>
 
                     <button
                       type="submit"
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-[0.16em] shadow-md hover:shadow-lg transition-all cursor-pointer"
+                      className="meraki-btn-fluid w-full sm:w-auto inline-flex items-center justify-center gap-2 px-8 py-3.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-bold uppercase tracking-[0.16em] shadow-md cursor-pointer"
                     >
-                      <span>Continuar a Cómo Reservar y Pago</span>
+                      <span>Revisar Adelanto y Confirmar</span>
                       <ArrowRight className="w-4 h-4 text-[#D5A688]" />
                     </button>
-                  </div>
-
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[10px] text-[#111111]/60 pt-1">
-                    <div className="flex items-center gap-1.5">
-                      <ShieldCheck className="w-3.5 h-3.5 text-[#5E765E] shrink-0" />
-                      <span>
-                        Tus datos se usan exclusivamente para la coordinación directa de tu cita.
-                      </span>
-                    </div>
-                    <a
-                      href="/privacy"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="underline hover:text-[#5E765E] transition-colors"
-                    >
-                      Políticas &amp; Privacidad
-                    </a>
                   </div>
                 </form>
               )}
 
-              {/* =========================================================================
-                 ETAPA 4: CÓMO RESERVAR, ENVÍO DEL MENSAJE Y ADELANTO YAPE A ANA DÍAZ
-                 ========================================================================= */}
+              {/* STEP 4: WEB REGISTRATION + DECOUPLED PAYMENT ADAPTER */}
               {currentStep === 4 && (
                 <div className="space-y-5 animate-fade-in text-left">
                   <div className="pb-2 border-b border-[#5E765E]/15">
                     <span className="text-[10px] font-['Montserrat',sans-serif] uppercase font-bold tracking-[0.2em] text-[#5E765E] block mb-1">
-                      Fase 4 de 4: Cómo Reservar Correctamente
+                      Paso 4 de 4: Confirmación Directa &amp; Adelanto del 40%
                     </span>
                     <h3 className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl font-normal text-[#111111]">
-                      Pasos Sencillos para Asegurar tu Cita
+                      Finaliza tu Reserva
                     </h3>
-                    <p className="font-['Montserrat',sans-serif] text-xs font-light text-[#111111]/75 mt-0.5">
-                      Sigue estas 4 sencillas pautas para formalizar tu experiencia en Meraki Spa:
-                    </p>
                   </div>
 
-                  {/* 4 Process Guidance Cards */}
-                  <div className="space-y-3 font-['Montserrat',sans-serif]">
-                    {/* Paso 1: Envío por WhatsApp */}
-                    <div className="bg-white rounded-2xl p-4 border border-[#5E765E]/15 shadow-sm flex items-start gap-3.5">
-                      <div className="w-8 h-8 rounded-full bg-[#25D366]/15 text-[#25D366] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                        1
+                  {/* Decoupled Payment Mode UI */}
+                  {scheduleConfig.paymentMode === 'gateway_checkout' ? (
+                    <div className="bg-[#FFFDF9] rounded-2xl p-5 border-2 border-[#5E765E]/35 shadow-sm space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-[#5E765E]" />
+                          <span className="text-xs font-bold text-[#111111] uppercase tracking-wider">
+                            Pasarela de Pago Yape / Tarjeta Online
+                          </span>
+                        </div>
+                        <span className="text-sm font-bold text-[#5E765E]">
+                          S/ {financialTotals.advancePayment} (40%)
+                        </span>
                       </div>
-                      <div className="flex-1 space-y-1">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#111111] flex items-center gap-1.5">
-                          <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
-                          <span>Envío de tu solicitud a WhatsApp</span>
-                        </h4>
-                        <p className="text-[11px] text-[#111111]/75 leading-relaxed font-light">
-                          Al presionar el botón verde inferior, se enviará el mensaje estructurado con tus <strong>{financialTotals.count} {financialTotals.count === 1 ? 'servicio' : 'servicios'}</strong>, fecha seleccionada (<strong>{date} a las {timeSlot} hrs</strong>) y modalidad ({locationType === 'estudio' ? 'Presencial en Estudio Pueblo Libre' : `A Domicilio en ${district}`}).
-                        </p>
-                      </div>
+                      <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                        La validación automática con pasarela bancaria está activa: no necesitas ingresar código de operación manual. Al confirmar, tu cita se registrará e igualmente te invitaremos a enviar tu ficha por WhatsApp para coordinar detalles con tu especialista.
+                      </p>
                     </div>
-
-                    {/* Paso 2: Validación de agenda */}
-                    <div className="bg-white rounded-2xl p-4 border border-[#5E765E]/15 shadow-sm flex items-start gap-3.5">
-                      <div className="w-8 h-8 rounded-full bg-[#5E765E]/15 text-[#5E765E] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                        2
-                      </div>
-                      <div className="flex-1 space-y-1">
+                  ) : (
+                    <div className="bg-[#FFFDF9] rounded-2xl p-4 sm:p-5 border-2 border-[#722282]/35 shadow-sm space-y-4">
+                      <div className="flex items-center justify-between flex-wrap gap-2">
                         <h4 className="text-xs sm:text-sm font-bold text-[#111111] flex items-center gap-1.5">
-                          <Clock className="w-3.5 h-3.5 text-[#5E765E]" />
-                          <span>Validación rápida de agenda y disponibilidad</span>
+                          <Smartphone className="w-4 h-4 text-[#722282]" />
+                          <span>Adelanto del 40% mediante Yape a Ana Díaz</span>
                         </h4>
-                        <p className="text-[11px] text-[#111111]/75 leading-relaxed font-light">
-                          Ana María Díaz o el equipo revisará de inmediato la agenda para confirmarte la disponibilidad del horario o coordinar el traslado según tu distrito.
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Paso 3: Coordinación del pago del adelanto mediante Yape a Ana Díaz */}
-                    <div className="bg-[#FFFDF9] rounded-2xl p-4 sm:p-5 border-2 border-[#722282]/35 shadow-md flex flex-col gap-3">
-                      <div className="flex items-start gap-3.5">
-                        <div className="w-8 h-8 rounded-full bg-[#722282] text-white font-bold text-xs flex items-center justify-center shrink-0 mt-0.5 shadow-sm">
-                          3
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between flex-wrap gap-2">
-                            <h4 className="text-xs sm:text-sm font-bold text-[#111111] flex items-center gap-1.5">
-                              <Smartphone className="w-3.5 h-3.5 text-[#722282]" />
-                              <span>Coordinación del pago del adelanto mediante Yape al Yape de Ana Díaz</span>
-                            </h4>
-                            <span className="px-2 py-0.5 rounded-full bg-[#722282]/10 text-[#722282] text-[10px] font-bold uppercase tracking-wider">
-                              Cuenta Oficial
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-[#111111]/75 leading-relaxed font-light mt-1">
-                            Para bloquear tu turno de forma exclusiva, se abona el <strong>40% de adelanto</strong> al Yape oficial de Ana Díaz. El saldo restante (60%) se abona al finalizar tu atención.
-                          </p>
-                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full bg-[#722282] text-white text-xs font-bold">
+                          S/ {financialTotals.advancePayment}
+                        </span>
                       </div>
 
-                      {/* Official Yape Data Card */}
-                      <div className="bg-gradient-to-br from-[#722282]/10 via-[#722282]/5 to-transparent rounded-xl p-3.5 sm:p-4 border border-[#722282]/25 space-y-3">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                          <div className="bg-white p-3 rounded-xl border border-[#722282]/20 shadow-xs">
-                            <span className="text-[10px] text-[#111111]/60 uppercase tracking-wider block font-semibold">
-                              Titular del Yape:
-                            </span>
-                            <strong className="text-sm text-[#111111] font-bold block mt-0.5">
-                              Ana María Díaz (Ana Díaz)
-                            </strong>
-                            <span className="text-[10px] text-[#5E765E] block mt-0.5 font-medium">
-                              Fundadora · Meraki Spa &amp; Beauty
-                            </span>
-                          </div>
-
-                          <div className="bg-white p-3 rounded-xl border border-[#722282]/20 shadow-xs flex items-center justify-between">
-                            <div>
-                              <span className="text-[10px] text-[#111111]/60 uppercase tracking-wider block font-semibold">
-                                Número de Yape / WhatsApp:
-                              </span>
-                              <strong className="text-base font-mono text-[#722282] font-bold block mt-0.5 tracking-wide">
-                                993 067 291
-                              </strong>
-                              <span className="text-[10px] text-[#111111]/60 block">
-                                (+51 993 067 291)
-                              </span>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={handleCopyYapeNumber}
-                              className="px-3 py-1.5 rounded-lg bg-[#722282]/10 hover:bg-[#722282]/20 text-[#722282] text-xs font-bold transition-all inline-flex items-center gap-1 cursor-pointer"
-                              title="Copiar número de Yape"
-                            >
-                              {isYapeCopied ? (
-                                <>
-                                  <Check className="w-3.5 h-3.5 text-[#5E765E]" />
-                                  <span>¡Copiado!</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="w-3.5 h-3.5" />
-                                  <span>Copiar</span>
-                                </>
-                              )}
-                            </button>
-                          </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                        <div className="bg-white p-3 rounded-xl border border-[#722282]/20">
+                          <span className="text-[10px] text-[#111111]/60 uppercase block font-semibold">
+                            Titular del Yape:
+                          </span>
+                          <strong className="text-sm text-[#111111] block mt-0.5">
+                            Ana María Díaz (Ana Díaz)
+                          </strong>
                         </div>
 
-                        {/* Financial Amounts breakdown */}
-                        <div className="pt-2 border-t border-[#722282]/20 flex items-center justify-between flex-wrap gap-2 text-xs">
+                        <div className="bg-white p-3 rounded-xl border border-[#722282]/20 flex items-center justify-between">
                           <div>
-                            <span className="text-[10px] text-[#111111]/60 block uppercase font-medium">Inversión Total:</span>
-                            <strong className="text-sm text-[#111111] font-bold">
-                              {financialTotals.hasUnpriced
-                                ? financialTotals.totalPrice > 0
-                                ? `S/ ${financialTotals.totalPrice} (+ bajo pedido)`
-                                : 'A cotizar bajo pedido'
-                                : `S/ ${financialTotals.totalPrice}`}
-                            </strong>
-                          </div>
-                          <div className="bg-[#722282] text-white px-3.5 py-1.5 rounded-xl shadow-xs text-right">
-                            <span className="text-[10px] text-[#FFF2DE] block uppercase tracking-wider font-medium">
-                              Adelanto a abonar (40%):
+                            <span className="text-[10px] text-[#111111]/60 uppercase block font-semibold">
+                              Número Yape:
                             </span>
-                            <strong className="text-base font-bold">
-                              {financialTotals.advancePayment > 0
-                                ? `S/ ${financialTotals.advancePayment}`
-                                : 'A coordinar por WhatsApp'}
-                            </strong>
+                            <strong className="text-base font-mono text-[#722282] block">993 067 291</strong>
                           </div>
-                          <div>
-                            <span className="text-[10px] text-[#111111]/60 block uppercase font-medium">Saldo al finalizar (60%):</span>
-                            <strong className="text-sm text-[#5E765E] font-bold">
-                              {financialTotals.balanceRemaining > 0
-                                ? `S/ ${financialTotals.balanceRemaining}`
-                                : 'A definir'}
-                            </strong>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={handleCopyYapeNumber}
+                            className="px-3 py-1.5 rounded-lg bg-[#722282]/10 hover:bg-[#722282]/20 text-[#722282] text-xs font-bold inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            {isYapeCopied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                            <span>{isYapeCopied ? '¡Copiado!' : 'Copiar'}</span>
+                          </button>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Paso 4: Envío de comprobante */}
-                    <div className="bg-white rounded-2xl p-4 border border-[#5E765E]/15 shadow-sm flex items-start gap-3.5">
-                      <div className="w-8 h-8 rounded-full bg-[#5E765E]/15 text-[#5E765E] font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">
-                        4
-                      </div>
-                      <div className="flex-1 space-y-1">
-                        <h4 className="text-xs sm:text-sm font-bold text-[#111111] flex items-center gap-1.5">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-[#5E765E]" />
-                          <span>Envío del comprobante de Yape por WhatsApp</span>
-                        </h4>
-                        <p className="text-[11px] text-[#111111]/75 leading-relaxed font-light">
-                          Envías la captura o constancia de tu Yape al mismo chat de WhatsApp de Ana Díaz y tu cita queda confirmada al 100%.
-                        </p>
+                      <div>
+                        <label
+                          htmlFor="booking-yape-code"
+                          className="block text-[11px] font-semibold text-[#111111] mb-1"
+                        >
+                          N° de Operación Yape (opcional si aún vas a realizar el yapeo):
+                        </label>
+                        <input
+                          id="booking-yape-code"
+                          type="text"
+                          placeholder="Ej. 4829104 (o deja en blanco para marcar Pendiente de abono)"
+                          value={yapeOperationCode}
+                          onChange={(e) => setYapeOperationCode(e.target.value)}
+                          className="w-full px-3.5 py-2.5 rounded-xl bg-white border border-[#722282]/25 text-xs text-[#111111] focus:outline-none focus:border-[#722282]"
+                        />
                       </div>
                     </div>
+                  )}
+
+                  <div className="p-3.5 rounded-2xl bg-[#EDF2EC]/80 border border-[#5E765E]/20 text-[11px] text-[#111111]/80 flex items-start gap-2.5">
+                    <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
+                    <span>
+                      Al confirmar en la web, reservaremos tu bloque de <strong>{date} ({timeSlot} hrs)</strong>, notificaremos por correo a <strong>{CENTRAL_OWNER_EMAIL}</strong> y te mostraremos el enlace directo a WhatsApp para enviar tu ficha a Ana Díaz.
+                    </span>
                   </div>
 
-                  {/* Action Buttons: Submit to WhatsApp & Back */}
                   <div className="pt-4 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-3">
                     <button
                       type="button"
                       onClick={() => setCurrentStep(3)}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider cursor-pointer"
                     >
                       <ArrowLeft className="w-3.5 h-3.5" />
                       <span>Volver a Datos</span>
                     </button>
 
-                    <div className="w-full sm:w-auto flex flex-col sm:flex-row items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={handleCopySummary}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-3 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-medium uppercase tracking-wider transition-colors cursor-pointer"
-                      >
-                        {isCopied ? (
-                          <>
-                            <Check className="w-3.5 h-3.5 text-[#5E765E]" />
-                            <span>¡Texto Copiado!</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3.5 h-3.5" />
-                            <span>Copiar Resumen</span>
-                          </>
-                        )}
-                      </button>
-
-                      <a
-                        id="btn-confirm-send-whatsapp-step4"
-                        href={whatsappUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={handleSubmit}
-                        className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-[#25D366] hover:bg-[#20ba59] text-white px-7 py-3.5 rounded-full text-xs font-['Montserrat',sans-serif] font-bold uppercase tracking-wider shadow-lg hover:shadow-xl transition-all cursor-pointer hover:scale-[1.02]"
-                      >
-                        <MessageCircle className="w-4 h-4 fill-white" />
-                        <span>Enviar Solicitud a WhatsApp</span>
-                      </a>
-                    </div>
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={handleConfirmBookingInWeb}
+                      className="meraki-btn-fluid w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] disabled:opacity-60 text-[#FFF2DE] px-8 py-4 rounded-full text-xs font-bold uppercase tracking-wider shadow-lg cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-[#D5A688]" />
+                      <span>
+                        {isSubmitting ? 'Registrando Reserva...' : 'Confirmar y Generar Constancia'}
+                      </span>
+                    </button>
                   </div>
                 </div>
               )}
