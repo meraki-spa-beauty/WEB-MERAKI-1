@@ -250,20 +250,30 @@ service cloud.firestore {
         incoming().uid == userId &&
         (!('uid' in existing()) || existing().uid == userId) &&
         incoming().updatedAt == request.time && (
-          isStaffOrOwner('canStampVip') ||
-          (
-            isOwner(userId) &&
-            existing().stamps == 5 &&
-            incoming().stamps == 0 &&
-            incoming().rewardsClaimed == existing().rewardsClaimed + 1 &&
-            incoming().diff(existing()).affectedKeys().hasOnly(['stamps', 'rewardsClaimed', 'history', 'updatedAt'])
-          ) ||
           (
             isOwner(userId) &&
             incoming().displayName.size() >= 2 &&
+            incoming().displayName != 'Clienta VIP' &&
             incoming().email.size() >= 5 &&
-            incoming().diff(existing()).affectedKeys().hasOnly(['email', 'displayName', 'phone', 'photoURL', 'dataConsentAccepted', 'dataConsentAt', 'updatedAt'])
-          )
+            incoming().dataConsentAccepted == true &&
+            incoming().stamps == existing().get('stamps', 0) &&
+            incoming().rewardsClaimed == existing().get('rewardsClaimed', 0) &&
+            (!('adminNote' in existing())
+              ? (!('adminNote' in incoming()) || incoming().adminNote == '')
+              : incoming().adminNote == existing().adminNote) &&
+            (!('history' in existing())
+              ? incoming().history.size() == 0
+              : (incoming().history == existing().history ||
+                  (incoming().history.size() == existing().history.size() && !('uid' in existing()))))
+          ) ||
+          (
+            isOwner(userId) &&
+            existing().get('stamps', 0) == 5 &&
+            incoming().stamps == 0 &&
+            incoming().rewardsClaimed == existing().get('rewardsClaimed', 0) + 1 &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['uid', 'stamps', 'rewardsClaimed', 'history', 'updatedAt'])
+          ) ||
+          isStaffOrOwner('canStampVip')
         );
       allow delete: if isCentralOwner() && isValidId(userId);
     }

@@ -370,7 +370,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 45,
     description: 'Depilación desde codo hasta muñeca con cera tibia.',
     includes: ['Depilación en ambos antebrazos', 'Hidratación calmante inmediata'],
-    image: '/assets/catalog/depilacion-brazos.jpg'
+    image: '/assets/catalog/depilacion-medio-brazo.jpg'
   },
   {
     id: 'depilacion-brazo-completo',
@@ -381,7 +381,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 60,
     description: 'Depilación integral de ambos brazos desde el hombro.',
     includes: ['Brazos completos de hombro a muñeca', 'Retiro uniforme de raíz y suavizado'],
-    image: '/assets/catalog/depilacion-brazos.jpg'
+    image: '/assets/catalog/depilacion-brazo-completo.jpg'
   },
   {
     id: 'depilacion-media-pierna',

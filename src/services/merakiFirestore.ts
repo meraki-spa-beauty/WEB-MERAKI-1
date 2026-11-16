@@ -627,6 +627,257 @@ export async function fetchAllVipUsers(): Promise<UserLoyaltyProfile[]> {
   }
 }
 
+function parseExistingLoyaltyHistory(raw: DocumentData): LoyaltyHistoryItem[] {
+  const rawHist = Array.isArray(raw.history) ? raw.history : [];
+  const items: LoyaltyHistoryItem[] = [];
+
+  for (const h of rawHist) {
+    if (Object.prototype.toString.call(h) === '[object Object]') {
+      items.push({
+        id: readStr(h, 'id', 'entry') || 'entry',
+        date: readStr(h, 'date', ''),
+        service: readStr(h, 'service', 'Servicio Meraki') || 'Servicio Meraki',
+        price: Math.max(0, Math.min(10000, Number(readNum(h, 'price', 0)))),
+      });
+    }
+  }
+
+  return items.slice(0, 100);
+}
+
+export async function fetchClientVipProfile(uid: string): Promise<UserLoyaltyProfile | null> {
+  if (!db) return null;
+
+  const cleanUid = uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128);
+  const path = `users/${cleanUid}`;
+
+  try {
+    const snap = await getDoc(doc(db, 'users', cleanUid));
+
+    if (!snap.exists()) return null;
+
+    const d = snap.data();
+
+    return {
+      uid: cleanUid,
+      email: readStr(d, 'email', ''),
+      displayName: readStr(d, 'displayName', ''),
+      phone: readStr(d, 'phone', ''),
+      adminNote: readStr(d, 'adminNote', ''),
+      photoURL: readStr(d, 'photoURL', ''),
+      dataConsentAccepted: readBool(d, 'dataConsentAccepted', false),
+      dataConsentAt: readStr(d, 'dataConsentAt', ''),
+      stamps: Math.max(0, Math.min(5, Math.round(readNum(d, 'stamps', 0)))),
+      rewardsClaimed: Math.max(0, Math.min(1000, Math.round(readNum(d, 'rewardsClaimed', 0)))),
+      history: parseExistingLoyaltyHistory(d),
+    };
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+  }
+}
+
+export async function saveClientVipProfileWithConsent(params: {
+  uid: string;
+  email: string;
+  displayName: string;
+  phone: string;
+  photoURL: string;
+}): Promise<UserLoyaltyProfile> {
+  if (!db) throw new Error('Firestore no está disponible.');
+
+  const cleanUid = params.uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128);
+  const path = `users/${cleanUid}`;
+  const userRef = doc(db, 'users', cleanUid);
+
+  const cleanEmail = clampText(params.email.toLowerCase(), 160);
+  const cleanName = clampText(params.displayName, 120);
+  const cleanPhone = clampText(params.phone, 30);
+  const cleanPhoto = clampText(params.photoURL, 500);
+  const consentIso = new Date().toISOString().slice(0, 40);
+
+  let existingSnap;
+
+  try {
+    existingSnap = await getDoc(userRef);
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+  }
+
+  if (existingSnap.exists()) {
+    const d = existingSnap.data();
+    const existingStamps = Math.max(0, Math.min(5, Math.round(readNum(d, 'stamps', 0))));
+    const existingRewards = Math.max(0, Math.min(1000, Math.round(readNum(d, 'rewardsClaimed', 0))));
+    const existingAdminNote = clampText(readStr(d, 'adminNote', ''), 160);
+    const preservedHistory = sanitizeLoyaltyHistory(parseExistingLoyaltyHistory(d));
+
+    try {
+      await setDoc(userRef, {
+        uid: cleanUid,
+        email: cleanEmail,
+        displayName: cleanName,
+        phone: cleanPhone,
+        adminNote: existingAdminNote,
+        photoURL: cleanPhoto,
+        dataConsentAccepted: true,
+        dataConsentAt: consentIso,
+        stamps: existingStamps,
+        rewardsClaimed: existingRewards,
+        history: preservedHistory,
+        updatedAt: serverTimestamp(),
+      });
+
+      return {
+        uid: cleanUid,
+        email: cleanEmail,
+        displayName: cleanName,
+        phone: cleanPhone,
+        adminNote: existingAdminNote,
+        photoURL: cleanPhoto,
+        dataConsentAccepted: true,
+        dataConsentAt: consentIso,
+        stamps: existingStamps,
+        rewardsClaimed: existingRewards,
+        history: preservedHistory,
+      };
+    } catch (err) {
+      handleFirestoreError(err, OperationType.UPDATE, path);
+    }
+  }
+
+  const todayLabel = new Date().toLocaleDateString('es-PE', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  const welcomeHistory: LoyaltyHistoryItem[] = sanitizeLoyaltyHistory([
+    {
+      id: 'welcome',
+      date: todayLabel,
+      service: 'Bienvenida a Meraki VIP',
+      price: 0,
+    },
+  ]);
+
+  try {
+    await setDoc(userRef, {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: '',
+      photoURL: cleanPhoto,
+      dataConsentAccepted: true,
+      dataConsentAt: consentIso,
+      stamps: 1,
+      rewardsClaimed: 0,
+      history: welcomeHistory,
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: '',
+      photoURL: cleanPhoto,
+      dataConsentAccepted: true,
+      dataConsentAt: consentIso,
+      stamps: 1,
+      rewardsClaimed: 0,
+      history: welcomeHistory,
+    };
+  } catch (err) {
+    handleFirestoreError(err, OperationType.CREATE, path);
+  }
+}
+
+export async function redeemClientVipReward(params: {
+  uid: string;
+  fallbackEmail: string;
+  fallbackDisplayName: string;
+  fallbackPhone: string;
+  fallbackPhotoURL: string;
+}): Promise<UserLoyaltyProfile | null> {
+  if (!db) return null;
+
+  const cleanUid = params.uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128);
+  const path = `users/${cleanUid}`;
+  const userRef = doc(db, 'users', cleanUid);
+
+  let snap;
+
+  try {
+    snap = await getDoc(userRef);
+  } catch (err) {
+    handleFirestoreError(err, OperationType.GET, path);
+  }
+
+  if (!snap.exists()) return null;
+
+  const d = snap.data();
+  const currentStamps = Math.max(0, Math.min(5, Math.round(readNum(d, 'stamps', 0))));
+
+  if (currentStamps < 5) return null;
+
+  const currentRewards = Math.max(0, Math.min(1000, Math.round(readNum(d, 'rewardsClaimed', 0))));
+  const nextRewards = Math.min(1000, currentRewards + 1);
+  const existingAdminNote = clampText(readStr(d, 'adminNote', ''), 160);
+  const cleanEmail = clampText(readStr(d, 'email', '') || params.fallbackEmail, 160);
+  const cleanName = clampText(readStr(d, 'displayName', '') || params.fallbackDisplayName, 120) || 'Clienta VIP';
+  const cleanPhone = clampText(readStr(d, 'phone', '') || params.fallbackPhone, 30);
+  const cleanPhoto = clampText(readStr(d, 'photoURL', '') || params.fallbackPhotoURL, 500);
+  const consentAccepted = readBool(d, 'dataConsentAccepted', true);
+  const consentAt = clampText(readStr(d, 'dataConsentAt', ''), 40);
+
+  const redeemEntry: LoyaltyHistoryItem = {
+    id: `redeem-${Date.now().toString(36)}`,
+    date: new Date().toLocaleDateString('es-PE', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }),
+    service: 'Canje de Beneficio Meraki VIP',
+    price: 0,
+  };
+
+  const nextHistory = sanitizeLoyaltyHistory([redeemEntry, ...parseExistingLoyaltyHistory(d)]);
+
+  try {
+    await setDoc(userRef, {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: existingAdminNote,
+      photoURL: cleanPhoto,
+      dataConsentAccepted: consentAccepted,
+      dataConsentAt: consentAt,
+      stamps: 0,
+      rewardsClaimed: nextRewards,
+      history: nextHistory,
+      updatedAt: serverTimestamp(),
+    });
+
+    return {
+      uid: cleanUid,
+      email: cleanEmail,
+      displayName: cleanName,
+      phone: cleanPhone,
+      adminNote: existingAdminNote,
+      photoURL: cleanPhoto,
+      dataConsentAccepted: consentAccepted,
+      dataConsentAt: consentAt,
+      stamps: 0,
+      rewardsClaimed: nextRewards,
+      history: nextHistory,
+    };
+  } catch (err) {
+    handleFirestoreError(err, OperationType.UPDATE, path);
+  }
+}
+
 export async function adminStampUserVip(params: {
   user: UserLoyaltyProfile;
   serviceName: string;

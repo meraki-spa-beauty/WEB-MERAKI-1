@@ -1,6 +1,7 @@
 import { createBrowserRouter, Link, Navigate, useLocation, useOutlet } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
+import { RouteCurtainOverlay } from '../components/layout/RouteTransition';
 import { Home } from '../routes/Home';
 import { Catalogo } from '../routes/Catalogo';
 import { ComoReservar } from '../routes/ComoReservar';
@@ -127,7 +128,6 @@ function RootLayout() {
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
   const prevSearchRef = useRef<string>(location.search);
-  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   useEffect(() => {
     syncRouteSeoMetadata(location.pathname);
@@ -135,7 +135,6 @@ function RootLayout() {
     if (prevPathRef.current !== location.pathname) {
       prevPathRef.current = location.pathname;
       prevSearchRef.current = location.search;
-      setIsTransitioning(true);
 
       if (location.pathname !== '/admin') {
         trackMetaPageView();
@@ -162,29 +161,14 @@ function RootLayout() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <AnimatePresence>
-        {isTransitioning && (
-          <motion.div
-            key={`route-bar-${location.pathname}`}
-            aria-hidden="true"
-            initial={{ scaleX: 0, opacity: 0.95 }}
-            animate={{ scaleX: 1, opacity: 0 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.85, ease: ROUTE_EASE }}
-            onAnimationComplete={() => setIsTransitioning(false)}
-            style={{ transformOrigin: 'left center' }}
-            className="fixed top-0 left-0 right-0 z-[9995] pointer-events-none h-[2.5px] bg-gradient-to-r from-[#5E765E] via-[#D5A688] to-[#5E765E]"
-          />
-        )}
-      </AnimatePresence>
+      <RouteCurtainOverlay pathname={location.pathname} />
 
       <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
         <motion.div
           key={location.pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.36, ease: ROUTE_EASE }}
+          initial={{ opacity: 0.85 }}
+          animate={{ opacity: 1, transition: { duration: 0.45, ease: ROUTE_EASE } }}
+          exit={{ opacity: 0.35, transition: { duration: 0.44, ease: [0.76, 0, 0.24, 1] } }}
         >
           <FrozenRouteOutlet />
         </motion.div>

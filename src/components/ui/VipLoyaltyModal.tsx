@@ -22,6 +22,33 @@ interface VipLoyaltyModalProps {
   onClose: () => void;
 }
 
+function formatVipModalError(err: Error): string {
+  const raw = err.message.trim();
+
+  if (raw.startsWith('{')) {
+    try {
+      // SAFETY: JSON structured error emitted by handleFirestoreError
+      const parsed = JSON.parse(raw) as { error?: string };
+
+      if (parsed?.error) {
+        if (parsed.error.toLowerCase().includes('insufficient permissions')) {
+          return 'No se pudo validar tu tarjeta en el servidor en este momento. Recarga la página o vuelve a iniciar sesión e inténtalo nuevamente.';
+        }
+
+        return parsed.error;
+      }
+    } catch {
+      // Fallback to raw message
+    }
+  }
+
+  if (raw.toLowerCase().includes('insufficient permissions')) {
+    return 'No se pudo validar tu tarjeta en el servidor en este momento. Recarga la página o vuelve a iniciar sesión e inténtalo nuevamente.';
+  }
+
+  return raw;
+}
+
 export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
   const {
     user,
@@ -96,7 +123,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
       await login();
     } catch (err) {
       if (err instanceof Error) {
-        setErrorMsg(err.message);
+        setErrorMsg(formatVipModalError(err));
       } else {
         setErrorMsg('Error al iniciar sesión con Google.');
       }
@@ -125,7 +152,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
       window.setTimeout(() => setProfileSavedNotice(false), 3500);
     } catch (err) {
       if (err instanceof Error) {
-        setErrorMsg(err.message);
+        setErrorMsg(formatVipModalError(err));
       } else {
         setErrorMsg('No se pudo activar tu tarjeta VIP en este momento.');
       }
@@ -170,7 +197,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
       window.setTimeout(() => setProfileSavedNotice(false), 3500);
     } catch (err) {
       if (err instanceof Error) {
-        setErrorMsg(err.message);
+        setErrorMsg(formatVipModalError(err));
       } else {
         setErrorMsg('No se pudieron guardar tus datos en este momento.');
       }

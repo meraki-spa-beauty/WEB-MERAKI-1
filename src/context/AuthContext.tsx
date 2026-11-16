@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc, serverTimestamp, setDoc, updateDoc, type DocumentData } from 'firebase/firestore';
 import {
   auth,
   db,
@@ -9,8 +8,11 @@ import {
   readCachedGoogleProfile,
 } from '../services/firebase';
 import {
+  fetchClientVipProfile,
   fetchMyStaffAccess,
   isCentralOwnerEmail,
+  redeemClientVipReward,
+  saveClientVipProfileWithConsent,
   testFirestoreConnection,
 } from '../services/merakiFirestore';
 import type { LoyaltyHistoryItem, StaffAccessEntry } from '../types';
@@ -67,22 +69,6 @@ const DEFAULT_ADMIN_PERMISSIONS: AdminPermissions = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function isLoyaltyArrayItem(value: LoyaltyHistoryItem | null | undefined): value is LoyaltyHistoryItem {
-  return Boolean(value && value.service && value.date && value.id);
-}
-
-function readDocText(data: DocumentData, key: string): string {
-  const raw = data[key];
-
-  return Object.prototype.toString.call(raw) === '[object String]' ? String(raw).trim() : '';
-}
-
-function readDocBool(data: DocumentData, key: string): boolean {
-  const raw = data[key];
-
-  return Object.prototype.toString.call(raw) === '[object Boolean]' ? Boolean(raw) : false;
-}
-
 interface GoogleIdentity {
   email: string;
   displayName: string;
@@ -134,29 +120,6 @@ async function resolveGoogleIdentity(firebaseUser: User): Promise<GoogleIdentity
     email: email.slice(0, 160),
     displayName: displayName.slice(0, 120),
     photoURL: photoURL.slice(0, 500),
-  };
-}
-
-function parseLoyaltyFromDoc(raw: DocumentData): LoyaltyData {
-  const safeHistory: LoyaltyHistoryItem[] = [];
-
-  if (Array.isArray(raw.history)) {
-    for (const item of raw.history) {
-      if (isLoyaltyArrayItem(item)) {
-        safeHistory.push({
-          id: String(item.id || 'entry').slice(0, 64),
-          date: String(item.date || '').slice(0, 40),
-          service: String(item.service || 'Servicio Meraki').slice(0, 160),
-          price: Math.max(0, Math.min(10000, Number(item.price || 0))),
-        });
-      }
-    }
-  }
-
-  return {
-    stamps: Math.max(0, Math.min(5, Math.round(Number(raw.stamps || 0)))),
-    rewardsClaimed: Math.max(0, Math.round(Number(raw.rewardsClaimed || 0))),
-    history: safeHistory,
   };
 }
 
@@ -259,27 +222,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       if (db) {
         try {
-          const userDocRef = doc(db, 'users', firebaseUser.uid);
-          const docSnap = await getDoc(userDocRef);
+          const existingProfile = await fetchClientVipProfile(firebaseUser.uid);
 
-          if (docSnap.exists()) {
+          if (existingProfile) {
             docExists = true;
-            const docData = docSnap.data();
+            loadedData = {
+              stamps: existingProfile.stamps,
+              rewardsClaimed: existingProfile.rewardsClaimed,
+              history: existingProfile.history,
+            };
 
-            loadedData = parseLoyaltyFromDoc(docData);
-
-            const existingName = readDocText(docData, 'displayName');
-            const existingEmail = readDocText(docData, 'email');
-            const existingPhone = readDocText(docData, 'phone');
-            const existingConsent = readDocBool(docData, 'dataConsentAccepted');
+            const existingName = existingProfile.displayName.trim();
 
             resolvedName =
               existingName && existingName !== 'Clienta VIP'
                 ? existingName
                 : googleIdentity.displayName || '';
-            resolvedEmail = existingEmail || googleIdentity.email;
-            resolvedPhone = existingPhone;
-            resolvedConsent = existingConsent;
+            resolvedEmail = existingProfile.email.trim() || googleIdentity.email;
+            resolvedPhone = existingProfile.phone.trim();
+            resolvedConsent = Boolean(existingProfile.dataConsentAccepted);
           }
         } catch (err) {
           console.warn('Could not fetch loyalty from Firestore:', err);
@@ -351,60 +312,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Debes aceptar el consentimiento de datos para activar tu tarjeta Club VIP.');
     }
 
-    const consentIso = new Date().toISOString().slice(0, 40);
     const googleIdentity = await resolveGoogleIdentity(user);
     const photoURL = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
 
     let nextLoyalty = loyalty;
 
     if (db) {
-      const userDocRef = doc(db, 'users', user.uid);
+      const savedProfile = await saveClientVipProfileWithConsent({
+        uid: user.uid,
+        email: cleanEmail,
+        displayName: cleanName,
+        phone: cleanPhone,
+        photoURL,
+      });
 
-      if (hasVipCard) {
-        await updateDoc(userDocRef, {
-          email: cleanEmail,
-          displayName: cleanName,
-          phone: cleanPhone,
-          photoURL,
-          dataConsentAccepted: true,
-          dataConsentAt: consentIso,
-          updatedAt: serverTimestamp(),
-        });
-      } else {
-        const welcomeHistory: LoyaltyHistoryItem[] = [
-          {
-            id: 'welcome',
-            date: new Date().toLocaleDateString('es-PE', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            }),
-            service: 'Bienvenida a Meraki VIP',
-            price: 0,
-          },
-        ];
-
-        nextLoyalty = {
-          stamps: 1,
-          rewardsClaimed: 0,
-          history: welcomeHistory,
-        };
-
-        await setDoc(userDocRef, {
-          uid: user.uid,
-          email: cleanEmail,
-          displayName: cleanName,
-          phone: cleanPhone,
-          adminNote: '',
-          photoURL,
-          dataConsentAccepted: true,
-          dataConsentAt: consentIso,
-          stamps: 1,
-          rewardsClaimed: 0,
-          history: welcomeHistory,
-          updatedAt: serverTimestamp(),
-        });
-      }
+      nextLoyalty = {
+        stamps: savedProfile.stamps,
+        rewardsClaimed: savedProfile.rewardsClaimed,
+        history: savedProfile.history,
+      };
     }
 
     setHasVipCard(true);
@@ -435,18 +361,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error('Ingresa un correo electrónico válido.');
     }
 
+    const googleIdentity = await resolveGoogleIdentity(user);
+    const photoURL = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
+
     if (db) {
-      await updateDoc(doc(db, 'users', user.uid), {
+      const savedProfile = await saveClientVipProfileWithConsent({
+        uid: user.uid,
+        email: cleanEmail,
         displayName: cleanName,
         phone: cleanPhone,
-        email: cleanEmail,
-        photoURL: (user.photoURL || '').trim().slice(0, 500),
-        dataConsentAccepted: true,
-        dataConsentAt: new Date().toISOString().slice(0, 40),
-        updatedAt: serverTimestamp(),
+        photoURL,
       });
+
+      const syncedLoyalty: LoyaltyData = {
+        stamps: savedProfile.stamps,
+        rewardsClaimed: savedProfile.rewardsClaimed,
+        history: savedProfile.history,
+      };
+
+      setLoyalty(syncedLoyalty);
+      localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(syncedLoyalty));
     }
 
+    setHasVipCard(true);
     setProfileName(cleanName);
     setProfileEmail(cleanEmail);
     setProfilePhone(cleanPhone);
@@ -455,6 +392,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const claimReward = async (): Promise<boolean> => {
     if (!user || loyalty.stamps < 5) return false;
+
+    const googleIdentity = await resolveGoogleIdentity(user);
+    const fallbackPhoto = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
+
+    if (db) {
+      try {
+        const redeemed = await redeemClientVipReward({
+          uid: user.uid,
+          fallbackEmail: profileEmail || googleIdentity.email,
+          fallbackDisplayName: profileName || googleIdentity.displayName || 'Clienta VIP',
+          fallbackPhone: profilePhone,
+          fallbackPhotoURL: fallbackPhoto,
+        });
+
+        if (redeemed) {
+          const nextLoyalty: LoyaltyData = {
+            stamps: redeemed.stamps,
+            rewardsClaimed: redeemed.rewardsClaimed,
+            history: redeemed.history,
+          };
+
+          setLoyalty(nextLoyalty);
+          localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(nextLoyalty));
+
+          return true;
+        }
+      } catch (err) {
+        console.warn('Could not sync reward claim to Firestore:', err);
+
+        return false;
+      }
+    }
 
     const updatedRewards = loyalty.rewardsClaimed + 1;
 
@@ -477,19 +446,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setLoyalty(nextLoyalty);
     localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(nextLoyalty));
-
-    if (db) {
-      try {
-        await updateDoc(doc(db, 'users', user.uid), {
-          stamps: 0,
-          rewardsClaimed: updatedRewards,
-          history: nextLoyalty.history,
-          updatedAt: serverTimestamp(),
-        });
-      } catch (err) {
-        console.warn('Could not sync reward claim to Firestore:', err);
-      }
-    }
 
     return true;
   };
