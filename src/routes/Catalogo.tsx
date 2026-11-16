@@ -7,6 +7,7 @@ import { SkeletonImage } from '../components/ui/Skeleton';
 import { CATALOG_SERVICES, CATEGORIES_DATA, POLICIES_DATA } from '../data/catalog';
 import { SPA_INFO } from '../data/spaData';
 import { useBooking } from '../context/BookingContext';
+import { ScrollReveal, getStaggerDelay } from '../components/ui/ScrollReveal';
 import type { CatalogService, ServiceCategory } from '../types';
 import {
   Search,
@@ -301,10 +302,14 @@ export function Catalogo() {
                   const waLink = buildWhatsAppLink(service);
 
                   return (
-                    <article
+                    <ScrollReveal
                       key={service.id}
-                      className="theme-card-surface rounded-2xl flex flex-col justify-between overflow-hidden group text-left"
+                      delay={getStaggerDelay(index)}
+                      className="h-full"
                     >
+                      <article
+                        className="theme-card-surface rounded-2xl flex flex-col justify-between overflow-hidden group text-left h-full"
+                      >
                       {service.image ? (
                         <SkeletonImage
                           src={service.image}
@@ -431,6 +436,7 @@ export function Catalogo() {
                         </div>
                       </div>
                     </article>
+                    </ScrollReveal>
                   );
                 })}
               </div>
@@ -440,58 +446,60 @@ export function Catalogo() {
 
         {/* Catalog Policies Box */}
         <section className="py-12 meraki-section-sage text-[#FFF2DE] border-t border-[#D5A688]/30">
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="p-8 rounded-3xl bg-[#FFFDF9] text-[#111111] shadow-lg border border-[#D5A688]/40 text-left">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shadow-sm">
-                  <ShieldCheck className="w-5 h-5 text-[#D5A688]" />
-                </div>
-                <div>
-                  <span className="meraki-editorial-pill inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
-                    Condiciones del Servicio
-                  </span>
-                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
-                    Datos Importantes &amp; Condiciones del Catálogo
-                  </h3>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#111111]/85 font-light">
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
-                  <CheckCircle2 className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
-                  <span><strong>Disponibilidad:</strong> {POLICIES_DATA.availability}</span>
+          <ScrollReveal variant="soft-scale">
+            <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="p-8 rounded-3xl bg-[#FFFDF9] text-[#111111] shadow-lg border border-[#D5A688]/40 text-left">
+                <div className="flex items-center gap-3 mb-6">
+                  <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shadow-sm">
+                    <ShieldCheck className="w-5 h-5 text-[#D5A688]" />
+                  </div>
+                  <div>
+                    <span className="meraki-editorial-pill inline-flex items-center px-3 py-0.5 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
+                      Condiciones del Servicio
+                    </span>
+                    <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111]">
+                      Datos Importantes &amp; Condiciones del Catálogo
+                    </h3>
+                  </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
-                  <Truck className="w-4 h-4 text-[#9A6342] shrink-0 mt-0.5" />
-                  <span><strong>Costo de Movilidad:</strong> {POLICIES_DATA.mobility}</span>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-[#111111]/85 font-light">
+                  <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
+                    <CheckCircle2 className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
+                    <span><strong>Disponibilidad:</strong> {POLICIES_DATA.availability}</span>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
+                    <Truck className="w-4 h-4 text-[#9A6342] shrink-0 mt-0.5" />
+                    <span><strong>Costo de Movilidad:</strong> {POLICIES_DATA.mobility}</span>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
+                    <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
+                    <span><strong>Bioseguridad:</strong> {POLICIES_DATA.biosecurity}</span>
+                  </div>
+
+                  <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
+                    <Clock className="w-4 h-4 text-[#9A6342] shrink-0 mt-0.5" />
+                    <span><strong>Cancelaciones:</strong> {POLICIES_DATA.cancellation}</span>
+                  </div>
                 </div>
 
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
-                  <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
-                  <span><strong>Bioseguridad:</strong> {POLICIES_DATA.biosecurity}</span>
+                <div className="mt-6 pt-6 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <p className="text-xs text-[#111111]/70">
+                    ¿Tienes dudas sobre los pasos para agendar tu cita?
+                  </p>
+                  <Link
+                    to="/como-reservar"
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5E765E] hover:underline"
+                  >
+                    <span>Ver guía paso a paso de reserva</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
-
-                <div className="flex items-start gap-2.5 p-3.5 rounded-xl bg-[#EDF2EC]/60 border border-[#5E765E]/20">
-                  <Clock className="w-4 h-4 text-[#9A6342] shrink-0 mt-0.5" />
-                  <span><strong>Cancelaciones:</strong> {POLICIES_DATA.cancellation}</span>
-                </div>
-              </div>
-
-              <div className="mt-6 pt-6 border-t border-[#5E765E]/15 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p className="text-xs text-[#111111]/70">
-                  ¿Tienes dudas sobre los pasos para agendar tu cita?
-                </p>
-                <Link
-                  to="/como-reservar"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#5E765E] hover:underline"
-                >
-                  <span>Ver guía paso a paso de reserva</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
       </main>
 

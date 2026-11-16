@@ -3,6 +3,7 @@ import { Header } from '../components/layout/Header';
 import { Footer } from '../components/layout/Footer';
 import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
 import { SPA_INFO, TESTIMONIALS } from '../data/spaData';
+import { ScrollReveal, getStaggerDelay } from '../components/ui/ScrollReveal';
 import {
   Sparkles,
   Award,
@@ -112,52 +113,60 @@ export function Nosotros() {
         {/* Pillars / Values */}
         <section className="py-16 meraki-section-cream">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
-            <div className="text-center max-w-xl mx-auto mb-12">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <Sparkles className="w-3 h-3 text-[#D5A688]" />
-                <span>Nuestros Pilares</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                La Experiencia Meraki
-              </h2>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                  <span>Nuestros Pilares</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  La Experiencia Meraki
+                </h2>
+              </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="theme-card-surface rounded-3xl p-8">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
-                  <Home className="w-6 h-6 text-[#5E765E]" />
+              <ScrollReveal delay={0} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <Home className="w-6 h-6 text-[#5E765E]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    En tu Casa u Oficina
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Evita el tráfico y el estrés de desplazarte. Llevamos todo el equipamiento profesional necesario para que disfrutes de tu momento especial donde estés.
+                  </p>
                 </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  En tu Casa u Oficina
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Evita el tráfico y el estrés de desplazarte. Llevamos todo el equipamiento profesional necesario para que disfrutes de tu momento especial donde estés.
-                </p>
-              </div>
+              </ScrollReveal>
 
-              <div className="theme-card-surface rounded-3xl p-8">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
-                  <ShieldCheck className="w-6 h-6 text-[#5E765E]" />
+              <ScrollReveal delay={100} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <ShieldCheck className="w-6 h-6 text-[#5E765E]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Máxima Bioseguridad
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Cumplimos rigurosamente todas las normas sanitarias: instrumental esterilizado, kits descartables y desinfección meticulosa antes de cada sesión.
+                  </p>
                 </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Máxima Bioseguridad
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Cumplimos rigurosamente todas las normas sanitarias: instrumental esterilizado, kits descartables y desinfección meticulosa antes de cada sesión.
-                </p>
-              </div>
+              </ScrollReveal>
 
-              <div className="theme-card-surface rounded-3xl p-8">
-                <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
-                  <Sparkles className="w-6 h-6 text-[#D5A688]" />
+              <ScrollReveal delay={200} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <Sparkles className="w-6 h-6 text-[#D5A688]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Empoderamiento y Bienestar
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Cuidar de ti no es un lujo, es una necesidad. Cada servicio está pensado para que te sientas renovada, feliz, segura de ti misma y lista para conquistar tus metas.
+                  </p>
                 </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Empoderamiento y Bienestar
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Cuidar de ti no es un lujo, es una necesidad. Cada servicio está pensado para que te sientas renovada, feliz, segura de ti misma y lista para conquistar tus metas.
-                </p>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -165,45 +174,46 @@ export function Nosotros() {
         {/* Testimonials */}
         <section className="py-16 meraki-section-ivory border-t border-[#D5A688]/25">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
-            <div className="text-center max-w-xl mx-auto mb-12">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <Star className="w-3 h-3 text-[#D5A688] fill-current" />
-                <span>Testimonios Reales</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                Lo que dicen nuestras clientas
-              </h2>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Star className="w-3 h-3 text-[#D5A688] fill-current" />
+                  <span>Testimonios Reales</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  Lo que dicen nuestras clientas
+                </h2>
+              </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t) => (
-                <div
-                  key={t.id}
-                  className="meraki-cream-card rounded-3xl p-8 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-1 text-[#D5A688] mb-4">
-                      {[...Array(t.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
-                      ))}
+              {TESTIMONIALS.map((t, index) => (
+                <ScrollReveal key={t.id} delay={getStaggerDelay(index)} className="h-full">
+                  <div className="meraki-cream-card rounded-3xl p-8 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-1 text-[#D5A688] mb-4">
+                        {[...Array(t.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <p className="font-['Cormorant_Garamond',serif] text-lg text-[#111111] italic leading-relaxed mb-6">
+                        “{t.comment}”
+                      </p>
                     </div>
-                    <p className="font-['Cormorant_Garamond',serif] text-lg text-[#111111] italic leading-relaxed mb-6">
-                      “{t.comment}”
-                    </p>
-                  </div>
 
-                  <div className="pt-4 border-t border-[#5E765E]/15">
-                    <span className="font-semibold text-xs text-[#111111] block">
-                      {t.author}
-                    </span>
-                    <span className="text-[11px] text-[#5E765E] block">
-                      {t.role} • {t.location}
-                    </span>
-                    <span className="text-[10px] text-[#111111]/55 block mt-1">
-                      Servicio: {t.service}
-                    </span>
+                    <div className="pt-4 border-t border-[#5E765E]/15">
+                      <span className="font-semibold text-xs text-[#111111] block">
+                        {t.author}
+                      </span>
+                      <span className="text-[11px] text-[#5E765E] block">
+                        {t.role} • {t.location}
+                      </span>
+                      <span className="text-[10px] text-[#111111]/55 block mt-1">
+                        Servicio: {t.service}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>

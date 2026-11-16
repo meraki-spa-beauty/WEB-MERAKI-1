@@ -5,6 +5,7 @@ import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppBut
 import { BOOKING_STEPS, POLICIES_DATA } from '../data/catalog';
 import { FAQ_ITEMS } from '../data/spaData';
 import { useBooking } from '../context/BookingContext';
+import { ScrollReveal, getStaggerDelay } from '../components/ui/ScrollReveal';
 import {
   Calendar,
   MessageSquare,
@@ -96,11 +97,9 @@ export function ComoReservar() {
         <section className="py-16 meraki-section-cream">
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="space-y-6">
-              {BOOKING_STEPS.map((step) => (
-                <div
-                  key={step.number}
-                  className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start gap-6 text-left"
-                >
+              {BOOKING_STEPS.map((step, index) => (
+                <ScrollReveal key={step.number} delay={getStaggerDelay(index)}>
+                  <div className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row items-start gap-6 text-left">
                   <div className="flex items-center gap-4 shrink-0">
                     <div className="w-14 h-14 rounded-2xl bg-[#5E765E] text-[#FFF2DE] font-['Cormorant_Garamond',serif] text-2xl font-bold flex items-center justify-center shadow-md">
                       {step.number}
@@ -140,6 +139,7 @@ export function ComoReservar() {
                     )}
                   </div>
                 </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -148,17 +148,20 @@ export function ComoReservar() {
         {/* Políticas y Condiciones Destacadas */}
         <section className="py-14 meraki-section-ivory border-t border-[#D5A688]/25">
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <ShieldCheck className="w-3 h-3 text-[#D5A688]" />
-                <span>Claridad y Transparencia</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                Políticas de Atención en Estudio y a Domicilio
-              </h2>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-10">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <ShieldCheck className="w-3 h-3 text-[#D5A688]" />
+                  <span>Claridad y Transparencia</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  Políticas de Atención en Estudio y a Domicilio
+                </h2>
+              </div>
+            </ScrollReveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <ScrollReveal delay={100}>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="p-6 rounded-2xl meraki-cream-card flex items-start gap-4">
                 <Truck className="w-6 h-6 text-[#D5A688] shrink-0 mt-1" />
                 <div>
@@ -207,36 +210,38 @@ export function ComoReservar() {
                 </div>
               </div>
             </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* FAQs Section */}
         <section className="py-16 meraki-section-cream border-t border-[#D5A688]/20">
           <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
-            <div className="text-center max-w-xl mx-auto mb-10">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <HelpCircle className="w-3 h-3 text-[#D5A688]" />
-                <span>Respuestas Rápidas</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                Preguntas Frecuentes
-              </h2>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-10">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <HelpCircle className="w-3 h-3 text-[#D5A688]" />
+                  <span>Respuestas Rápidas</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  Preguntas Frecuentes
+                </h2>
+              </div>
+            </ScrollReveal>
 
             <div className="space-y-4">
-              {FAQ_ITEMS.map((faq) => (
-                <div
-                  key={faq.id}
-                  className="theme-card-surface rounded-2xl p-6"
-                >
-                  <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-2 flex items-center gap-2">
-                    <HelpCircle className="w-4 h-4 text-[#5E765E] shrink-0" />
-                    <span>{faq.question}</span>
-                  </h3>
-                  <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed pl-6">
-                    {faq.answer}
-                  </p>
-                </div>
+              {FAQ_ITEMS.map((faq, index) => (
+                <ScrollReveal key={faq.id} delay={getStaggerDelay(index)}>
+                  <div className="theme-card-surface rounded-2xl p-6">
+                    <h3 className="font-['Cormorant_Garamond',serif] text-xl font-bold text-[#111111] mb-2 flex items-center gap-2">
+                      <HelpCircle className="w-4 h-4 text-[#5E765E] shrink-0" />
+                      <span>{faq.question}</span>
+                    </h3>
+                    <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed pl-6">
+                      {faq.answer}
+                    </p>
+                  </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>

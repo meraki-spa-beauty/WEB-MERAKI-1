@@ -9,6 +9,7 @@ import { useBooking } from '../context/BookingContext';
 import { trackMetaLead } from '../utils/metaPixel';
 import { trackTikTokSubmitForm } from '../utils/tiktokPixel';
 import { syncLeadToGoogleSheets } from '../utils/googleSheetsSync';
+import { ScrollReveal } from '../components/ui/ScrollReveal';
 import {
   Phone,
   Instagram,
@@ -173,7 +174,7 @@ export function Contacto() {
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
               {/* Left Column: Direct Info Cards + Primary Booking CTA */}
-              <div className="lg:col-span-5 space-y-6 text-left">
+              <ScrollReveal className="lg:col-span-5 space-y-6 text-left">
                 {/* Direct Booking Wizard Card */}
                 <div className="p-6 rounded-3xl meraki-section-sage text-[#FFF2DE] shadow-md">
                   <div className="relative z-10">
@@ -323,10 +324,10 @@ export function Contacto() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </ScrollReveal>
 
               {/* Right Column: Focused Consultation / Quote Form */}
-              <div className="lg:col-span-7 text-left">
+              <ScrollReveal delay={100} className="lg:col-span-7 text-left">
                 <div className="theme-card-surface rounded-3xl p-8">
                   <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center shadow-sm">
@@ -559,7 +560,7 @@ export function Contacto() {
                     </form>
                   )}
                 </div>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>

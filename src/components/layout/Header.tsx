@@ -140,7 +140,7 @@ export function Header() {
 
     const closeTimer = window.setTimeout(() => {
       setDrawerMounted(false);
-    }, 280);
+    }, 500);
 
     return () => window.clearTimeout(closeTimer);
   }, [isOpen, drawerMounted]);
@@ -316,7 +316,7 @@ export function Header() {
               id="menu-catalog-dropdown"
               role="menu"
               aria-hidden={!catalogDropdownOpen}
-              className={`absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 text-left text-[#111111] origin-top transition-all duration-200 ease-out ${
+              className={`absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 text-left text-[#111111] origin-top transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                 catalogDropdownOpen
                   ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible'
                   : 'opacity-0 -translate-y-2 scale-[0.98] pointer-events-none invisible'
@@ -523,7 +523,7 @@ export function Header() {
       {drawerMounted && typeof document !== 'undefined' && createPortal(
         <div
           id="mobile-nav-drawer"
-          className={`fixed inset-0 z-[9999] bg-[#FFF2DE] text-[#111111] flex flex-col h-[100dvh] w-screen overflow-hidden lg:hidden transition-[transform,opacity] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+          className={`fixed inset-0 z-[9999] bg-[#FFF2DE] text-[#111111] flex flex-col h-[100dvh] w-screen overflow-hidden lg:hidden transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
             drawerVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
           }`}
           role="dialog"
@@ -591,7 +591,7 @@ export function Header() {
                   </button>
 
                   <div
-                    className={`grid transition-[grid-template-rows,opacity,margin] duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                    className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
                       mobileCatalogOpen
                         ? 'grid-rows-[1fr] opacity-100 mt-3'
                         : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'

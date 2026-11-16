@@ -6,6 +6,7 @@ import { EditorialHeroFeed } from '../components/sections/EditorialHeroFeed';
 import { TESTIMONIALS } from '../data/spaData';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../data/catalog';
 import { useBooking } from '../context/BookingContext';
+import { ScrollReveal, getStaggerDelay } from '../components/ui/ScrollReveal';
 import {
   Sparkles,
   ArrowRight,
@@ -59,88 +60,96 @@ export function Home() {
         {/* 2. CÓMO FUNCIONA EL SERVICIO */}
         <section className="py-16 md:py-20 meraki-section-ivory border-b border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-2xl mx-auto mb-14">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <Sparkles className="w-3 h-3 text-[#D5A688]" />
-                <span>Fácil, Cómodo y Seguro</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-2 mb-4">
-                ¿Cómo funciona el servicio de Meraki?
-              </h2>
-              <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed">
-                Disfruta de una atención de estética profesional y bienestar en nuestro estudio de Pueblo Libre o sin salir de tu casa u oficina.
-              </p>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-2xl mx-auto mb-14">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                  <span>Fácil, Cómodo y Seguro</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-2 mb-4">
+                  ¿Cómo funciona el servicio de Meraki?
+                </h2>
+                <p className="text-xs sm:text-sm text-[#111111]/75 font-light leading-relaxed">
+                  Disfruta de una atención de estética profesional y bienestar en nuestro estudio de Pueblo Libre o sin salir de tu casa u oficina.
+                </p>
+              </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
-                  01
-                </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
-                  <Sparkles className="w-6 h-6 text-[#D5A688]" />
-                </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Elige tu Tratamiento
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Explora nuestro catálogo oficial de manicura, pedicura, pestañas, depilación cera/hilo, masajes o faciales con tarifas claras.
-                </p>
-                <div className="mt-4">
-                  <Link
-                    to="/catalogo"
-                    className="text-xs font-semibold text-[#5E765E] hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>Ver catálogo</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-
-              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
-                  02
-                </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
-                  <MessageSquare className="w-6 h-6 text-[#D5A688]" />
-                </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  Reserva &amp; Coordina por WhatsApp
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Selecciona fecha y horario disponible en web, asegura con el 40% de adelanto por Yape y envíanos tu constancia al WhatsApp.
-                </p>
-                <div className="mt-4">
-                  <Link
-                    to="/como-reservar"
-                    className="text-xs font-semibold text-[#5E765E] hover:underline inline-flex items-center gap-1"
-                  >
-                    <span>Ver pasos de reserva</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </Link>
-                </div>
-              </div>
-
-              <div className="meraki-cream-card rounded-3xl p-8 relative transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md">
-                <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
-                  03
-                </span>
-                <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
-                  <HomeIcon className="w-6 h-6 text-[#D5A688]" />
-                </div>
-                <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
-                  En Estudio o a Domicilio
-                </h3>
-                <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
-                  Te recibimos en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o nos trasladamos a tu domicilio con instrumental esterilizado.
-                </p>
-                <div className="mt-4">
-                  <span className="text-xs text-[#5E765E] font-medium flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    <span>Bioseguridad hospitalaria</span>
+              <ScrollReveal delay={0} className="h-full">
+                <div className="meraki-cream-card rounded-3xl p-8 relative h-full">
+                  <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
+                    01
                   </span>
+                  <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
+                    <Sparkles className="w-6 h-6 text-[#D5A688]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Elige tu Tratamiento
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Explora nuestro catálogo oficial de manicura, pedicura, pestañas, depilación cera/hilo, masajes o faciales con tarifas claras.
+                  </p>
+                  <div className="mt-4">
+                    <Link
+                      to="/catalogo"
+                      className="text-xs font-semibold text-[#5E765E] hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>Ver catálogo</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
                 </div>
-              </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={100} className="h-full">
+                <div className="meraki-cream-card rounded-3xl p-8 relative h-full">
+                  <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
+                    02
+                  </span>
+                  <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
+                    <MessageSquare className="w-6 h-6 text-[#D5A688]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Reserva &amp; Coordina por WhatsApp
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Selecciona fecha y horario disponible en web, asegura con el 40% de adelanto por Yape y envíanos tu constancia al WhatsApp.
+                  </p>
+                  <div className="mt-4">
+                    <Link
+                      to="/como-reservar"
+                      className="text-xs font-semibold text-[#5E765E] hover:underline inline-flex items-center gap-1"
+                    >
+                      <span>Ver pasos de reserva</span>
+                      <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </div>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={200} className="h-full">
+                <div className="meraki-cream-card rounded-3xl p-8 relative h-full">
+                  <span className="font-['Cormorant_Garamond',serif] text-5xl font-bold text-[#5E765E]/20 absolute top-6 right-6">
+                    03
+                  </span>
+                  <div className="w-12 h-12 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-sm">
+                    <HomeIcon className="w-6 h-6 text-[#D5A688]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    En Estudio o a Domicilio
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Te recibimos en nuestro estudio (Calle Agustín Gamarra 515, Pueblo Libre) o nos trasladamos a tu domicilio con instrumental esterilizado.
+                  </p>
+                  <div className="mt-4">
+                    <span className="text-xs text-[#5E765E] font-medium flex items-center gap-1">
+                      <ShieldCheck className="w-3.5 h-3.5" />
+                      <span>Bioseguridad hospitalaria</span>
+                    </span>
+                  </div>
+                </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -148,67 +157,72 @@ export function Home() {
         {/* 3. NUESTRAS 6 ESPECIALIDADES */}
         <section className="py-16 md:py-20 meraki-section-cream text-left">
           <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
-              <div>
-                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
-                  <span>Catálogo Oficial</span>
-                </span>
-                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-1">
-                  Nuestras Especialidades
-                </h2>
+            <ScrollReveal>
+              <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+                <div>
+                  <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                    <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                    <span>Catálogo Oficial</span>
+                  </span>
+                  <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl md:text-5xl font-bold text-[#111111] mt-1">
+                    Nuestras Especialidades
+                  </h2>
+                </div>
+                <Link
+                  to="/catalogo"
+                  className="inline-flex items-center gap-2 text-xs font-semibold text-[#5E765E] uppercase tracking-wider hover:underline"
+                >
+                  <span>Explorar los {CATALOG_SERVICES.length} servicios con tarifas</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
               </div>
-              <Link
-                to="/catalogo"
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[#5E765E] uppercase tracking-wider hover:underline"
-              >
-                <span>Explorar los {CATALOG_SERVICES.length} servicios con tarifas</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoriesPreview.map((cat) => (
-                <Link
-                  key={cat.id}
-                  to={`/catalogo?cat=${cat.id}`}
-                  className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between group cursor-pointer transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md"
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center group-hover:bg-[#5E765E] group-hover:text-[#FFF2DE] transition-colors">
-                        {getCategoryIcon(cat.id)}
+              {categoriesPreview.map((cat, idx) => (
+                <ScrollReveal key={cat.id} delay={getStaggerDelay(idx)} className="h-full">
+                  <Link
+                    to={`/catalogo?cat=${cat.id}`}
+                    className="theme-card-surface rounded-3xl p-6 sm:p-8 flex flex-col justify-between group cursor-pointer h-full"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center group-hover:bg-[#5E765E] group-hover:text-[#FFF2DE] transition-colors">
+                          {getCategoryIcon(cat.id)}
+                        </div>
+                        <span className="meraki-editorial-pill text-xs font-bold text-[#5E765E] px-3 py-1 rounded-full">
+                          {cat.count} servicios
+                        </span>
                       </div>
-                      <span className="meraki-editorial-pill text-xs font-bold text-[#5E765E] px-3 py-1 rounded-full">
-                        {cat.count} servicios
-                      </span>
+
+                      <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2 group-hover:text-[#5E765E] transition-colors">
+                        {cat.label}
+                      </h3>
+                      <p className="text-xs text-[#111111]/75 font-light leading-relaxed mb-6">
+                        {cat.description}
+                      </p>
                     </div>
 
-                    <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2 group-hover:text-[#5E765E] transition-colors">
-                      {cat.label}
-                    </h3>
-                    <p className="text-xs text-[#111111]/75 font-light leading-relaxed mb-6">
-                      {cat.description}
-                    </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-[#5E765E]/10 flex items-center justify-between text-xs font-semibold text-[#5E765E]">
-                    <span>Ver servicios y precios</span>
-                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-                  </div>
-                </Link>
+                    <div className="pt-4 border-t border-[#5E765E]/10 flex items-center justify-between text-xs font-semibold text-[#5E765E]">
+                      <span>Ver servicios y precios</span>
+                      <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                </ScrollReveal>
               ))}
             </div>
 
-            <div className="mt-10 text-center">
-              <Link
-                to="/catalogo"
-                className="inline-flex items-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md"
-              >
-                <span>Abrir Catálogo Completo</span>
-                <ArrowRight className="w-4 h-4 text-[#D5A688]" />
-              </Link>
-            </div>
+            <ScrollReveal delay={100}>
+              <div className="mt-10 text-center">
+                <Link
+                  to="/catalogo"
+                  className="meraki-btn-fluid inline-flex items-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest shadow-md"
+                >
+                  <span>Abrir Catálogo Completo</span>
+                  <ArrowRight className="w-4 h-4 text-[#D5A688]" />
+                </Link>
+              </div>
+            </ScrollReveal>
           </div>
         </section>
 
@@ -216,7 +230,7 @@ export function Home() {
         <section className="py-16 md:py-20 meraki-section-ivory border-y border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-              <div className="lg:col-span-5">
+              <ScrollReveal variant="soft-scale" className="lg:col-span-5">
                 <div className="meraki-cream-card rounded-3xl p-8">
                   <div className="w-16 h-16 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-2xl font-bold mb-6 shadow-sm">
                     AMD
@@ -240,9 +254,9 @@ export function Home() {
                     </Link>
                   </div>
                 </div>
-              </div>
+              </ScrollReveal>
 
-              <div className="lg:col-span-7">
+              <ScrollReveal delay={100} className="lg:col-span-7">
                 <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
                   <Sparkles className="w-3 h-3 text-[#D5A688]" />
                   <span>Propósito de Marca</span>
@@ -275,7 +289,7 @@ export function Home() {
                     <span>Puntualidad y calidez humana</span>
                   </div>
                 </div>
-              </div>
+              </ScrollReveal>
             </div>
           </div>
         </section>
@@ -283,7 +297,8 @@ export function Home() {
         {/* 5. CONDICIONES CLAVE PARA CLIENTES NUEVOS */}
         <section className="py-16 meraki-section-cream text-left">
           <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="p-8 sm:p-10 rounded-3xl theme-card-surface">
+            <ScrollReveal variant="soft-scale">
+              <div className="p-8 sm:p-10 rounded-3xl theme-card-surface">
               <div className="flex items-center justify-between flex-wrap gap-4 mb-8">
                 <div>
                   <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-1">
@@ -337,51 +352,53 @@ export function Home() {
                 </div>
               </div>
             </div>
+            </ScrollReveal>
           </div>
         </section>
 
         {/* 6. TESTIMONIOS REALES */}
         <section className="py-16 meraki-section-ivory border-t border-[#D5A688]/25 text-left">
           <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-xl mx-auto mb-12">
-              <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
-                <Star className="w-3 h-3 text-[#D5A688] fill-current" />
-                <span>Opiniones de Nuestras Clientas</span>
-              </span>
-              <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
-                La comodidad de cuidarte en casa
-              </h2>
-            </div>
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Star className="w-3 h-3 text-[#D5A688] fill-current" />
+                  <span>Opiniones de Nuestras Clientas</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  La comodidad de cuidarte en casa
+                </h2>
+              </div>
+            </ScrollReveal>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {TESTIMONIALS.map((t) => (
-                <div
-                  key={t.id}
-                  className="meraki-cream-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="flex items-center gap-1 text-[#D5A688] mb-4">
-                      {[...Array(t.rating)].map((_, i) => (
-                        <Star key={i} className="w-4 h-4 fill-current" />
-                      ))}
+              {TESTIMONIALS.map((t, idx) => (
+                <ScrollReveal key={t.id} delay={getStaggerDelay(idx)} className="h-full">
+                  <div className="meraki-cream-card rounded-3xl p-6 sm:p-8 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-1 text-[#D5A688] mb-4">
+                        {[...Array(t.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <p className="font-['Cormorant_Garamond',serif] text-lg text-[#111111] italic leading-relaxed mb-6">
+                        “{t.comment}”
+                      </p>
                     </div>
-                    <p className="font-['Cormorant_Garamond',serif] text-lg text-[#111111] italic leading-relaxed mb-6">
-                      “{t.comment}”
-                    </p>
-                  </div>
 
-                  <div className="pt-4 border-t border-[#5E765E]/15">
-                    <span className="font-semibold text-xs text-[#111111] block">
-                      {t.author}
-                    </span>
-                    <span className="text-[11px] text-[#5E765E] block">
-                      {t.role} • {t.location}
-                    </span>
-                    <span className="text-[10px] text-[#111111]/50 block mt-1">
-                      Servicio: {t.service}
-                    </span>
+                    <div className="pt-4 border-t border-[#5E765E]/15">
+                      <span className="font-semibold text-xs text-[#111111] block">
+                        {t.author}
+                      </span>
+                      <span className="text-[11px] text-[#5E765E] block">
+                        {t.role} • {t.location}
+                      </span>
+                      <span className="text-[10px] text-[#111111]/50 block mt-1">
+                        Servicio: {t.service}
+                      </span>
+                    </div>
                   </div>
-                </div>
+                </ScrollReveal>
               ))}
             </div>
           </div>
@@ -389,37 +406,39 @@ export function Home() {
 
         {/* 7. CTA FINAL */}
         <section className="py-20 meraki-section-sage text-[#FFF2DE] text-center">
-          <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-[#D5A688]/45 shadow-sm text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#FFF2DE] mb-4">
-              <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
-              <span>¿Lista para tu momento especial?</span>
-            </span>
-            <h2 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl font-normal leading-tight mb-6">
-              Agenda tu cita hoy y déjanos consentirte donde estés
-            </h2>
-            <p className="text-xs sm:text-sm text-[#FFF2DE]/85 font-light max-w-xl mx-auto mb-10 leading-relaxed">
-              Consulta disponibilidad en horario real de 06:00 a 20:00 o programa tu cita con anticipación.
-            </p>
+          <ScrollReveal variant="soft-scale">
+            <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-[#D5A688]/45 shadow-sm text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#FFF2DE] mb-4">
+                <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
+                <span>¿Lista para tu momento especial?</span>
+              </span>
+              <h2 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl font-normal leading-tight mb-6">
+                Agenda tu cita hoy y déjanos consentirte donde estés
+              </h2>
+              <p className="text-xs sm:text-sm text-[#FFF2DE]/85 font-light max-w-xl mx-auto mb-10 leading-relaxed">
+                Consulta disponibilidad en horario real de 06:00 a 20:00 o programa tu cita con anticipación.
+              </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                type="button"
-                onClick={() => openBooking()}
-                className="w-full sm:w-auto bg-[#FFFDF9] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
-              >
-                <Calendar className="w-4 h-4 text-[#D5A688]" />
-                <span>Agendar Cita</span>
-              </button>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => openBooking()}
+                  className="meraki-btn-fluid w-full sm:w-auto bg-[#FFFDF9] text-[#5E765E] hover:bg-white px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest shadow-lg inline-flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <Calendar className="w-4 h-4 text-[#D5A688]" />
+                  <span>Agendar Cita</span>
+                </button>
 
-              <Link
-                to="/catalogo"
-                className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-sm text-[#FFF2DE] border border-[#D5A688]/45 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest transition-all inline-flex items-center justify-center gap-2"
-              >
-                <span>Ver Catálogo Completo</span>
-                <ArrowRight className="w-4 h-4" />
-              </Link>
+                <Link
+                  to="/catalogo"
+                  className="meraki-btn-fluid w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-sm text-[#FFF2DE] border border-[#D5A688]/45 px-8 py-4 rounded-full text-xs font-semibold uppercase tracking-widest inline-flex items-center justify-center gap-2"
+                >
+                  <span>Ver Catálogo Completo</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
             </div>
-          </div>
+          </ScrollReveal>
         </section>
       </main>
 
