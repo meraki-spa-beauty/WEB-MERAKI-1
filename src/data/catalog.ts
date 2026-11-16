@@ -292,7 +292,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Eliminación rápida y suave del vello del labio superior.',
     includes: ['Elección entre cera suave o hilo de algodón', 'Protección previa de la piel y tónico calmante'],
-    image: '/assets/catalog/depilacion-facial-cejas.jpg'
+    image: '/assets/catalog/depilacion-bozo-rostro.jpg'
   },
   {
     id: 'depilacion-patillas',
@@ -306,7 +306,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Definición del contorno lateral del rostro.',
     includes: ['Limpieza precisa del lateral facial', 'Técnica en cera o hilo según sensibilidad'],
-    image: '/assets/catalog/depilacion-facial-cejas.jpg'
+    image: '/assets/catalog/depilacion-bozo-rostro.jpg'
   },
   {
     id: 'depilacion-menton',
@@ -320,7 +320,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Depilación del vello en la zona del mentón con efecto suave.',
     includes: ['Extracción de raíz con cera o hilo', 'Loción descongestiva posdepilatoria'],
-    image: '/assets/catalog/depilacion-facial-cejas.jpg'
+    image: '/assets/catalog/depilacion-bozo-rostro.jpg'
   },
   {
     id: 'depilacion-frente',
@@ -334,7 +334,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Despeje estético de la línea capilar y zona frontal.',
     includes: ['Limpieza prolija de la zona frontal', 'Acabado suave y limpio'],
-    image: '/assets/catalog/depilacion-facial-cejas.jpg'
+    image: '/assets/catalog/depilacion-bozo-rostro.jpg'
   },
   {
     id: 'depilacion-rostro-completo',
@@ -348,7 +348,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Depilación integral de cejas, bozo, patillas, mentón y frente en una sola sesión.',
     includes: ['Cejas, bozo, patillas, mentón y frente', 'Técnica a elección (Cera S/ 70 o Hilo S/ 65)', 'Mascarilla o gel refrescante para cerrar poros'],
-    image: '/assets/catalog/depilacion-facial-cejas.jpg'
+    image: '/assets/catalog/depilacion-bozo-rostro.jpg'
   },
   {
     id: 'depilacion-axilas',
@@ -359,7 +359,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 35,
     description: 'Depilación higiénica con cera tibia que debilita progresivamente el vello.',
     includes: ['Cera descartable higiénica', 'Aplicación de talco preparatorio y loción calmante'],
-    image: '/assets/catalog/depilacion-cera-corporal.jpg'
+    image: '/assets/catalog/depilacion-axilas.jpg'
   },
   {
     id: 'depilacion-medio-brazo',
@@ -370,7 +370,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 45,
     description: 'Depilación desde codo hasta muñeca con cera tibia.',
     includes: ['Depilación en ambos antebrazos', 'Hidratación calmante inmediata'],
-    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
+    image: '/assets/catalog/depilacion-brazos.jpg'
   },
   {
     id: 'depilacion-brazo-completo',
@@ -381,7 +381,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 60,
     description: 'Depilación integral de ambos brazos desde el hombro.',
     includes: ['Brazos completos de hombro a muñeca', 'Retiro uniforme de raíz y suavizado'],
-    image: '/assets/catalog/depilacion-piernas-brazos.jpg'
+    image: '/assets/catalog/depilacion-brazos.jpg'
   },
   {
     id: 'depilacion-media-pierna',
@@ -447,7 +447,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 40,
     description: 'Depilación de la zona lumbar con cera tibia.',
     includes: ['Zona sacrolumbar', 'Loción calmante posdepilación'],
-    image: '/assets/catalog/depilacion-cera-corporal.jpg'
+    image: '/assets/catalog/depilacion-espalda.jpg'
   },
   {
     id: 'depilacion-espalda-completa',
@@ -458,7 +458,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     pricePEN: 80,
     description: 'Depilación desde hombros y cervicales hasta la zona lumbar.',
     includes: ['Toda la superficie de la espalda', 'Piel suave y libre de vello'],
-    image: '/assets/catalog/depilacion-cera-corporal.jpg'
+    image: '/assets/catalog/depilacion-espalda.jpg'
   },
   {
     id: 'depilacion-gluteos',
@@ -527,7 +527,7 @@ export const CATALOG_SERVICES: CatalogService[] = [
     ],
     description: 'Tratamiento corporal avanzado orientado a la reducción de grasa localizada y mejora de la firmeza.',
     includes: ['Protocolo por sesiones programadas', 'Principios activos reductores focalizados', 'Seguimiento de evolución corporal en cada visita'],
-    image: '/assets/catalog/masaje-drenaje-reductor.jpg'
+    image: '/assets/catalog/masaje-mesoterapia.jpg'
   },
   {
     id: 'masajes-drenaje-linfatico',

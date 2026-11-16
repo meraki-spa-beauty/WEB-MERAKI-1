@@ -70,7 +70,7 @@ export function BookingModal({
   preselectedServiceId,
   preselectedOptionIndex,
 }: BookingModalProps) {
-  const { user } = useAuth();
+  const { user, profileName, profileEmail, profilePhone } = useAuth();
 
   // Wizard 4-Step State
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3 | 4>(1);
@@ -145,12 +145,21 @@ export function BookingModal({
     setStepError(null);
 
     if (user) {
-      if (!clientName && user.displayName) {
-        setClientName(user.displayName);
+      const candidateName =
+        profileName && profileName !== 'Clienta VIP' ? profileName : user.displayName || '';
+
+      const candidateEmail = profileEmail || user.email || '';
+
+      if (!clientName && candidateName) {
+        setClientName(candidateName);
       }
 
-      if (!clientEmail && user.email) {
-        setClientEmail(user.email);
+      if (!clientEmail && candidateEmail) {
+        setClientEmail(candidateEmail);
+      }
+
+      if (!clientPhone && profilePhone) {
+        setClientPhone(profilePhone);
       }
     }
 
@@ -163,7 +172,7 @@ export function BookingModal({
         },
       ]);
     }
-  }, [isOpen, preselectedServiceId, preselectedOptionIndex, user]);
+  }, [isOpen, preselectedServiceId, preselectedOptionIndex, user, profileName, profileEmail, profilePhone]);
 
   // Load real-time schedule config & date slotLocks when modal is open or date changes
   useEffect(() => {

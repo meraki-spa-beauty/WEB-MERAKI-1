@@ -71,6 +71,8 @@ export interface UserLoyaltyProfile {
   phone?: string;
   adminNote?: string;
   photoURL?: string;
+  dataConsentAccepted?: boolean;
+  dataConsentAt?: string;
   stamps: number;
   rewardsClaimed: number;
   history: LoyaltyHistoryItem[];

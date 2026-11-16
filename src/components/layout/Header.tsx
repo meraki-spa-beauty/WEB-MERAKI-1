@@ -104,7 +104,7 @@ function MiniLoyaltyProgressDots({ stamps, isDarkHero }: { stamps: number; isDar
 
 export function Header() {
   const { openBooking } = useBooking();
-  const { user, loyalty } = useAuth();
+  const { user, loyalty, needsVipRegistration } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [drawerMounted, setDrawerMounted] = useState(false);
   const [drawerVisible, setDrawerVisible] = useState(false);
@@ -434,7 +434,13 @@ export function Header() {
           <button
             type="button"
             onClick={() => setIsVipModalOpen(true)}
-            aria-label={user ? `Abrir Club VIP, ${loyalty.stamps} de 5 sellos` : 'Abrir Club VIP'}
+            aria-label={
+              user
+                ? needsVipRegistration
+                  ? 'Activar Club VIP con consentimiento'
+                  : `Abrir Club VIP, ${loyalty.stamps} de 5 sellos`
+                : 'Abrir Club VIP'
+            }
             className={`meraki-btn-fluid inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-['Montserrat',sans-serif] font-semibold transition-all border cursor-pointer whitespace-nowrap shrink-0 ${
               user
                 ? isDarkHero
@@ -446,9 +452,13 @@ export function Header() {
             }`}
           >
             <Award className="w-3.5 h-3.5 text-[#D5A688]" />
-            <span>{user ? `${loyalty.stamps}/5` : 'Club VIP'}</span>
-            {user && <MiniLoyaltyProgressDots stamps={loyalty.stamps} isDarkHero={isDarkHero} />}
-            {user && loyalty.rewardsClaimed > 0 && (
+            <span>
+              {!user ? 'Club VIP' : needsVipRegistration ? 'Activar VIP' : `${loyalty.stamps}/5`}
+            </span>
+            {user && !needsVipRegistration && (
+              <MiniLoyaltyProgressDots stamps={loyalty.stamps} isDarkHero={isDarkHero} />
+            )}
+            {user && !needsVipRegistration && loyalty.rewardsClaimed > 0 && (
               <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#5E765E] text-[#FFF2DE] font-bold">
                 {loyalty.rewardsClaimed}★
               </span>
@@ -481,17 +491,25 @@ export function Header() {
           <button
             type="button"
             onClick={() => setIsVipModalOpen(true)}
-            aria-label={user ? `Club VIP: ${loyalty.stamps} de 5 sellos` : 'Abrir Club VIP'}
+            aria-label={
+              user
+                ? needsVipRegistration
+                  ? 'Activar Club VIP con consentimiento'
+                  : `Club VIP: ${loyalty.stamps} de 5 sellos`
+                : 'Abrir Club VIP'
+            }
             className="meraki-btn-fluid inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[36px] rounded-full border border-[#D5A688] bg-[#FFFDF9] hover:bg-white text-[#111111] text-[11px] font-semibold cursor-pointer shadow-xs whitespace-nowrap shrink-0"
           >
             <Award className="w-3.5 h-3.5 text-[#5E765E]" />
-            {user ? (
+            {!user ? (
+              <span className="text-[10px] text-[#243224] font-bold">Club VIP</span>
+            ) : needsVipRegistration ? (
+              <span className="text-[10px] text-[#243224] font-bold">Activar VIP</span>
+            ) : (
               <>
                 <MiniLoyaltyProgressDots stamps={loyalty.stamps} isDarkHero={false} />
                 <span className="text-[10px] text-[#243224] font-bold">{loyalty.stamps}/5</span>
               </>
-            ) : (
-              <span className="text-[10px] text-[#243224] font-bold">Club VIP</span>
             )}
           </button>
 
@@ -682,9 +700,11 @@ export function Header() {
               >
                 <Award className="w-4 h-4 text-[#5E765E]" />
                 <span>
-                  {user
-                    ? `Mi Club VIP (${loyalty.stamps}/5 Sellos${loyalty.rewardsClaimed > 0 ? ` · ${loyalty.rewardsClaimed} canjes` : ''})`
-                    : 'Club VIP & Tarjeta de Puntos'}
+                  {!user
+                    ? 'Club VIP & Tarjeta de Puntos'
+                    : needsVipRegistration
+                      ? 'Activar Mi Tarjeta VIP (Registro)'
+                      : `Mi Club VIP (${loyalty.stamps}/5 Sellos${loyalty.rewardsClaimed > 0 ? ` · ${loyalty.rewardsClaimed} canjes` : ''})`}
                 </span>
               </button>
 

@@ -1,7 +1,13 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, serverTimestamp, setDoc, updateDoc, type DocumentData } from 'firebase/firestore';
-import { auth, db, loginWithGoogle, logoutUser } from '../services/firebase';
+import {
+  auth,
+  db,
+  loginWithGoogle,
+  logoutUser,
+  readCachedGoogleProfile,
+} from '../services/firebase';
 import {
   fetchMyStaffAccess,
   isCentralOwnerEmail,
@@ -24,6 +30,13 @@ export interface AdminPermissions {
   staffProfile: StaffAccessEntry | null;
 }
 
+export interface ActivateVipCardInput {
+  displayName: string;
+  email: string;
+  phone: string;
+  consentAccepted: boolean;
+}
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
@@ -31,11 +44,15 @@ interface AuthContextType {
   profileName: string;
   profileEmail: string;
   profilePhone: string;
+  hasVipCard: boolean;
+  needsVipRegistration: boolean;
+  dataConsentAccepted: boolean;
   adminPermissions: AdminPermissions;
   login: () => Promise<void>;
   logout: () => Promise<void>;
   claimReward: () => Promise<boolean>;
-  updateMemberProfile: (displayName: string, phone: string) => Promise<void>;
+  activateVipCard: (input: ActivateVipCardInput) => Promise<void>;
+  updateMemberProfile: (displayName: string, phone: string, email?: string) => Promise<void>;
   isConfigured: boolean;
 }
 
@@ -60,16 +77,24 @@ function readDocText(data: DocumentData, key: string): string {
   return Object.prototype.toString.call(raw) === '[object String]' ? String(raw).trim() : '';
 }
 
+function readDocBool(data: DocumentData, key: string): boolean {
+  const raw = data[key];
+
+  return Object.prototype.toString.call(raw) === '[object Boolean]' ? Boolean(raw) : false;
+}
+
 interface GoogleIdentity {
   email: string;
   displayName: string;
   photoURL: string;
 }
 
-function extractGoogleIdentity(firebaseUser: User): GoogleIdentity {
-  let email = (firebaseUser.email || '').trim();
-  let displayName = (firebaseUser.displayName || '').trim();
-  let photoURL = (firebaseUser.photoURL || '').trim();
+async function resolveGoogleIdentity(firebaseUser: User): Promise<GoogleIdentity> {
+  const cached = readCachedGoogleProfile(firebaseUser.uid);
+
+  let email = (firebaseUser.email || cached?.email || '').trim();
+  let displayName = (firebaseUser.displayName || cached?.displayName || '').trim();
+  let photoURL = (firebaseUser.photoURL || cached?.photoURL || '').trim();
 
   for (const provider of firebaseUser.providerData) {
     if (!email && provider.email) {
@@ -82,6 +107,26 @@ function extractGoogleIdentity(firebaseUser: User): GoogleIdentity {
 
     if (!photoURL && provider.photoURL) {
       photoURL = provider.photoURL.trim();
+    }
+  }
+
+  if (!email || !displayName) {
+    try {
+      const tokenRes = await firebaseUser.getIdTokenResult();
+
+      if (!email && Object.prototype.toString.call(tokenRes.claims.email) === '[object String]') {
+        email = String(tokenRes.claims.email).trim();
+      }
+
+      if (!displayName && Object.prototype.toString.call(tokenRes.claims.name) === '[object String]') {
+        displayName = String(tokenRes.claims.name).trim();
+      }
+
+      if (!photoURL && Object.prototype.toString.call(tokenRes.claims.picture) === '[object String]') {
+        photoURL = String(tokenRes.claims.picture).trim();
+      }
+    } catch {
+      // Token claims fallback optional
     }
   }
 
@@ -128,6 +173,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profileName, setProfileName] = useState<string>('');
   const [profileEmail, setProfileEmail] = useState<string>('');
   const [profilePhone, setProfilePhone] = useState<string>('');
+  const [hasVipCard, setHasVipCard] = useState<boolean>(false);
+  const [dataConsentAccepted, setDataConsentAccepted] = useState<boolean>(false);
 
   const [adminPermissions, setAdminPermissions] = useState<AdminPermissions>(
     DEFAULT_ADMIN_PERMISSIONS,
@@ -152,13 +199,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfileName('');
         setProfileEmail('');
         setProfilePhone('');
+        setHasVipCard(false);
+        setDataConsentAccepted(false);
         setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
         setLoading(false);
 
         return;
       }
 
-      const googleIdentity = extractGoogleIdentity(firebaseUser);
+      const googleIdentity = await resolveGoogleIdentity(firebaseUser);
       const effectiveEmail = firebaseUser.email || googleIdentity.email;
       const verifiedEmail = firebaseUser.emailVerified ? effectiveEmail : null;
       const centralOwner = isCentralOwnerEmail(verifiedEmail);
@@ -196,10 +245,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
       }
 
-      let loadedData: LoyaltyData | null = null;
-      let resolvedName = googleIdentity.displayName || 'Clienta VIP';
+      let resolvedName = googleIdentity.displayName;
       let resolvedEmail = googleIdentity.email;
       let resolvedPhone = '';
+      let docExists = false;
+      let resolvedConsent = false;
+
+      let loadedData: LoyaltyData = {
+        stamps: 0,
+        rewardsClaimed: 0,
+        history: [],
+      };
 
       if (db) {
         try {
@@ -207,6 +263,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const docSnap = await getDoc(userDocRef);
 
           if (docSnap.exists()) {
+            docExists = true;
             const docData = docSnap.data();
 
             loadedData = parseLoyaltyFromDoc(docData);
@@ -214,116 +271,46 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const existingName = readDocText(docData, 'displayName');
             const existingEmail = readDocText(docData, 'email');
             const existingPhone = readDocText(docData, 'phone');
-            const existingPhoto = readDocText(docData, 'photoURL');
+            const existingConsent = readDocBool(docData, 'dataConsentAccepted');
 
             resolvedName =
               existingName && existingName !== 'Clienta VIP'
                 ? existingName
-                : googleIdentity.displayName || existingName || 'Clienta VIP';
+                : googleIdentity.displayName || '';
             resolvedEmail = existingEmail || googleIdentity.email;
             resolvedPhone = existingPhone;
-
-            const resolvedPhoto = googleIdentity.photoURL || existingPhoto;
-
-            if (
-              resolvedEmail !== existingEmail ||
-              resolvedName !== existingName ||
-              resolvedPhoto !== existingPhoto
-            ) {
-              try {
-                await updateDoc(userDocRef, {
-                  email: resolvedEmail.slice(0, 160),
-                  displayName: resolvedName.slice(0, 120),
-                  phone: resolvedPhone.slice(0, 30),
-                  photoURL: resolvedPhoto.slice(0, 500),
-                  updatedAt: serverTimestamp(),
-                });
-              } catch {
-                // Keep existing stored values if schema has legacy fields handled by admin sync
-              }
-            }
-          } else {
-            const initialLoyalty: LoyaltyData = {
-              stamps: 1,
-              rewardsClaimed: 0,
-              history: [
-                {
-                  id: 'welcome',
-                  date: new Date().toLocaleDateString('es-PE', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                  }),
-                  service: 'Bienvenida a Meraki VIP',
-                  price: 0,
-                },
-              ],
-            };
-
-            loadedData = initialLoyalty;
-
-            try {
-              await setDoc(userDocRef, {
-                uid: firebaseUser.uid,
-                email: resolvedEmail.slice(0, 160),
-                displayName: resolvedName.slice(0, 120),
-                phone: '',
-                adminNote: '',
-                photoURL: googleIdentity.photoURL.slice(0, 500),
-                stamps: 1,
-                rewardsClaimed: 0,
-                history: initialLoyalty.history,
-                updatedAt: serverTimestamp(),
-              });
-            } catch (writeErr) {
-              console.warn('Could not initialize loyalty profile in Firestore:', writeErr);
-            }
+            resolvedConsent = existingConsent;
           }
         } catch (err) {
-          console.warn('Could not fetch loyalty from Firestore, falling back to localStorage:', err);
+          console.warn('Could not fetch loyalty from Firestore:', err);
         }
       }
 
-      if (!loadedData) {
-        const saved = localStorage.getItem(`meraki_loyalty_${firebaseUser.uid}`);
-
-        if (saved) {
-          try {
-            // SAFETY: Parsed from localStorage stored by this provider
-            loadedData = parseLoyaltyFromDoc(JSON.parse(saved) as DocumentData);
-          } catch {
-            loadedData = null;
-          }
-        }
-      }
-
-      const finalLoyalty = loadedData ?? {
-        stamps: 1,
-        rewardsClaimed: 0,
-        history: [
-          {
-            id: 'welcome',
-            date: new Date().toLocaleDateString('es-PE', {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            }),
-            service: 'Bienvenida a Meraki VIP',
-            price: 0,
-          },
-        ],
-      };
-
+      setHasVipCard(docExists);
+      setDataConsentAccepted(resolvedConsent);
       setProfileName(resolvedName);
       setProfileEmail(resolvedEmail);
       setProfilePhone(resolvedPhone);
-      setLoyalty(finalLoyalty);
-      localStorage.setItem(`meraki_loyalty_${firebaseUser.uid}`, JSON.stringify(finalLoyalty));
+      setLoyalty(loadedData);
+
+      if (docExists) {
+        localStorage.setItem(`meraki_loyalty_${firebaseUser.uid}`, JSON.stringify(loadedData));
+      }
+
       setLoading(false);
     });
 
     return () => unsubscribe();
   }, []);
+
+  const needsVipRegistration = Boolean(
+    user &&
+      (!hasVipCard ||
+        !dataConsentAccepted ||
+        !profileName.trim() ||
+        profileName.trim() === 'Clienta VIP' ||
+        !profileEmail.trim()),
+  );
 
   const login = async () => {
     const firebaseUser = await loginWithGoogle();
@@ -338,27 +325,132 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfileName('');
     setProfileEmail('');
     setProfilePhone('');
+    setHasVipCard(false);
+    setDataConsentAccepted(false);
     setAdminPermissions(DEFAULT_ADMIN_PERMISSIONS);
   };
 
-  const updateMemberProfile = async (displayName: string, phone: string): Promise<void> => {
+  const activateVipCard = async (input: ActivateVipCardInput): Promise<void> => {
+    if (!user) {
+      throw new Error('Debes iniciar sesión con Google primero.');
+    }
+
+    const cleanName = input.displayName.trim().slice(0, 120);
+    const cleanEmail = input.email.trim().toLowerCase().slice(0, 160);
+    const cleanPhone = input.phone.trim().slice(0, 30);
+
+    if (cleanName.length < 2 || cleanName === 'Clienta VIP') {
+      throw new Error('Por favor ingresa tu nombre y apellido reales.');
+    }
+
+    if (cleanEmail.length < 5 || !cleanEmail.includes('@')) {
+      throw new Error('Por favor ingresa un correo electrónico válido.');
+    }
+
+    if (!input.consentAccepted) {
+      throw new Error('Debes aceptar el consentimiento de datos para activar tu tarjeta Club VIP.');
+    }
+
+    const consentIso = new Date().toISOString().slice(0, 40);
+    const googleIdentity = await resolveGoogleIdentity(user);
+    const photoURL = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
+
+    let nextLoyalty = loyalty;
+
+    if (db) {
+      const userDocRef = doc(db, 'users', user.uid);
+
+      if (hasVipCard) {
+        await updateDoc(userDocRef, {
+          email: cleanEmail,
+          displayName: cleanName,
+          phone: cleanPhone,
+          photoURL,
+          dataConsentAccepted: true,
+          dataConsentAt: consentIso,
+          updatedAt: serverTimestamp(),
+        });
+      } else {
+        const welcomeHistory: LoyaltyHistoryItem[] = [
+          {
+            id: 'welcome',
+            date: new Date().toLocaleDateString('es-PE', {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            }),
+            service: 'Bienvenida a Meraki VIP',
+            price: 0,
+          },
+        ];
+
+        nextLoyalty = {
+          stamps: 1,
+          rewardsClaimed: 0,
+          history: welcomeHistory,
+        };
+
+        await setDoc(userDocRef, {
+          uid: user.uid,
+          email: cleanEmail,
+          displayName: cleanName,
+          phone: cleanPhone,
+          adminNote: '',
+          photoURL,
+          dataConsentAccepted: true,
+          dataConsentAt: consentIso,
+          stamps: 1,
+          rewardsClaimed: 0,
+          history: welcomeHistory,
+          updatedAt: serverTimestamp(),
+        });
+      }
+    }
+
+    setHasVipCard(true);
+    setDataConsentAccepted(true);
+    setProfileName(cleanName);
+    setProfileEmail(cleanEmail);
+    setProfilePhone(cleanPhone);
+    setLoyalty(nextLoyalty);
+    localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(nextLoyalty));
+  };
+
+  const updateMemberProfile = async (
+    displayName: string,
+    phone: string,
+    email?: string,
+  ): Promise<void> => {
     if (!user) return;
 
-    const cleanName = displayName.trim().slice(0, 120) || 'Clienta VIP';
+    const cleanName = displayName.trim().slice(0, 120);
     const cleanPhone = phone.trim().slice(0, 30);
+    const cleanEmail = (email ?? (profileEmail || user.email || '')).trim().toLowerCase().slice(0, 160);
+
+    if (cleanName.length < 2 || cleanName === 'Clienta VIP') {
+      throw new Error('Ingresa un nombre y apellido válido.');
+    }
+
+    if (cleanEmail.length < 5 || !cleanEmail.includes('@')) {
+      throw new Error('Ingresa un correo electrónico válido.');
+    }
 
     if (db) {
       await updateDoc(doc(db, 'users', user.uid), {
         displayName: cleanName,
         phone: cleanPhone,
-        email: (profileEmail || user.email || '').trim().slice(0, 160),
+        email: cleanEmail,
         photoURL: (user.photoURL || '').trim().slice(0, 500),
+        dataConsentAccepted: true,
+        dataConsentAt: new Date().toISOString().slice(0, 40),
         updatedAt: serverTimestamp(),
       });
     }
 
     setProfileName(cleanName);
+    setProfileEmail(cleanEmail);
     setProfilePhone(cleanPhone);
+    setDataConsentAccepted(true);
   };
 
   const claimReward = async (): Promise<boolean> => {
@@ -411,10 +503,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         profileName,
         profileEmail,
         profilePhone,
+        hasVipCard,
+        needsVipRegistration,
+        dataConsentAccepted,
         adminPermissions,
         login,
         logout,
         claimReward,
+        activateVipCard,
         updateMemberProfile,
         isConfigured,
       }}

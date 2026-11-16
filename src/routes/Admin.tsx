@@ -18,6 +18,7 @@ import {
   adminSaveVipCardProfile,
   adminStampUserVip,
   deleteStaffAccessEntry,
+  deleteVipCardAdmin,
   fetchAllStaffAccess,
   fetchAllVipUsers,
   fetchBookingsForAdmin,
@@ -86,6 +87,7 @@ export function Admin() {
   const [newVipPhone, setNewVipPhone] = useState('');
   const [newVipEmail, setNewVipEmail] = useState('');
   const [newVipNote, setNewVipNote] = useState('');
+  const [confirmDeleteVipUid, setConfirmDeleteVipUid] = useState<string | null>(null);
 
   // Toast notice
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
@@ -361,6 +363,23 @@ export function Admin() {
       showNotice(`Nueva tarjeta VIP creada para ${created.displayName}.`);
     } catch {
       showNotice('No se pudo crear la nueva tarjeta VIP.');
+    } finally {
+      setSavingVipUid(null);
+    }
+  };
+
+  const handleDeleteVipCard = async (targetUser: UserLoyaltyProfile) => {
+    if (!adminPermissions.isCentralOwner) return;
+
+    setSavingVipUid(targetUser.uid);
+
+    try {
+      await deleteVipCardAdmin(targetUser.uid);
+      setVipUsers((prev) => prev.filter((u) => u.uid !== targetUser.uid));
+      setConfirmDeleteVipUid(null);
+      showNotice(`Tarjeta #${targetUser.uid.slice(0, 8).toUpperCase()} eliminada.`);
+    } catch {
+      showNotice('No se pudo eliminar la tarjeta VIP.');
     } finally {
       setSavingVipUid(null);
     }
@@ -918,7 +937,7 @@ export function Admin() {
                   Tarjetas de Fidelidad Club VIP
                 </h2>
                 <p className="text-xs text-[#111111]/65">
-                  Identifica por nombre, correo, WhatsApp o nota interna y asigna el sello al concluir la atención.
+                  Las clientas registran su nombre, correo y consentimiento al activar su tarjeta. También puedes identificar tarjetas anteriores o eliminar duplicados.
                 </p>
               </div>
 
@@ -1039,6 +1058,7 @@ export function Admin() {
                 const suggestedBooking = isUnidentified ? findSuggestedBookingForVip(u) : null;
                 const lastEntry = u.history[0];
                 const isBusy = savingVipUid === u.uid;
+                const isConfirmingDelete = confirmDeleteVipUid === u.uid;
 
                 return (
                   <div
@@ -1052,9 +1072,13 @@ export function Admin() {
                           <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-white border border-[#5E765E]/20 text-[#5E765E]">
                             #{u.uid.slice(0, 8).toUpperCase()}
                           </span>
-                          {isUnidentified && (
+                          {u.dataConsentAccepted ? (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EDF2EC] text-[#5E765E] font-semibold">
+                              Consentimiento ✓
+                            </span>
+                          ) : (
                             <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 font-semibold">
-                              Sin identificar
+                              {isUnidentified ? 'Sin identificar' : 'Sin consentimiento'}
                             </span>
                           )}
                         </div>
@@ -1114,6 +1138,35 @@ export function Admin() {
                           <Pencil className="w-3 h-3" />
                           <span>{isEditing ? 'Cerrar' : 'Identificar'}</span>
                         </button>
+                        {adminPermissions.isCentralOwner && !isConfirmingDelete && (
+                          <button
+                            type="button"
+                            onClick={() => setConfirmDeleteVipUid(u.uid)}
+                            className="px-3 py-1 rounded-lg bg-white border border-red-200 text-red-600 text-[11px] font-semibold inline-flex items-center justify-center gap-1 cursor-pointer hover:bg-red-50"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Eliminar</span>
+                          </button>
+                        )}
+                        {adminPermissions.isCentralOwner && isConfirmingDelete && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              disabled={isBusy}
+                              onClick={() => void handleDeleteVipCard(u)}
+                              className="px-2.5 py-1 rounded-lg bg-red-600 text-white text-[10px] font-bold cursor-pointer"
+                            >
+                              Confirmar
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setConfirmDeleteVipUid(null)}
+                              className="px-2 py-1 rounded-lg bg-white border border-[#5E765E]/25 text-[10px] text-[#111111]/70 cursor-pointer"
+                            >
+                              No
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 

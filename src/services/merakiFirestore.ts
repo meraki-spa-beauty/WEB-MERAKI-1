@@ -613,6 +613,8 @@ export async function fetchAllVipUsers(): Promise<UserLoyaltyProfile[]> {
         phone: readStr(d, 'phone', ''),
         adminNote: readStr(d, 'adminNote', ''),
         photoURL: readStr(d, 'photoURL', ''),
+        dataConsentAccepted: readBool(d, 'dataConsentAccepted', false),
+        dataConsentAt: readStr(d, 'dataConsentAt', ''),
         stamps: Math.max(0, Math.min(5, Math.round(readNum(d, 'stamps', 0)))),
         rewardsClaimed: Math.max(0, Math.round(readNum(d, 'rewardsClaimed', 0))),
         history,
@@ -669,6 +671,8 @@ export async function adminStampUserVip(params: {
   const normalizedPhone = clampText(params.user.phone || '', 30);
   const normalizedAdminNote = clampText(params.user.adminNote || '', 160);
   const normalizedPhoto = clampText(params.user.photoURL || '', 500);
+  const normalizedConsent = Boolean(params.user.dataConsentAccepted);
+  const normalizedConsentAt = clampText(params.user.dataConsentAt || '', 40);
 
   try {
     await setDoc(doc(db, 'users', cleanUid), {
@@ -678,6 +682,8 @@ export async function adminStampUserVip(params: {
       phone: normalizedPhone,
       adminNote: normalizedAdminNote,
       photoURL: normalizedPhoto,
+      dataConsentAccepted: normalizedConsent,
+      dataConsentAt: normalizedConsentAt,
       stamps: nextStamps,
       rewardsClaimed: nextRewards,
       history: nextHistory,
@@ -691,6 +697,8 @@ export async function adminStampUserVip(params: {
       phone: normalizedPhone,
       adminNote: normalizedAdminNote,
       photoURL: normalizedPhoto,
+      dataConsentAccepted: normalizedConsent,
+      dataConsentAt: normalizedConsentAt,
       stamps: nextStamps,
       rewardsClaimed: nextRewards,
       history: nextHistory,
@@ -719,6 +727,11 @@ export async function adminSaveVipCardProfile(params: {
   const cleanPhone = clampText(params.phone, 30);
   const cleanNote = clampText(params.adminNote, 160);
   const cleanPhoto = clampText(params.existing?.photoURL || '', 500);
+  const cleanConsent = params.existing ? Boolean(params.existing.dataConsentAccepted) : true;
+
+  const cleanConsentAt = params.existing
+    ? clampText(params.existing.dataConsentAt || '', 40)
+    : new Date().toISOString().slice(0, 40);
 
   const todayLabel = new Date().toLocaleDateString('es-PE', {
     day: 'numeric',
@@ -753,6 +766,8 @@ export async function adminSaveVipCardProfile(params: {
       phone: cleanPhone,
       adminNote: cleanNote,
       photoURL: cleanPhoto,
+      dataConsentAccepted: cleanConsent,
+      dataConsentAt: cleanConsentAt,
       stamps,
       rewardsClaimed,
       history,
@@ -766,12 +781,27 @@ export async function adminSaveVipCardProfile(params: {
       phone: cleanPhone,
       adminNote: cleanNote,
       photoURL: cleanPhoto,
+      dataConsentAccepted: cleanConsent,
+      dataConsentAt: cleanConsentAt,
       stamps,
       rewardsClaimed,
       history,
     };
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
+  }
+}
+
+export async function deleteVipCardAdmin(uid: string): Promise<void> {
+  if (!db) throw new Error('Firestore no está disponible.');
+
+  const cleanUid = uid.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 128);
+  const path = `users/${cleanUid}`;
+
+  try {
+    await deleteDoc(doc(db, 'users', cleanUid));
+  } catch (err) {
+    handleFirestoreError(err, OperationType.DELETE, path);
   }
 }
 

@@ -1,5 +1,6 @@
-import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { createBrowserRouter, Link, Navigate, useLocation, useOutlet } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { Home } from '../routes/Home';
 import { Catalogo } from '../routes/Catalogo';
 import { ComoReservar } from '../routes/ComoReservar';
@@ -113,57 +114,82 @@ function syncRouteSeoMetadata(pathname: string) {
   }
 }
 
+function FrozenRouteOutlet() {
+  const outlet = useOutlet();
+  const [capturedOutlet] = useState(outlet);
+
+  return <>{capturedOutlet}</>;
+}
+
+const ROUTE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
 function RootLayout() {
   const location = useLocation();
-  const isFirstRender = useRef(true);
-  const [transitionKey, setTransitionKey] = useState<number>(0);
+  const prevPathRef = useRef<string>(location.pathname);
+  const prevSearchRef = useRef<string>(location.search);
+  const [isTransitioning, setIsTransitioning] = useState<boolean>(false);
 
   useEffect(() => {
     syncRouteSeoMetadata(location.pathname);
 
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (prevPathRef.current !== location.pathname) {
+      prevPathRef.current = location.pathname;
+      prevSearchRef.current = location.search;
+      setIsTransitioning(true);
+
+      if (location.pathname !== '/admin') {
+        trackMetaPageView();
+        trackTikTokPageView();
+      }
 
       return;
     }
 
-    setTransitionKey((prev) => prev + 1);
+    if (prevSearchRef.current !== location.search) {
+      prevSearchRef.current = location.search;
 
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+  }, [location.pathname, location.search]);
+
+  const handleExitComplete = () => {
     if (typeof window !== 'undefined') {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
-
-    if (location.pathname !== '/admin') {
-      trackMetaPageView();
-      trackTikTokPageView();
-    }
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (transitionKey === 0) return;
-
-    const timer = window.setTimeout(() => {
-      setTransitionKey(0);
-    }, 1080);
-
-    return () => window.clearTimeout(timer);
-  }, [transitionKey]);
+  };
 
   return (
-    <>
-      {transitionKey > 0 && (
-        <div
-          key={`curtain-${transitionKey}`}
-          aria-hidden="true"
-          className="meraki-page-curtain fixed inset-0 z-[9990] flex items-center justify-center"
+    <MotionConfig reducedMotion="user">
+      <AnimatePresence>
+        {isTransitioning && (
+          <motion.div
+            key={`route-bar-${location.pathname}`}
+            aria-hidden="true"
+            initial={{ scaleX: 0, opacity: 0.95 }}
+            animate={{ scaleX: 1, opacity: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.85, ease: ROUTE_EASE }}
+            onAnimationComplete={() => setIsTransitioning(false)}
+            style={{ transformOrigin: 'left center' }}
+            className="fixed top-0 left-0 right-0 z-[9995] pointer-events-none h-[2.5px] bg-gradient-to-r from-[#5E765E] via-[#D5A688] to-[#5E765E]"
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.36, ease: ROUTE_EASE }}
         >
-          <span className="h-px w-24 bg-gradient-to-r from-transparent via-[#D5A688] to-transparent opacity-70" />
-        </div>
-      )}
-      <div key={location.pathname} className="meraki-route-enter">
-        <Outlet />
-      </div>
-    </>
+          <FrozenRouteOutlet />
+        </motion.div>
+      </AnimatePresence>
+    </MotionConfig>
   );
 }
 

@@ -1,5 +1,12 @@
 import { FirebaseError, initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import {
+  getAdditionalUserInfo,
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  type ParsedToken,
+} from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import firebaseConfig from '../../firebase-applet-config.json';
 
@@ -18,11 +25,66 @@ export const db = app ? getFirestore(app, firebaseConfig.firestoreDatabaseId) : 
 
 export const googleProvider = new GoogleAuthProvider();
 
+googleProvider.addScope('openid');
+
 googleProvider.addScope('profile');
 
 googleProvider.addScope('email');
 
 googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+export interface CachedGoogleIdentity {
+  email: string;
+  displayName: string;
+  photoURL: string;
+}
+
+const memoryGoogleCache = new Map<string, CachedGoogleIdentity>();
+
+function readTokenClaim(claims: ParsedToken, key: string): string {
+  const val = claims[key];
+
+  return Object.prototype.toString.call(val) === '[object String]' ? String(val).trim() : '';
+}
+
+export function readCachedGoogleProfile(uid: string): CachedGoogleIdentity | null {
+  const inMem = memoryGoogleCache.get(uid);
+
+  if (inMem) return inMem;
+
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const raw = window.sessionStorage.getItem(`meraki_google_identity_${uid}`);
+
+    if (!raw) return null;
+
+    // SAFETY: JSON string written by cacheGoogleProfile below
+    const parsed = JSON.parse(raw) as CachedGoogleIdentity;
+
+    if (parsed && (parsed.email || parsed.displayName)) {
+      memoryGoogleCache.set(uid, parsed);
+
+      return parsed;
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function cacheGoogleProfile(uid: string, identity: CachedGoogleIdentity): void {
+  memoryGoogleCache.set(uid, identity);
+
+  if (typeof window !== 'undefined') {
+    try {
+      window.sessionStorage.setItem(`meraki_google_identity_${uid}`, JSON.stringify(identity));
+    } catch {
+      // Ignore storage quota errors
+    }
+  }
+}
 
 function mapFirebaseAuthCodeToMessage(code: string, fallbackMessage: string): string {
   switch (code) {
@@ -59,6 +121,67 @@ export async function loginWithGoogle() {
 
   try {
     const result = await signInWithPopup(auth, googleProvider);
+    const additionalInfo = getAdditionalUserInfo(result);
+    const profileMap = new Map<string, string>();
+
+    if (additionalInfo?.profile) {
+      for (const [k, v] of Object.entries(additionalInfo.profile)) {
+        if (Object.prototype.toString.call(v) === '[object String]') {
+          profileMap.set(k, String(v).trim());
+        }
+      }
+    }
+
+    let tokenEmail = '';
+    let tokenName = '';
+    let tokenPhoto = '';
+
+    try {
+      const tokenRes = await result.user.getIdTokenResult();
+
+      tokenEmail = readTokenClaim(tokenRes.claims, 'email');
+      tokenName = readTokenClaim(tokenRes.claims, 'name');
+      tokenPhoto = readTokenClaim(tokenRes.claims, 'picture');
+    } catch {
+      // Token claims fallback optional
+    }
+
+    const providerEmail = result.user.providerData.find((p) => Boolean(p.email))?.email?.trim() || '';
+    const providerName = result.user.providerData.find((p) => Boolean(p.displayName))?.displayName?.trim() || '';
+    const providerPhoto = result.user.providerData.find((p) => Boolean(p.photoURL))?.photoURL?.trim() || '';
+
+    const fullGivenFamily = [profileMap.get('given_name') || '', profileMap.get('family_name') || '']
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
+    const resolvedEmail = (
+      result.user.email ||
+      providerEmail ||
+      profileMap.get('email') ||
+      tokenEmail
+    ).trim().slice(0, 160);
+
+    const resolvedName = (
+      result.user.displayName ||
+      providerName ||
+      profileMap.get('name') ||
+      fullGivenFamily ||
+      tokenName
+    ).trim().slice(0, 120);
+
+    const resolvedPhoto = (
+      result.user.photoURL ||
+      providerPhoto ||
+      profileMap.get('picture') ||
+      tokenPhoto
+    ).trim().slice(0, 500);
+
+    cacheGoogleProfile(result.user.uid, {
+      email: resolvedEmail,
+      displayName: resolvedName,
+      photoURL: resolvedPhoto,
+    });
 
     return result.user;
   } catch (err) {

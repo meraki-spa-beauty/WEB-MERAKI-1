@@ -1,6 +1,20 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Sparkles, Award, LogOut, CheckCircle2, Gift, X, User as UserIcon, Pencil, Phone, Save } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import {
+  Sparkles,
+  Award,
+  LogOut,
+  CheckCircle2,
+  Gift,
+  X,
+  User as UserIcon,
+  Pencil,
+  Phone,
+  Mail,
+  Save,
+  ShieldCheck,
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
 interface VipLoyaltyModalProps {
@@ -15,9 +29,11 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
     profileName,
     profileEmail,
     profilePhone,
+    needsVipRegistration,
     login,
     logout,
     claimReward,
+    activateVipCard,
     updateMemberProfile,
     isConfigured,
   } = useAuth();
@@ -29,27 +45,30 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
 
   const [isEditingProfile, setIsEditingProfile] = useState<boolean>(false);
   const [draftName, setDraftName] = useState<string>('');
+  const [draftEmail, setDraftEmail] = useState<string>('');
   const [draftPhone, setDraftPhone] = useState<string>('');
+  const [consentAccepted, setConsentAccepted] = useState<boolean>(false);
   const [isSavingProfile, setIsSavingProfile] = useState<boolean>(false);
   const [profileSavedNotice, setProfileSavedNotice] = useState<boolean>(false);
 
   const effectiveName = profileName || user?.displayName || 'Clienta VIP';
   const effectiveEmail = profileEmail || user?.email || '';
 
-  const needsProfileCompletion = Boolean(
-    user && (!profilePhone.trim() || effectiveName === 'Clienta VIP'),
-  );
-
   useEffect(() => {
-    if (user) {
-      setDraftName(effectiveName === 'Clienta VIP' ? '' : effectiveName);
-      setDraftPhone(profilePhone);
+    if (!user) {
+      setDraftName('');
+      setDraftEmail('');
+      setDraftPhone('');
+      setConsentAccepted(false);
+      setIsEditingProfile(false);
 
-      if (needsProfileCompletion) {
-        setIsEditingProfile(true);
-      }
+      return;
     }
-  }, [user, effectiveName, profilePhone, needsProfileCompletion]);
+
+    setDraftName(effectiveName === 'Clienta VIP' ? '' : effectiveName);
+    setDraftEmail(effectiveEmail);
+    setDraftPhone(profilePhone);
+  }, [user, effectiveName, effectiveEmail, profilePhone]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -86,6 +105,35 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
     }
   };
 
+  const handleActivateVip = async (event: React.FormEvent) => {
+    event.preventDefault();
+
+    if (!user || isSavingProfile) return;
+
+    setErrorMsg(null);
+    setIsSavingProfile(true);
+
+    try {
+      await activateVipCard({
+        displayName: draftName,
+        email: draftEmail,
+        phone: draftPhone,
+        consentAccepted,
+      });
+
+      setProfileSavedNotice(true);
+      window.setTimeout(() => setProfileSavedNotice(false), 3500);
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg('No se pudo activar tu tarjeta VIP en este momento.');
+      }
+    } finally {
+      setIsSavingProfile(false);
+    }
+  };
+
   const handleClaim = async () => {
     if (isClaiming) return;
 
@@ -112,12 +160,20 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
     setIsSavingProfile(true);
 
     try {
-      await updateMemberProfile(draftName || effectiveName, draftPhone);
+      await updateMemberProfile(
+        draftName || effectiveName,
+        draftPhone,
+        draftEmail || effectiveEmail,
+      );
       setIsEditingProfile(false);
       setProfileSavedNotice(true);
       window.setTimeout(() => setProfileSavedNotice(false), 3500);
-    } catch {
-      setErrorMsg('No se pudieron guardar tus datos en este momento.');
+    } catch (err) {
+      if (err instanceof Error) {
+        setErrorMsg(err.message);
+      } else {
+        setErrorMsg('No se pudieron guardar tus datos en este momento.');
+      }
     } finally {
       setIsSavingProfile(false);
     }
@@ -150,12 +206,18 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
             <span>Meraki Club VIP</span>
           </span>
           <h3 id="vip-modal-title" className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111]">
-            {user ? `¡Hola, ${effectiveName}!` : 'Mi Cuenta & Tarjeta de Puntos'}
+            {!user
+              ? 'Mi Cuenta & Tarjeta de Puntos'
+              : needsVipRegistration
+                ? 'Activa tu Tarjeta VIP'
+                : `¡Hola, ${effectiveName}!`}
           </h3>
           <p className="text-xs text-[#111111]/75 font-light mt-1">
-            {user
-              ? 'Acumula sellos verificados en cada visita y desbloquea beneficios exclusivos en Meraki Spa.'
-              : 'Inicia sesión con tu cuenta de Google para revisar tus tarjetas de fidelización y sellos acumulados.'}
+            {!user
+              ? 'Inicia sesión con tu cuenta de Google para revisar tus tarjetas de fidelización y sellos acumulados.'
+              : needsVipRegistration
+                ? 'Confirma tus datos y autoriza el uso de tu perfil para identificar tu tarjeta y asignar sellos al instante.'
+                : 'Acumula sellos verificados en cada visita y desbloquea beneficios exclusivos en Meraki Spa.'}
           </p>
         </div>
 
@@ -166,7 +228,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
         )}
 
         {errorMsg && (
-          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs">
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs text-left">
             {errorMsg}
           </div>
         )}
@@ -179,7 +241,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
 
             <div className="space-y-2 text-xs text-[#111111]/85 font-light">
               <p>✨ <strong>Tarjeta de Sellos Digital:</strong> Completa 5 visitas y recibe un tratamiento de parafina o beneficio VIP.</p>
-              <p>📅 <strong>Historial de Visitas:</strong> Nuestras especialistas marcan cada sello directamente tras tu atención.</p>
+              <p>📅 <strong>Historial de Visitas:</strong> Nuestras especialistas identifican tu nombre y marcan cada sello tras tu atención.</p>
             </div>
 
             <button
@@ -208,6 +270,133 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
               </svg>
               <span>{isLoggingIn ? 'Conectando con Google...' : 'Continuar con Google'}</span>
             </button>
+
+            <p className="text-[11px] text-[#111111]/65 leading-relaxed px-2">
+              Al ingresar te pediremos confirmar tu nombre, correo y consentimiento de datos antes de activar tu tarjeta.
+            </p>
+          </div>
+        ) : needsVipRegistration ? (
+          <div className="space-y-4 text-left">
+            <div className="p-3 rounded-2xl bg-[#FFF2DE]/70 border border-[#D5A688]/30 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                {user.photoURL ? (
+                  <img
+                    src={user.photoURL}
+                    alt={effectiveName}
+                    className="w-9 h-9 rounded-full object-cover border border-[#5E765E]/30 shrink-0"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="w-9 h-9 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-bold text-xs shrink-0">
+                    {(effectiveName[0] || effectiveEmail[0] || 'M').toUpperCase()}
+                  </div>
+                )}
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-[#111111] truncate">
+                    {effectiveEmail || 'Cuenta Google conectada'}
+                  </p>
+                  <p className="text-[10px] text-[#5E765E] font-medium">
+                    Paso único de registro &amp; consentimiento
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={logout}
+                className="text-[#111111]/60 hover:text-red-600 p-2 rounded-full transition-colors cursor-pointer shrink-0"
+                aria-label="Cambiar de cuenta Google"
+                title="Cerrar sesión"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+
+            <form onSubmit={handleActivateVip} className="space-y-3">
+              <div>
+                <label htmlFor="vip-onboard-name" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                  Nombre y Apellido *
+                </label>
+                <div className="relative">
+                  <UserIcon className="w-3.5 h-3.5 text-[#5E765E]/70 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="vip-onboard-name"
+                    type="text"
+                    required
+                    minLength={2}
+                    placeholder="Ej. Valeria Paredes"
+                    value={draftName}
+                    onChange={(e) => setDraftName(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111] focus:outline-none focus:border-[#5E765E]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="vip-onboard-email" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                  Correo electrónico *
+                </label>
+                <div className="relative">
+                  <Mail className="w-3.5 h-3.5 text-[#5E765E]/70 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="vip-onboard-email"
+                    type="email"
+                    required
+                    placeholder="tu-correo@gmail.com"
+                    value={draftEmail}
+                    onChange={(e) => setDraftEmail(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111] focus:outline-none focus:border-[#5E765E]"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="vip-onboard-phone" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                  WhatsApp (para identificarte rápido al atenderte)
+                </label>
+                <div className="relative">
+                  <Phone className="w-3.5 h-3.5 text-[#5E765E]/70 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    id="vip-onboard-phone"
+                    type="tel"
+                    placeholder="999 888 777"
+                    value={draftPhone}
+                    onChange={(e) => setDraftPhone(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111] focus:outline-none focus:border-[#5E765E]"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-[#EDF2EC]/70 border border-[#5E765E]/25 flex items-start gap-2.5">
+                <input
+                  id="vip-consent-checkbox"
+                  type="checkbox"
+                  checked={consentAccepted}
+                  onChange={(e) => setConsentAccepted(e.target.checked)}
+                  required
+                  className="mt-0.5 rounded border-[#5E765E]/40 text-[#5E765E] cursor-pointer"
+                />
+                <label htmlFor="vip-consent-checkbox" className="text-[11px] text-[#111111]/85 leading-relaxed cursor-pointer">
+                  Autorizo a Meraki Spa a almacenar y mostrar mi nombre completo, correo electrónico y WhatsApp para identificar mi tarjeta digital, registrar sellos y gestionar beneficios del Club VIP según la{' '}
+                  <Link
+                    to="/privacy"
+                    onClick={onClose}
+                    className="underline font-semibold text-[#5E765E]"
+                  >
+                    Política de Privacidad
+                  </Link>
+                  .
+                </label>
+              </div>
+
+              <button
+                type="submit"
+                disabled={isSavingProfile || !consentAccepted}
+                className="w-full bg-[#5E765E] hover:bg-[#4d634d] disabled:opacity-50 text-[#FFF2DE] py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <ShieldCheck className="w-4 h-4 text-[#D5A688]" />
+                <span>{isSavingProfile ? 'Activando tarjeta...' : 'Aceptar y Activar Tarjeta VIP'}</span>
+              </button>
+            </form>
           </div>
         ) : (
           <div className="space-y-5">
@@ -219,6 +408,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
                       src={user.photoURL}
                       alt={effectiveName}
                       className="w-10 h-10 rounded-full object-cover border border-[#5E765E]/30 shrink-0"
+                      referrerPolicy="no-referrer"
                     />
                   ) : (
                     <div className="w-10 h-10 rounded-full bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-bold shrink-0">
@@ -260,14 +450,14 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
 
               {profileSavedNotice && (
                 <div className="p-2 rounded-xl bg-[#5E765E]/10 text-[#5E765E] text-[11px] font-medium text-left">
-                  Tus datos se guardaron en tu tarjeta VIP.
+                  Tus datos y consentimiento quedaron guardados en tu tarjeta VIP.
                 </div>
               )}
 
               {isEditingProfile && (
                 <form onSubmit={handleSaveProfile} className="pt-2 border-t border-[#D5A688]/25 space-y-2.5 text-left">
                   <p className="text-[11px] text-[#111111]/75 leading-snug">
-                    Completa tu nombre y WhatsApp para que nuestras especialistas identifiquen rápido tu tarjeta al atenderte:
+                    Actualiza tus datos de contacto para tu tarjeta digital:
                   </p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     <div>
@@ -278,6 +468,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
                         id="vip-member-name"
                         type="text"
                         required
+                        minLength={2}
                         placeholder="Ej. Valeria Paredes"
                         value={draftName}
                         onChange={(e) => setDraftName(e.target.value)}
@@ -293,13 +484,26 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
                         <input
                           id="vip-member-phone"
                           type="tel"
-                          required
                           placeholder="999 888 777"
                           value={draftPhone}
                           onChange={(e) => setDraftPhone(e.target.value)}
                           className="w-full pl-8 pr-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111]"
                         />
                       </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                      <label htmlFor="vip-member-email" className="block text-[10px] font-semibold text-[#5E765E] uppercase mb-1">
+                        Correo electrónico
+                      </label>
+                      <input
+                        id="vip-member-email"
+                        type="email"
+                        required
+                        placeholder="tu-correo@gmail.com"
+                        value={draftEmail}
+                        onChange={(e) => setDraftEmail(e.target.value)}
+                        className="w-full px-3 py-1.5 rounded-xl border border-[#5E765E]/25 bg-white text-xs text-[#111111]"
+                      />
                     </div>
                   </div>
                   <div className="flex items-center justify-end gap-2">
@@ -308,7 +512,7 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
                       onClick={() => setIsEditingProfile(false)}
                       className="px-3 py-1.5 rounded-full text-[11px] text-[#111111]/70 hover:bg-black/5 cursor-pointer"
                     >
-                      Omitir por ahora
+                      Cancelar
                     </button>
                     <button
                       type="submit"
