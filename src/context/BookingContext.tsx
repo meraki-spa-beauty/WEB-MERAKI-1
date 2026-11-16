@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { BookingModal } from '../components/modals/BookingModal';
 
 interface BookingContextType {
   isBookingOpen: boolean;
@@ -37,12 +36,6 @@ export function BookingProvider({ children }: { children: ReactNode }) {
       }}
     >
       {children}
-      <BookingModal
-        isOpen={isOpen}
-        onClose={closeBooking}
-        preselectedServiceId={selectedServiceId}
-        preselectedOptionIndex={selectedOptionIndex}
-      />
     </BookingContext.Provider>
   );
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { createPortal } from 'react-dom';
 import { CATALOG_SERVICES, CATEGORIES_DATA } from '../../data/catalog';
 import { CENTRAL_OWNER_EMAIL, SPA_INFO } from '../../data/spaData';
 import type {
@@ -401,7 +401,7 @@ export function BookingModal({
   const handleProceedToStep4 = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
 
-    if (!clientName.trim()) {
+    if (clientName.trim().length < 2) {
       setStepError('Por favor ingresa tu nombre y apellidos.');
 
       return;
@@ -594,7 +594,7 @@ export function BookingModal({
 
     const bookingPayload: MerakiBooking = {
       bookingCode: newCode,
-      uid: user?.uid || 'guest',
+      uid: user?.uid || '',
       clientName: clientName.trim(),
       clientPhone: clientPhone.trim(),
       clientEmail: clientEmail.trim(),
@@ -695,9 +695,9 @@ export function BookingModal({
 
   const isStudio = locationType === 'estudio';
 
-  return (
+  const modalContent = (
     <div
-      className="meraki-overlay-enter fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm text-left"
+      className="meraki-overlay-enter fixed inset-0 z-[99998] flex items-center justify-center p-3 sm:p-5 md:p-6 bg-black/60 backdrop-blur-sm text-left"
       role="dialog"
       aria-modal="true"
       aria-labelledby="modal-booking-title"
@@ -1498,17 +1498,23 @@ export function BookingModal({
                       />
                       <label htmlFor="booking-privacy" className="text-[11px] text-[#111111]/80 leading-relaxed">
                         He leído y acepto la{' '}
-                        <Link to="/privacy" target="_blank" className="underline text-[#5E765E] font-semibold">
-                          Política de Privacidad
-                        </Link>{' '}
-                        y las{' '}
-                        <Link
-                          to="/privacy#terminos-cancelaciones"
+                        <a
+                          href="/privacy"
                           target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline text-[#5E765E] font-semibold"
+                        >
+                          Política de Privacidad
+                        </a>{' '}
+                        y las{' '}
+                        <a
+                          href="/privacy#terminos-cancelaciones"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           className="underline text-[#5E765E] font-semibold"
                         >
                           Condiciones de Reserva y Cancelación (24h)
-                        </Link>
+                        </a>
                         .
                       </label>
                     </div>
@@ -1661,4 +1667,10 @@ export function BookingModal({
       </div>
     </div>
   );
+
+  if (typeof document === 'undefined') {
+    return modalContent;
+  }
+
+  return createPortal(modalContent, document.body);
 }

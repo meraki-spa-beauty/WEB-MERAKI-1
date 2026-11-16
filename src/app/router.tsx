@@ -2,6 +2,8 @@ import { createBrowserRouter, Link, Navigate, useLocation, useOutlet } from 'rea
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import { RouteCurtainOverlay } from '../components/layout/RouteTransition';
+import { BookingModal } from '../components/modals/BookingModal';
+import { useBooking } from '../context/BookingContext';
 import { Home } from '../routes/Home';
 import { Catalogo } from '../routes/Catalogo';
 import { ComoReservar } from '../routes/ComoReservar';
@@ -124,6 +126,19 @@ function FrozenRouteOutlet() {
 
 const ROUTE_EASE: [number, number, number, number] = [0.22, 1, 0.36, 1];
 
+function BookingModalHost() {
+  const { isBookingOpen, closeBooking, preselectedServiceId, preselectedOptionIndex } = useBooking();
+
+  return (
+    <BookingModal
+      isOpen={isBookingOpen}
+      onClose={closeBooking}
+      preselectedServiceId={preselectedServiceId}
+      preselectedOptionIndex={preselectedOptionIndex}
+    />
+  );
+}
+
 function RootLayout() {
   const location = useLocation();
   const prevPathRef = useRef<string>(location.pathname);
@@ -162,6 +177,7 @@ function RootLayout() {
   return (
     <MotionConfig reducedMotion="user">
       <RouteCurtainOverlay pathname={location.pathname} />
+      <BookingModalHost />
 
       <AnimatePresence mode="wait" initial={false} onExitComplete={handleExitComplete}>
         <motion.div
