@@ -7,6 +7,7 @@
     "dev": "vite --port=3000 --host=0.0.0.0",
     "vendor:anti-slop": "node scripts/vendor-anti-slop.mjs",
     "typecheck": "tsc --noEmit",
+    "test:vip": "node --experimental-strip-types --test tests/confirmVipReward.test.mjs",
     "lint:oxlint": "oxlint src",
     "lint": "npm run typecheck && npm run lint:oxlint",
     "build": "npm run typecheck && vite build",

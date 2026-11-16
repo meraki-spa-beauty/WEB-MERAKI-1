@@ -16,6 +16,7 @@ import {
   testFirestoreConnection,
 } from '../services/merakiFirestore';
 import type { LoyaltyHistoryItem, StaffAccessEntry } from '../types';
+import { confirmVipReward } from '../utils/confirmVipReward';
 
 export interface LoyaltyData {
   stamps: number;
@@ -391,63 +392,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const claimReward = async (): Promise<boolean> => {
-    if (!user || loyalty.stamps < 5) return false;
+    if (!user || !db || loyalty.stamps < 5) return false;
 
-    const googleIdentity = await resolveGoogleIdentity(user);
-    const fallbackPhoto = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
+    try {
+      const googleIdentity = await resolveGoogleIdentity(user);
+      const fallbackPhoto = (user.photoURL || googleIdentity.photoURL || '').trim().slice(0, 500);
 
-    if (db) {
-      try {
-        const redeemed = await redeemClientVipReward({
+      return await confirmVipReward(
+        () => redeemClientVipReward({
           uid: user.uid,
           fallbackEmail: profileEmail || googleIdentity.email,
           fallbackDisplayName: profileName || googleIdentity.displayName || 'Clienta VIP',
           fallbackPhone: profilePhone,
           fallbackPhotoURL: fallbackPhoto,
-        });
-
-        if (redeemed) {
-          const nextLoyalty: LoyaltyData = {
-            stamps: redeemed.stamps,
-            rewardsClaimed: redeemed.rewardsClaimed,
-            history: redeemed.history,
-          };
-
+        }),
+        (nextLoyalty) => {
           setLoyalty(nextLoyalty);
           localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(nextLoyalty));
+        },
+      );
+    } catch (err) {
+      console.warn('Could not sync reward claim to Firestore:', err);
 
-          return true;
-        }
-      } catch (err) {
-        console.warn('Could not sync reward claim to Firestore:', err);
-
-        return false;
-      }
+      return false;
     }
-
-    const updatedRewards = loyalty.rewardsClaimed + 1;
-
-    const redeemEntry: LoyaltyHistoryItem = {
-      id: `redeem-${Date.now().toString(36)}`,
-      date: new Date().toLocaleDateString('es-PE', {
-        day: 'numeric',
-        month: 'short',
-        year: 'numeric',
-      }),
-      service: 'Canje de Beneficio Meraki VIP',
-      price: 0,
-    };
-
-    const nextLoyalty: LoyaltyData = {
-      stamps: 0,
-      rewardsClaimed: updatedRewards,
-      history: [redeemEntry, ...loyalty.history].slice(0, 100),
-    };
-
-    setLoyalty(nextLoyalty);
-    localStorage.setItem(`meraki_loyalty_${user.uid}`, JSON.stringify(nextLoyalty));
-
-    return true;
   };
 
   return (

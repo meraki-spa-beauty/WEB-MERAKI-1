@@ -165,6 +165,8 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
     if (isClaiming) return;
 
     setIsClaiming(true);
+    setErrorMsg(null);
+    setClaimedSuccess(false);
 
     try {
       const success = await claimReward();
@@ -172,6 +174,8 @@ export function VipLoyaltyModal({ isOpen, onClose }: VipLoyaltyModalProps) {
       if (success) {
         setClaimedSuccess(true);
         window.setTimeout(() => setClaimedSuccess(false), 4500);
+      } else {
+        setErrorMsg('No se pudo confirmar el canje. Recarga tu tarjeta para comprobar tus sellos antes de volver a intentarlo.');
       }
     } finally {
       setIsClaiming(false);
