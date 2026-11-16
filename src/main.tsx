@@ -10,10 +10,10 @@ declare global {
   }
 }
 
-// Tier 1 Google Maps Platform quota & auth failure guard before React mount
+// Maps auth & quota listener before React mount
 if (typeof window !== 'undefined') {
   window.gm_authFailure = () => {
-    window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
+    window.dispatchEvent(new CustomEvent('gmp-auth-failure'));
   };
 
   const origError = console.error.bind(console);
@@ -23,7 +23,14 @@ if (typeof window !== 'undefined') {
 
     const msg = args.map((item) => String(item)).join(' ');
 
-    if (msg.includes('OverQuotaMapError') || msg.includes('QuotaExceededError')) {
+    if (
+      msg.includes('InvalidKeyMapError') ||
+      msg.includes('ApiNotActivatedMapError') ||
+      msg.includes('RefererNotAllowedMapError') ||
+      msg.includes('BillingNotEnabledMapError')
+    ) {
+      window.dispatchEvent(new CustomEvent('gmp-auth-failure'));
+    } else if (msg.includes('OverQuotaMapError') || msg.includes('QuotaExceededError')) {
       window.dispatchEvent(new CustomEvent('gmp-quota-exceeded'));
     }
   };

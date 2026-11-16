@@ -1,4 +1,4 @@
-import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router-dom';
+import { createBrowserRouter, Link, Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useRef } from 'react';
 import { Home } from '../routes/Home';
 import { Catalogo } from '../routes/Catalogo';
@@ -143,9 +143,40 @@ function RootLayout() {
   );
 }
 
+function RouteErrorFallback() {
+  return (
+    <div className="min-h-screen bg-[#FFF2DE] text-[#111111] flex items-center justify-center p-6 font-['Montserrat',sans-serif]">
+      <div className="max-w-md w-full bg-[#FFFDF9] rounded-3xl p-8 border border-[#D5A688]/40 shadow-lg text-center space-y-4">
+        <h1 className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111]">
+          Ocurrió un inconveniente temporal
+        </h1>
+        <p className="text-xs text-[#111111]/75 leading-relaxed">
+          No pudimos cargar esta vista por completo. Puedes recargar la página o volver al inicio sin perder tu avance.
+        </p>
+        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <button
+            type="button"
+            onClick={() => window.location.reload()}
+            className="px-5 py-2.5 rounded-full bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] text-xs font-semibold uppercase tracking-wider cursor-pointer transition-colors"
+          >
+            Recargar Página
+          </button>
+          <Link
+            to="/"
+            className="px-5 py-2.5 rounded-full border border-[#5E765E]/30 bg-white hover:bg-[#FFF2DE] text-[#111111] text-xs font-semibold uppercase tracking-wider transition-colors"
+          >
+            Volver al Inicio
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     element: <RootLayout />,
+    errorElement: <RouteErrorFallback />,
     children: [
       { path: '/', element: <Home /> },
       { path: '/catalogo', element: <Catalogo /> },
