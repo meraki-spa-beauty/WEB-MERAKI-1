@@ -11,6 +11,8 @@
         "phone": { "type": "string", "maxLength": 30 },
         "adminNote": { "type": "string", "maxLength": 160 },
         "photoURL": { "type": "string", "maxLength": 500 },
+        "dataConsentAccepted": { "type": "boolean" },
+        "dataConsentAt": { "type": "string", "maxLength": 40 },
         "stamps": { "type": "integer" },
         "rewardsClaimed": { "type": "integer" },
         "history": { "type": "array" },
