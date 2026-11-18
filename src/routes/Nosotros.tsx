@@ -1,0 +1,227 @@
+import { Link } from 'react-router-dom';
+import { Header } from '../components/layout/Header';
+import { Footer } from '../components/layout/Footer';
+import { FloatingWhatsAppButton } from '../components/layout/FloatingWhatsAppButton';
+import { SPA_INFO, TESTIMONIALS } from '../data/spaData';
+import { ScrollReveal, getStaggerDelay } from '../components/ui/ScrollReveal';
+import {
+  Sparkles,
+  Award,
+  Heart,
+  Home,
+  ShieldCheck,
+  Calendar,
+  ArrowRight,
+  Star,
+} from 'lucide-react';
+
+export function Nosotros() {
+  return (
+    <div className="min-h-screen meraki-editorial-canvas text-[#111111] font-['Montserrat',sans-serif] flex flex-col selection:bg-[#5E765E] selection:text-[#FFF2DE]">
+      <Header />
+
+      <main className="flex-1">
+        {/* Banner Hero */}
+        <section className="meraki-hero-banner pt-10 lg:pt-24 pb-12 border-b border-[#D5A688]/35 text-left">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none select-none absolute inset-0 overflow-hidden"
+          >
+            <div className="absolute -top-20 -left-20 w-80 h-80 rounded-full bg-[#D5A688]/35 blur-3xl" />
+            <div className="absolute -bottom-24 -right-20 w-96 h-96 rounded-full bg-[#AEC2AE]/45 blur-3xl" />
+          </div>
+
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+              <div className="lg:col-span-7">
+                <div className="meraki-editorial-pill inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-[#5E765E] text-[11px] font-semibold uppercase tracking-[0.2em] mb-4">
+                  <Sparkles className="w-3.5 h-3.5 text-[#D5A688]" />
+                  <span>Conoce Nuestra Esencia</span>
+                </div>
+                <h1 className="font-['Cormorant_Garamond',serif] text-4xl sm:text-5xl md:text-6xl font-normal text-[#111111] leading-tight mb-6">
+                  ¡Bienvenid@ a Meraki Spa!
+                </h1>
+                <p className="font-['Cormorant_Garamond',serif] text-2xl sm:text-3xl text-[#5E765E] italic mb-6">
+                  “Tenemos como principal objetivo que te sientas feliz y empoderad@.”
+                </p>
+                <p className="text-sm sm:text-base text-[#111111]/80 font-light leading-relaxed mb-6">
+                  Somos una marca liderada por <strong>Ana Maria Díaz</strong>, profesional con más de 10 años de experiencia en el mundo de la belleza, la estética integral y el bienestar.
+                </p>
+                <p className="text-sm sm:text-base text-[#111111]/80 font-light leading-relaxed mb-8">
+                  Nos acomodamos a tu ritmo y estilo de vida, recibiéndote en nuestro acogedor estudio en Pueblo Libre (Calle Agustín Gamarra 515) o llegando con todo lo que necesitas para disfrutar de una sesión de spa, uñas, pestañas, depilación, masajes o faciales en la comodidad de tu casa y/o lugar de trabajo.
+                </p>
+
+                <div className="flex flex-wrap gap-4">
+                  <Link
+                    to="/catalogo"
+                    className="meraki-btn-fluid bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest shadow-md inline-flex items-center gap-2"
+                  >
+                    <span>Ver Catálogo de Servicios</span>
+                    <ArrowRight className="w-4 h-4 text-[#D5A688]" />
+                  </Link>
+                  <a
+                    href={SPA_INFO.whatsappLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white/85 hover:bg-white backdrop-blur-md text-[#5E765E] border border-[#D5A688]/40 px-8 py-3.5 rounded-full text-xs font-semibold uppercase tracking-widest transition-all shadow-sm inline-flex items-center gap-2"
+                  >
+                    <Calendar className="w-4 h-4 text-[#D5A688]" />
+                    <span>Contactar por WhatsApp</span>
+                  </a>
+                </div>
+              </div>
+
+              {/* Founder Profile Box */}
+              <div className="lg:col-span-5">
+                <div className="theme-card-surface rounded-3xl p-8 relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#D5A688]/15 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
+
+                  <div className="w-20 h-20 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-3xl font-bold mb-6 shadow-md">
+                    AMD
+                  </div>
+
+                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#9A6342] block mb-1">
+                    Fundadora &amp; Especialista
+                  </span>
+                  <h2 className="font-['Cormorant_Garamond',serif] text-3xl font-bold text-[#111111] mb-2">
+                    Ana Maria Díaz
+                  </h2>
+                  <p className="text-xs text-[#5E765E] font-semibold mb-4">
+                    Más de 10 años de trayectoria profesional
+                  </p>
+
+                  <div className="space-y-3 text-xs text-[#111111]/80 font-light border-t border-[#5E765E]/15 pt-4">
+                    <div className="flex items-start gap-2.5">
+                      <Award className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
+                      <span>Especialista certificada en estética facial, manicura avanzada, extensiones de pestañas y masoterapia.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <ShieldCheck className="w-4 h-4 text-[#5E765E] shrink-0 mt-0.5" />
+                      <span>Riguroso protocolo de esterilización y bioseguridad en cada servicio en estudio o a domicilio/oficina.</span>
+                    </div>
+                    <div className="flex items-start gap-2.5">
+                      <Heart className="w-4 h-4 text-[#D5A688] shrink-0 mt-0.5" />
+                      <span>Vocación de servicio, calidez humana y enfoque en potenciar tu autoestima y descanso.</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Pillars / Values */}
+        <section className="py-16 meraki-section-cream">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Sparkles className="w-3 h-3 text-[#D5A688]" />
+                  <span>Nuestros Pilares</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  La Experiencia Meraki
+                </h2>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <ScrollReveal delay={0} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <Home className="w-6 h-6 text-[#5E765E]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    En tu Casa u Oficina
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Evita el tráfico y el estrés de desplazarte. Llevamos todo el equipamiento profesional necesario para que disfrutes de tu momento especial donde estés.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={100} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <ShieldCheck className="w-6 h-6 text-[#5E765E]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Máxima Bioseguridad
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Cumplimos rigurosamente todas las normas sanitarias: instrumental esterilizado, kits descartables y desinfección meticulosa antes de cada sesión.
+                  </p>
+                </div>
+              </ScrollReveal>
+
+              <ScrollReveal delay={200} className="h-full">
+                <div className="theme-card-surface rounded-3xl p-8 h-full">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF2DE] border border-[#D5A688]/30 flex items-center justify-center mb-6">
+                    <Sparkles className="w-6 h-6 text-[#D5A688]" />
+                  </div>
+                  <h3 className="font-['Cormorant_Garamond',serif] text-2xl font-bold text-[#111111] mb-2">
+                    Empoderamiento y Bienestar
+                  </h3>
+                  <p className="text-xs text-[#111111]/75 font-light leading-relaxed">
+                    Cuidar de ti no es un lujo, es una necesidad. Cada servicio está pensado para que te sientas renovada, feliz, segura de ti misma y lista para conquistar tus metas.
+                  </p>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+        </section>
+
+        {/* Testimonials */}
+        <section className="py-16 meraki-section-ivory border-t border-[#D5A688]/25">
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-left">
+            <ScrollReveal>
+              <div className="text-center max-w-xl mx-auto mb-12">
+                <span className="meraki-editorial-pill inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E] mb-2">
+                  <Star className="w-3 h-3 text-[#D5A688] fill-current" />
+                  <span>Testimonios Reales</span>
+                </span>
+                <h2 className="font-['Cormorant_Garamond',serif] text-3xl sm:text-4xl font-bold text-[#111111] mt-1">
+                  Lo que dicen nuestras clientas
+                </h2>
+              </div>
+            </ScrollReveal>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {TESTIMONIALS.map((t, index) => (
+                <ScrollReveal key={t.id} delay={getStaggerDelay(index)} className="h-full">
+                  <div className="meraki-cream-card rounded-3xl p-8 flex flex-col justify-between h-full">
+                    <div>
+                      <div className="flex items-center gap-1 text-[#D5A688] mb-4">
+                        {[...Array(t.rating)].map((_, i) => (
+                          <Star key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <p className="font-['Cormorant_Garamond',serif] text-lg text-[#111111] italic leading-relaxed mb-6">
+                        “{t.comment}”
+                      </p>
+                    </div>
+
+                    <div className="pt-4 border-t border-[#5E765E]/15">
+                      <span className="font-semibold text-xs text-[#111111] block">
+                        {t.author}
+                      </span>
+                      <span className="text-[11px] text-[#5E765E] block">
+                        {t.role} • {t.location}
+                      </span>
+                      <span className="text-[10px] text-[#111111]/55 block mt-1">
+                        Servicio: {t.service}
+                      </span>
+                    </div>
+                  </div>
+                </ScrollReveal>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <Footer />
+      <FloatingWhatsAppButton />
+    </div>
+  );
+}

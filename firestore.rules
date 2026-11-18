@@ -1,0 +1,498 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function emailToStaffId(email) {
+      return email.lower().replace('[^a-z0-9]', '_');
+    }
+
+    function isCentralOwner() {
+      return isVerifiedUser() &&
+        request.auth.token.email is string &&
+        request.auth.token.email.lower() == 'meraki.spa.pe@gmail.com';
+    }
+
+    function hasStaffPermission(permField) {
+      return isVerifiedUser() &&
+        request.auth.token.email is string &&
+        exists(/databases/$(database)/documents/staffAccess/$(emailToStaffId(request.auth.token.email))) &&
+        get(/databases/$(database)/documents/staffAccess/$(emailToStaffId(request.auth.token.email))).data.isActive == true &&
+        get(/databases/$(database)/documents/staffAccess/$(emailToStaffId(request.auth.token.email))).data[permField] == true;
+    }
+
+    function isStaffOrOwner(permField) {
+      return isCentralOwner() || hasStaffPermission(permField);
+    }
+
+    function isValidUserLoyalty(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'stamps', 'rewardsClaimed', 'history', 'updatedAt']) &&
+        data.keys().hasOnly(['uid', 'email', 'displayName', 'phone', 'adminNote', 'photoURL', 'dataConsentAccepted', 'dataConsentAt', 'stamps', 'rewardsClaimed', 'history', 'updatedAt']) &&
+        data.uid is string && data.uid.size() >= 1 && data.uid.size() <= 128 && data.uid.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.email is string && data.email.size() <= 160 &&
+        data.displayName is string && data.displayName.size() <= 120 &&
+        (!('phone' in data) || (data.phone is string && data.phone.size() <= 30)) &&
+        (!('adminNote' in data) || (data.adminNote is string && data.adminNote.size() <= 160)) &&
+        (!('photoURL' in data) || (data.photoURL is string && data.photoURL.size() <= 500)) &&
+        (!('dataConsentAccepted' in data) || data.dataConsentAccepted is bool) &&
+        (!('dataConsentAt' in data) || (data.dataConsentAt is string && data.dataConsentAt.size() <= 40)) &&
+        data.stamps is int && data.stamps >= 0 && data.stamps <= 5 &&
+        data.rewardsClaimed is int && data.rewardsClaimed >= 0 && data.rewardsClaimed <= 1000 &&
+        data.history is list && data.history.size() <= 100 &&
+        (data.history.size() == 0 || (
+          data.history[0] is map &&
+          data.history[0].keys().hasAll(['id', 'date', 'service', 'price']) &&
+          data.history[0].keys().hasOnly(['id', 'date', 'service', 'price']) &&
+          data.history[0].id is string && data.history[0].id.size() <= 64 &&
+          data.history[0].date is string && data.history[0].date.size() <= 40 &&
+          data.history[0]['service'] is string && data.history[0]['service'].size() <= 160 &&
+          data.history[0].price is number && data.history[0].price >= 0 && data.history[0].price <= 10000
+        )) &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidStaffAccess(data) {
+      return data.keys().hasAll([
+          'email', 'name', 'isActive', 'canManageAgenda',
+          'canManageBookings', 'canStampVip', 'createdBy', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'email', 'name', 'isActive', 'canManageAgenda',
+          'canManageBookings', 'canStampVip', 'createdBy', 'createdAt', 'updatedAt'
+        ]) &&
+        data.email is string && data.email.size() >= 5 && data.email.size() <= 160 &&
+        data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+        data.isActive is bool &&
+        data.canManageAgenda is bool &&
+        data.canManageBookings is bool &&
+        data.canStampVip is bool &&
+        data.createdBy is string && data.createdBy.size() >= 1 && data.createdBy.size() <= 160 &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidScheduleConfig(data) {
+      return data.keys().hasAll([
+          'blockedDates', 'blockedSlots', 'enableConditional0800',
+          'requireNearby0600For0800', 'maxTravelMinutes', 'distantMinOrderPEN',
+          'paymentMode', 'updatedAt', 'updatedBy'
+        ]) &&
+        data.keys().hasOnly([
+          'blockedDates', 'blockedSlots', 'enableConditional0800',
+          'requireNearby0600For0800', 'maxTravelMinutes', 'distantMinOrderPEN',
+          'paymentMode', 'updatedAt', 'updatedBy'
+        ]) &&
+        data.blockedDates is list && data.blockedDates.size() <= 180 &&
+        (data.blockedDates.size() == 0 || (data.blockedDates[0] is string && data.blockedDates[0].size() == 10)) &&
+        data.blockedSlots is list && data.blockedSlots.size() <= 400 &&
+        (data.blockedSlots.size() == 0 || (data.blockedSlots[0] is string && data.blockedSlots[0].size() <= 40)) &&
+        data.enableConditional0800 is bool &&
+        data.requireNearby0600For0800 is bool &&
+        data.maxTravelMinutes is int && data.maxTravelMinutes >= 5 && data.maxTravelMinutes <= 120 &&
+        data.distantMinOrderPEN is int && data.distantMinOrderPEN >= 0 && data.distantMinOrderPEN <= 1000 &&
+        data.paymentMode in ['manual_yape', 'gateway_checkout'] &&
+        data.updatedAt is timestamp &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 160;
+    }
+
+    function isValidSlotLock(data) {
+      return data.keys().hasAll([
+          'bookingCode', 'date', 'timeSlot', 'locationType',
+          'district', 'totalPEN', 'estimatedDurationMin', 'status', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'bookingCode', 'date', 'timeSlot', 'locationType',
+          'district', 'totalPEN', 'estimatedDurationMin', 'status', 'createdAt'
+        ]) &&
+        data.bookingCode is string && data.bookingCode.size() >= 3 && data.bookingCode.size() <= 32 &&
+        data.date is string && data.date.size() == 10 && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        data.timeSlot is string && data.timeSlot.size() == 5 && data.timeSlot.matches('^[0-9]{2}:[0-9]{2}$') &&
+        data.locationType in ['estudio', 'casa', 'trabajo'] &&
+        data.district is string && data.district.size() >= 2 && data.district.size() <= 60 &&
+        data.totalPEN is int && data.totalPEN >= 0 && data.totalPEN <= 20000 &&
+        data.estimatedDurationMin is int && data.estimatedDurationMin >= 15 && data.estimatedDurationMin <= 360 &&
+        data.status in ['active', 'cancelled'] &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidBooking(data) {
+      return data.keys().hasAll([
+          'bookingCode', 'uid', 'clientName', 'clientPhone', 'clientEmail',
+          'specialNotes', 'services', 'servicesSummary', 'locationType',
+          'district', 'address', 'date', 'timeSlot', 'estimatedDurationMin',
+          'totalPEN', 'advancePEN', 'paymentMode', 'paymentStatus',
+          'yapeOperationCode', 'status', 'privacyAccepted', 'createdAt', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'bookingCode', 'uid', 'clientName', 'clientPhone', 'clientEmail',
+          'specialNotes', 'services', 'servicesSummary', 'locationType',
+          'district', 'address', 'date', 'timeSlot', 'estimatedDurationMin',
+          'totalPEN', 'advancePEN', 'paymentMode', 'paymentStatus',
+          'yapeOperationCode', 'status', 'privacyAccepted', 'createdAt', 'updatedAt'
+        ]) &&
+        data.bookingCode is string && data.bookingCode.size() >= 3 && data.bookingCode.size() <= 32 &&
+        data.uid is string && data.uid.size() <= 128 &&
+        data.clientName is string && data.clientName.size() >= 2 && data.clientName.size() <= 120 &&
+        data.clientPhone is string && data.clientPhone.size() >= 6 && data.clientPhone.size() <= 30 &&
+        data.clientEmail is string && data.clientEmail.size() <= 160 &&
+        data.specialNotes is string && data.specialNotes.size() <= 600 &&
+        data.services is list && data.services.size() >= 1 && data.services.size() <= 15 &&
+        data.services[0] is map &&
+        data.services[0].keys().hasAll(['serviceId', 'serviceName', 'optionLabel', 'pricePEN']) &&
+        data.services[0].keys().hasOnly(['serviceId', 'serviceName', 'optionLabel', 'pricePEN']) &&
+        data.services[0].serviceId is string && data.services[0].serviceId.size() <= 80 &&
+        data.services[0].serviceName is string && data.services[0].serviceName.size() <= 160 &&
+        data.services[0].optionLabel is string && data.services[0].optionLabel.size() <= 100 &&
+        data.services[0].pricePEN is number && data.services[0].pricePEN >= 0 && data.services[0].pricePEN <= 10000 &&
+        data.servicesSummary is string && data.servicesSummary.size() >= 2 && data.servicesSummary.size() <= 400 &&
+        data.locationType in ['estudio', 'casa', 'trabajo'] &&
+        data.district is string && data.district.size() >= 2 && data.district.size() <= 60 &&
+        data.address is string && data.address.size() <= 240 &&
+        data.date is string && data.date.size() == 10 && data.date.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$') &&
+        data.timeSlot is string && data.timeSlot.size() == 5 && data.timeSlot.matches('^[0-9]{2}:[0-9]{2}$') &&
+        data.estimatedDurationMin is int && data.estimatedDurationMin >= 15 && data.estimatedDurationMin <= 360 &&
+        data.totalPEN is int && data.totalPEN >= 0 && data.totalPEN <= 20000 &&
+        data.advancePEN is int && data.advancePEN >= 0 && data.advancePEN <= 20000 &&
+        data.paymentMode in ['manual_yape', 'gateway_checkout'] &&
+        data.paymentStatus in ['pending_yape', 'manual_code_submitted', 'gateway_paid', 'verified', 'cancelled'] &&
+        data.yapeOperationCode is string && data.yapeOperationCode.size() <= 32 &&
+        data.status in ['pending_yape', 'manual_code_submitted', 'confirmed', 'completed', 'cancelled'] &&
+        data.privacyAccepted is bool && data.privacyAccepted == true &&
+        data.createdAt is timestamp &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidComplaint(data) {
+      return data.keys().hasAll([
+          'claimCode', 'fullName', 'documentType', 'documentNumber',
+          'phone', 'email', 'address', 'isMinor', 'serviceContracted',
+          'amountClaimedPEN', 'complaintType', 'detail', 'consumerRequest',
+          'status', 'adminResponse', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'claimCode', 'fullName', 'documentType', 'documentNumber',
+          'phone', 'email', 'address', 'isMinor', 'serviceContracted',
+          'amountClaimedPEN', 'complaintType', 'detail', 'consumerRequest',
+          'status', 'adminResponse', 'createdAt'
+        ]) &&
+        data.claimCode is string && data.claimCode.size() >= 3 && data.claimCode.size() <= 32 &&
+        data.fullName is string && data.fullName.size() >= 2 && data.fullName.size() <= 120 &&
+        data.documentType in ['DNI', 'CE', 'Pasaporte', 'RUC'] &&
+        data.documentNumber is string && data.documentNumber.size() >= 6 && data.documentNumber.size() <= 20 &&
+        data.phone is string && data.phone.size() >= 6 && data.phone.size() <= 30 &&
+        data.email is string && data.email.size() >= 4 && data.email.size() <= 160 &&
+        data.address is string && data.address.size() >= 3 && data.address.size() <= 240 &&
+        data.isMinor is bool &&
+        data.serviceContracted is string && data.serviceContracted.size() >= 2 && data.serviceContracted.size() <= 200 &&
+        data.amountClaimedPEN is number && data.amountClaimedPEN >= 0 && data.amountClaimedPEN <= 50000 &&
+        data.complaintType in ['reclamo', 'queja'] &&
+        data.detail is string && data.detail.size() >= 10 && data.detail.size() <= 2000 &&
+        data.consumerRequest is string && data.consumerRequest.size() >= 5 && data.consumerRequest.size() <= 1000 &&
+        data.status in ['pendiente', 'atendido'] &&
+        data.adminResponse is string && data.adminResponse.size() <= 1500 &&
+        data.createdAt is timestamp;
+    }
+
+    function isValidCatalogService(data) {
+      return data.keys().hasAll([
+          'id', 'name', 'category', 'categoryLabel', 'subcategory',
+          'description', 'includes', 'active', 'displayOrder', 'updatedBy', 'updatedAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'name', 'category', 'categoryLabel', 'subcategory',
+          'pricePEN', 'priceOptions', 'priceNote', 'description', 'includes',
+          'note', 'popular', 'image', 'gallery', 'active', 'durationMin',
+          'displayOrder', 'updatedBy', 'updatedAt'
+        ]) &&
+        data.id is string && data.id.size() >= 2 && data.id.size() <= 80 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.name is string && data.name.size() >= 2 && data.name.size() <= 120 &&
+        data.category in ['manos', 'pies', 'pestanas', 'depilacion', 'masajes', 'faciales'] &&
+        data.categoryLabel is string && data.categoryLabel.size() >= 2 && data.categoryLabel.size() <= 60 &&
+        data.subcategory is string && data.subcategory.size() >= 2 && data.subcategory.size() <= 100 &&
+        (!('pricePEN' in data) || (data.pricePEN is int && data.pricePEN >= 0 && data.pricePEN <= 20000)) &&
+        (!('priceOptions' in data) || (
+          data.priceOptions is list && data.priceOptions.size() <= 12 &&
+          (data.priceOptions.size() == 0 || (
+            data.priceOptions[0] is map &&
+            data.priceOptions[0].keys().hasAll(['label', 'pricePEN']) &&
+            data.priceOptions[0].keys().hasOnly(['label', 'pricePEN', 'sessions']) &&
+            data.priceOptions[0].label is string && data.priceOptions[0].label.size() >= 1 && data.priceOptions[0].label.size() <= 100 &&
+            data.priceOptions[0].pricePEN is number && data.priceOptions[0].pricePEN >= 0 && data.priceOptions[0].pricePEN <= 20000 &&
+            (!('sessions' in data.priceOptions[0]) || (data.priceOptions[0].sessions is int && data.priceOptions[0].sessions >= 1 && data.priceOptions[0].sessions <= 50))
+          ))
+        )) &&
+        (!('priceNote' in data) || (data.priceNote is string && data.priceNote.size() <= 80)) &&
+        data.description is string && data.description.size() >= 5 && data.description.size() <= 1200 &&
+        data.includes is list && data.includes.size() <= 20 &&
+        (data.includes.size() == 0 || (data.includes[0] is string && data.includes[0].size() <= 240)) &&
+        (!('note' in data) || (data.note is string && data.note.size() <= 600)) &&
+        (!('popular' in data) || data.popular is bool) &&
+        (!('image' in data) || (data.image is string && data.image.size() <= 500)) &&
+        (!('gallery' in data) || (
+          data.gallery is list && data.gallery.size() <= 10 &&
+          (data.gallery.size() == 0 || (data.gallery[0] is string && data.gallery[0].size() <= 500))
+        )) &&
+        data.active is bool &&
+        (!('durationMin' in data) || (data.durationMin is int && data.durationMin >= 15 && data.durationMin <= 360)) &&
+        data.displayOrder is int && data.displayOrder >= 0 && data.displayOrder <= 10000 &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 160 &&
+        data.updatedAt is timestamp;
+    }
+
+    function isValidCatalogMedia(data) {
+      return data.keys().hasAll([
+          'id', 'serviceId', 'dataUrl', 'mimeType', 'width', 'height', 'updatedBy', 'createdAt'
+        ]) &&
+        data.keys().hasOnly([
+          'id', 'serviceId', 'dataUrl', 'mimeType', 'width', 'height', 'updatedBy', 'createdAt'
+        ]) &&
+        data.id is string && data.id.size() >= 2 && data.id.size() <= 128 && data.id.matches('^[a-zA-Z0-9_\\-]+$') &&
+        data.serviceId is string && data.serviceId.size() >= 2 && data.serviceId.size() <= 80 &&
+        data.dataUrl is string && data.dataUrl.size() >= 20 && data.dataUrl.size() <= 450000 &&
+        data.dataUrl.matches('^data:image/(webp|jpeg|png);base64,[A-Za-z0-9+/=]+$') &&
+        data.mimeType in ['image/webp', 'image/jpeg', 'image/png'] &&
+        data.width is int && data.width >= 16 && data.width <= 2048 &&
+        data.height is int && data.height >= 16 && data.height <= 2048 &&
+        data.updatedBy is string && data.updatedBy.size() >= 1 && data.updatedBy.size() <= 160 &&
+        data.createdAt is timestamp;
+    }
+
+    match /test/{docId} {
+      allow get: if docId == 'connection';
+    }
+
+    match /users/{userId} {
+      allow get: if isValidId(userId) && (isOwner(userId) || isStaffOrOwner('canStampVip'));
+      allow list: if isCentralOwner() || isStaffOrOwner('canStampVip') || (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isSignedIn() &&
+        isValidId(userId) &&
+        isValidUserLoyalty(incoming()) &&
+        incoming().uid == userId &&
+        incoming().updatedAt == request.time && (
+          (
+            isOwner(userId) &&
+            incoming().uid == request.auth.uid &&
+            incoming().displayName.size() >= 2 &&
+            incoming().displayName != 'Clienta VIP' &&
+            incoming().email.size() >= 5 &&
+            incoming().dataConsentAccepted == true &&
+            incoming().stamps == 1 &&
+            incoming().rewardsClaimed == 0 &&
+            incoming().history.size() <= 1
+          ) ||
+          isStaffOrOwner('canStampVip')
+        );
+      allow update: if isSignedIn() &&
+        isValidId(userId) &&
+        isValidUserLoyalty(incoming()) &&
+        incoming().uid == userId &&
+        (!('uid' in existing()) || existing().uid == userId) &&
+        incoming().updatedAt == request.time && (
+          (
+            isOwner(userId) &&
+            incoming().displayName.size() >= 2 &&
+            incoming().displayName != 'Clienta VIP' &&
+            incoming().email.size() >= 5 &&
+            incoming().dataConsentAccepted == true &&
+            incoming().stamps == existing().get('stamps', 0) &&
+            incoming().rewardsClaimed == existing().get('rewardsClaimed', 0) &&
+            (!('adminNote' in existing())
+              ? (!('adminNote' in incoming()) || incoming().adminNote == '')
+              : incoming().adminNote == existing().adminNote) &&
+            (!('history' in existing())
+              ? incoming().history.size() == 0
+              : (incoming().history == existing().history ||
+                  (incoming().history.size() == existing().history.size() && !('uid' in existing()))))
+          ) ||
+          (
+            isOwner(userId) &&
+            existing().get('stamps', 0) == 5 &&
+            incoming().stamps == 0 &&
+            incoming().rewardsClaimed == existing().get('rewardsClaimed', 0) + 1 &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['uid', 'stamps', 'rewardsClaimed', 'history', 'updatedAt'])
+          ) ||
+          isStaffOrOwner('canStampVip')
+        );
+      allow delete: if isCentralOwner() && isValidId(userId);
+    }
+
+    match /staffAccess/{staffId} {
+      allow get: if isValidId(staffId) && (
+        isCentralOwner() ||
+        (isVerifiedUser() && request.auth.token.email is string && staffId == emailToStaffId(request.auth.token.email))
+      );
+      allow list: if isCentralOwner();
+      allow create: if isCentralOwner() &&
+        isValidId(staffId) &&
+        isValidStaffAccess(incoming()) &&
+        staffId == emailToStaffId(incoming().email) &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time;
+      allow update: if isCentralOwner() &&
+        isValidId(staffId) &&
+        isValidStaffAccess(incoming()) &&
+        incoming().email == existing().email &&
+        incoming().createdBy == existing().createdBy &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'isActive', 'canManageAgenda', 'canManageBookings', 'canStampVip', 'updatedAt'
+        ]);
+      allow delete: if isCentralOwner() && isValidId(staffId);
+    }
+
+    match /scheduleConfig/{configId} {
+      allow get: if isValidId(configId) && configId == 'global';
+      allow list: if false;
+      allow create: if isValidId(configId) &&
+        configId == 'global' &&
+        isStaffOrOwner('canManageAgenda') &&
+        isValidScheduleConfig(incoming()) &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(configId) &&
+        configId == 'global' &&
+        isStaffOrOwner('canManageAgenda') &&
+        isValidScheduleConfig(incoming()) &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'blockedDates', 'blockedSlots', 'enableConditional0800',
+          'requireNearby0600For0800', 'maxTravelMinutes', 'distantMinOrderPEN',
+          'paymentMode', 'updatedAt', 'updatedBy'
+        ]);
+      allow delete: if false;
+    }
+
+    match /slotLocks/{lockId} {
+      allow get: if isValidId(lockId);
+      allow list: if resource.data.date is string && resource.data.status in ['active', 'cancelled'];
+      allow create: if isValidId(lockId) &&
+        isValidSlotLock(incoming()) &&
+        incoming().bookingCode == lockId &&
+        incoming().status == 'active' &&
+        incoming().createdAt == request.time &&
+        existsAfter(/databases/$(database)/documents/bookings/$(lockId));
+      allow update: if isValidId(lockId) &&
+        isStaffOrOwner('canManageBookings') &&
+        isValidSlotLock(incoming()) &&
+        incoming().bookingCode == existing().bookingCode &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'timeSlot', 'date', 'locationType', 'district']);
+      allow delete: if isValidId(lockId) && isStaffOrOwner('canManageBookings');
+    }
+
+    match /bookings/{bookingId} {
+      allow get: if isValidId(bookingId) && (
+        isStaffOrOwner('canManageBookings') ||
+        (isSignedIn() && existing().uid != '' && existing().uid == request.auth.uid)
+      );
+      allow list: if isCentralOwner() ||
+        isStaffOrOwner('canManageBookings') ||
+        (isSignedIn() && resource.data.uid == request.auth.uid);
+      allow create: if isValidId(bookingId) &&
+        isValidBooking(incoming()) &&
+        incoming().bookingCode == bookingId &&
+        (incoming().uid == '' || (isSignedIn() && incoming().uid == request.auth.uid)) &&
+        incoming().status in ['pending_yape', 'manual_code_submitted'] &&
+        incoming().paymentStatus in ['pending_yape', 'manual_code_submitted'] &&
+        incoming().createdAt == request.time &&
+        incoming().updatedAt == request.time &&
+        existsAfter(/databases/$(database)/documents/slotLocks/$(bookingId));
+      allow update: if isValidId(bookingId) &&
+        isValidBooking(incoming()) &&
+        incoming().bookingCode == existing().bookingCode &&
+        incoming().uid == existing().uid &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().updatedAt == request.time && (
+          isStaffOrOwner('canManageBookings') ||
+          (
+            isSignedIn() &&
+            existing().uid != '' &&
+            existing().uid == request.auth.uid &&
+            !(existing().status in ['completed', 'cancelled']) &&
+            incoming().diff(existing()).affectedKeys().hasOnly(['yapeOperationCode', 'paymentStatus', 'status', 'updatedAt']) &&
+            incoming().status == 'manual_code_submitted' &&
+            incoming().paymentStatus == 'manual_code_submitted'
+          )
+        );
+      allow delete: if isCentralOwner() && isValidId(bookingId);
+    }
+
+    match /complaints/{claimId} {
+      allow get: if isValidId(claimId) && isStaffOrOwner('canManageBookings');
+      allow list: if isCentralOwner() || isStaffOrOwner('canManageBookings');
+      allow create: if isValidId(claimId) &&
+        isValidComplaint(incoming()) &&
+        incoming().claimCode == claimId &&
+        incoming().status == 'pendiente' &&
+        incoming().adminResponse == '' &&
+        incoming().createdAt == request.time;
+      allow update: if isValidId(claimId) &&
+        isStaffOrOwner('canManageBookings') &&
+        isValidComplaint(incoming()) &&
+        incoming().claimCode == existing().claimCode &&
+        incoming().createdAt == existing().createdAt &&
+        incoming().diff(existing()).affectedKeys().hasOnly(['status', 'adminResponse']);
+      allow delete: if isCentralOwner() && isValidId(claimId);
+    }
+
+    match /catalogServices/{serviceId} {
+      allow get: if isValidId(serviceId);
+      allow list: if resource.data.id is string && resource.data.active is bool;
+      allow create: if isValidId(serviceId) &&
+        isStaffOrOwner('canManageAgenda') &&
+        isValidCatalogService(incoming()) &&
+        incoming().id == serviceId &&
+        incoming().updatedAt == request.time;
+      allow update: if isValidId(serviceId) &&
+        isStaffOrOwner('canManageAgenda') &&
+        isValidCatalogService(incoming()) &&
+        incoming().id == existing().id &&
+        incoming().updatedAt == request.time &&
+        incoming().diff(existing()).affectedKeys().hasOnly([
+          'name', 'category', 'categoryLabel', 'subcategory',
+          'pricePEN', 'priceOptions', 'priceNote', 'description', 'includes',
+          'note', 'popular', 'image', 'gallery', 'active', 'durationMin',
+          'displayOrder', 'updatedBy', 'updatedAt'
+        ]);
+      allow delete: if isCentralOwner() && isValidId(serviceId);
+    }
+
+    match /catalogMedia/{mediaId} {
+      allow get: if isValidId(mediaId);
+      allow list: if isStaffOrOwner('canManageAgenda');
+      allow create: if isValidId(mediaId) &&
+        isStaffOrOwner('canManageAgenda') &&
+        isValidCatalogMedia(incoming()) &&
+        incoming().id == mediaId &&
+        incoming().createdAt == request.time;
+      allow update: if false;
+      allow delete: if isValidId(mediaId) && isStaffOrOwner('canManageAgenda');
+    }
+  }
+}

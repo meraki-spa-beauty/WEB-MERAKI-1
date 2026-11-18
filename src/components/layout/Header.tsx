@@ -1,0 +1,748 @@
+import { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
+import { Link, useLocation } from 'react-router-dom';
+import { Logo } from '../brand/Logo';
+import { useBooking } from '../../context/BookingContext';
+import { useAuth } from '../../context/AuthContext';
+import { VipLoyaltyModal } from '../ui/VipLoyaltyModal';
+import {
+  Menu,
+  X,
+  Calendar,
+  ChevronDown,
+  ArrowRight,
+  Sparkles,
+  Hand,
+  Footprints,
+  Eye,
+  Scissors,
+  Flame,
+  Smile,
+  Award,
+} from 'lucide-react';
+import { SPA_INFO } from '../../data/spaData';
+import { useCatalog } from '../../context/CatalogContext';
+
+export interface HeaderCategoryItem {
+  id: string;
+  label: string;
+  categoryKey: string;
+  shortDesc: string;
+  startingPrice: string;
+  icon: 'manos' | 'pies' | 'pestanas' | 'depilacion' | 'masajes' | 'faciales';
+}
+
+export const HEADER_CATEGORIES: HeaderCategoryItem[] = [
+  {
+    id: 'cat-manos',
+    label: 'Manos & Uñas',
+    categoryKey: 'manos',
+    shortDesc: 'Básica, Gel, Rubber, Acrílicos y Esculpidas',
+    startingPrice: 'Desde S/ 60',
+    icon: 'manos',
+  },
+  {
+    id: 'cat-pies',
+    label: 'Cuidado de Pies',
+    categoryKey: 'pies',
+    shortDesc: 'Pedicura básica, gel y jellyparafina spa',
+    startingPrice: 'Desde S/ 70',
+    icon: 'pies',
+  },
+  {
+    id: 'cat-pestanas',
+    label: 'Pestañas',
+    categoryKey: 'pestanas',
+    shortDesc: 'Lifting y extensiones (clásicas, rímel, volumen, híbrido)',
+    startingPrice: 'Desde S/ 100',
+    icon: 'pestanas',
+  },
+  {
+    id: 'cat-depilacion',
+    label: 'Depilación Cera & Hilo',
+    categoryKey: 'depilacion',
+    shortDesc: 'Facial (cera/hilo), axilas, piernas y zonas íntimas',
+    startingPrice: 'Desde S/ 15',
+    icon: 'depilacion',
+  },
+  {
+    id: 'cat-masajes',
+    label: 'Masajes & Packs',
+    categoryKey: 'masajes',
+    shortDesc: 'Relajantes, descontracturantes, drenaje y reductores',
+    startingPrice: 'Desde S/ 60',
+    icon: 'masajes',
+  },
+  {
+    id: 'cat-faciales',
+    label: 'Faciales Profesionales',
+    categoryKey: 'faciales',
+    shortDesc: 'Facial básico, intermedio y profundo con máscara LED',
+    startingPrice: 'Desde S/ 120',
+    icon: 'faciales',
+  },
+];
+
+function MiniLoyaltyProgressDots({ stamps, isDarkHero }: { stamps: number; isDarkHero: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-0.5" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((n) => (
+        <span
+          key={n}
+          className={`w-1.5 h-1.5 rounded-full transition-colors ${
+            n <= stamps
+              ? 'bg-[#D5A688]'
+              : isDarkHero
+                ? 'bg-[#5E765E]/30 lg:bg-white/40'
+                : 'bg-[#5E765E]/30'
+          }`}
+        />
+      ))}
+    </span>
+  );
+}
+
+export function Header() {
+  const { openBooking } = useBooking();
+  const { user, loyalty, needsVipRegistration } = useAuth();
+  const { activeServices } = useCatalog();
+  const [isOpen, setIsOpen] = useState(false);
+  const [drawerMounted, setDrawerMounted] = useState(false);
+  const [drawerVisible, setDrawerVisible] = useState(false);
+  const [isVipModalOpen, setIsVipModalOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [catalogDropdownOpen, setCatalogDropdownOpen] = useState(false);
+  const [mobileCatalogOpen, setMobileCatalogOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    setIsOpen(false);
+    setCatalogDropdownOpen(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    if (isOpen) {
+      setDrawerMounted(true);
+
+      const rafId = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => {
+          setDrawerVisible(true);
+        });
+      });
+
+      return () => window.cancelAnimationFrame(rafId);
+    }
+
+    setDrawerVisible(false);
+
+    if (!drawerMounted) return;
+
+    const closeTimer = window.setTimeout(() => {
+      setDrawerMounted(false);
+    }, 500);
+
+    return () => window.clearTimeout(closeTimer);
+  }, [isOpen, drawerMounted]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      const target = event.target;
+
+      if (dropdownRef.current && target instanceof Node && !dropdownRef.current.contains(target)) {
+        setCatalogDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleEsc);
+
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen]);
+
+  const handleMouseEnter = () => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setCatalogDropdownOpen(true);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setCatalogDropdownOpen(false);
+    }, 200);
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [isOpen]);
+
+  const renderIcon = (iconName: HeaderCategoryItem['icon']) => {
+    switch (iconName) {
+      case 'manos':
+        return <Hand className="w-4 h-4 text-[#5E765E]" />;
+      case 'pies':
+        return <Footprints className="w-4 h-4 text-[#D5A688]" />;
+      case 'pestanas':
+        return <Eye className="w-4 h-4 text-[#5E765E]" />;
+      case 'depilacion':
+        return <Scissors className="w-4 h-4 text-[#D5A688]" />;
+      case 'masajes':
+        return <Flame className="w-4 h-4 text-[#5E765E]" />;
+      case 'faciales':
+        return <Smile className="w-4 h-4 text-[#D5A688]" />;
+      default:
+        return <Sparkles className="w-4 h-4 text-[#5E765E]" />;
+    }
+  };
+
+  const isActive = (path: string) => {
+    if (path === '/' && location.pathname === '/') {
+      return true;
+    }
+
+    if (path !== '/' && location.pathname.startsWith(path)) {
+      return true;
+    }
+
+    return false;
+  };
+
+  const isHome = location.pathname === '/';
+  const isDarkHero = isHome && !isScrolled;
+
+  return (
+    <header
+      className={`sticky top-0 z-50 lg:fixed lg:top-0 lg:left-0 lg:right-0 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-[#5E765E]/15 py-2.5 lg:py-3'
+          : 'bg-[#FFF2DE]/90 backdrop-blur-sm py-3 lg:py-4 border-b border-[#5E765E]/10 lg:bg-transparent lg:border-transparent lg:shadow-none'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-3">
+        <div className="sm:hidden shrink-0">
+          <Logo variant="monogram" color="dark" />
+        </div>
+
+        <div className="hidden sm:block lg:hidden shrink-0">
+          <Logo variant="horizontal" color="dark" />
+        </div>
+
+        <div className="hidden lg:block">
+          <Logo variant="horizontal" color={isDarkHero ? 'light' : 'dark'} />
+        </div>
+
+        {/* Desktop Navigation */}
+        <nav
+          aria-label="Navegación principal"
+          className={`hidden lg:flex items-center gap-7 text-xs font-['Montserrat',sans-serif] uppercase tracking-[0.14em] font-medium transition-colors ${
+            isDarkHero ? 'text-white/85' : 'text-[#111111]/85'
+          }`}
+        >
+          <Link
+            to="/"
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
+            }`}
+          >
+            Inicio
+          </Link>
+
+          <div
+            ref={dropdownRef}
+            className="relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            <Link
+              to="/catalogo"
+              className={`inline-flex items-center gap-1.5 py-1 transition-colors relative cursor-pointer ${
+                isDarkHero
+                  ? isActive('/catalogo')
+                    ? 'text-white font-semibold'
+                    : 'hover:text-white'
+                  : isActive('/catalogo')
+                    ? 'text-[#5E765E] font-semibold'
+                    : 'hover:text-[#5E765E]'
+              }`}
+            >
+              <span>Catálogo</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                  catalogDropdownOpen
+                    ? isDarkHero
+                      ? 'rotate-180 text-white'
+                      : 'rotate-180 text-[#5E765E]'
+                    : isDarkHero
+                      ? 'text-white/60'
+                      : 'text-[#111111]/50'
+                }`}
+              />
+            </Link>
+
+            <div
+              id="menu-catalog-dropdown"
+              role="menu"
+              aria-hidden={!catalogDropdownOpen}
+              className={`absolute top-full left-0 mt-3 w-96 rounded-2xl bg-white/98 backdrop-blur-md border border-[#5E765E]/20 shadow-2xl p-3 z-50 text-left text-[#111111] origin-top transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                catalogDropdownOpen
+                  ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto visible'
+                  : 'opacity-0 -translate-y-2 scale-[0.98] pointer-events-none invisible'
+              }`}
+            >
+                <div className="px-3 py-2 border-b border-[#5E765E]/10 mb-2 flex items-center justify-between">
+                  <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#5E765E]">
+                    Servicios Oficiales
+                  </span>
+                  <Link
+                    to="/catalogo"
+                    className="text-[10px] text-[#D5A688] font-semibold hover:underline"
+                  >
+                    Ver Todo
+                  </Link>
+                </div>
+
+                <div className="space-y-1">
+                  {HEADER_CATEGORIES.map((item) => (
+                    <Link
+                      key={item.id}
+                      to={`/catalogo?cat=${item.categoryKey}`}
+                      role="menuitem"
+                      onClick={() => setCatalogDropdownOpen(false)}
+                      className="w-full text-left p-2.5 rounded-xl hover:bg-[#FFF2DE]/70 transition-all flex items-start gap-3 group cursor-pointer"
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#5E765E]/10 flex items-center justify-center shrink-0 mt-0.5 group-hover:bg-[#5E765E]/20 transition-colors">
+                        {renderIcon(item.icon)}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="font-['Cormorant_Garamond',serif] text-base font-semibold text-[#111111] group-hover:text-[#5E765E] transition-colors normal-case">
+                            {item.label}
+                          </span>
+                          <span className="text-[10px] font-['Montserrat',sans-serif] text-[#5E765E] font-medium tracking-normal">
+                            {item.startingPrice}
+                          </span>
+                        </div>
+                        <p className="text-[11px] font-['Montserrat',sans-serif] text-[#111111]/60 font-light truncate normal-case mt-0.5">
+                          {item.shortDesc}
+                        </p>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="mt-2 pt-2 border-t border-[#5E765E]/10 px-3 py-1.5 flex items-center justify-between text-[11px] text-[#5E765E] font-semibold tracking-normal normal-case">
+                  <a
+                    href="/workshop/"
+                    onClick={() => setCatalogDropdownOpen(false)}
+                    className="text-[#111111]/65 hover:text-[#5E765E] font-normal transition-colors"
+                  >
+                    Press On Workshop
+                  </a>
+                  <Link
+                    to="/catalogo"
+                    onClick={() => setCatalogDropdownOpen(false)}
+                    className="inline-flex items-center gap-1 text-[#5E765E] hover:underline"
+                  >
+                    <span>Explorar catálogo completo</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </Link>
+                </div>
+              </div>
+          </div>
+
+          <Link
+            to="/como-reservar"
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/como-reservar')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/como-reservar')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
+            }`}
+          >
+            Cómo Reservar
+          </Link>
+
+          <Link
+            to="/nosotros"
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/nosotros')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/nosotros')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
+            }`}
+          >
+            Nosotros
+          </Link>
+
+          <Link
+            to="/contacto"
+            className={`py-1 transition-colors relative ${
+              isDarkHero
+                ? isActive('/contacto')
+                  ? 'text-white font-semibold'
+                  : 'hover:text-white'
+                : isActive('/contacto')
+                  ? 'text-[#5E765E] font-semibold'
+                  : 'hover:text-[#5E765E]'
+            }`}
+          >
+            Contacto
+          </Link>
+        </nav>
+
+        {/* Desktop & Tablet Right CTA */}
+        <div className="hidden sm:flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsVipModalOpen(true)}
+            aria-label={
+              user
+                ? needsVipRegistration
+                  ? 'Activar Club VIP con consentimiento'
+                  : `Abrir Club VIP, ${loyalty.stamps} de 5 sellos`
+                : 'Abrir Club VIP'
+            }
+            className={`meraki-btn-fluid inline-flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-['Montserrat',sans-serif] font-semibold transition-all border cursor-pointer whitespace-nowrap shrink-0 ${
+              user
+                ? isDarkHero
+                  ? 'bg-[#FFFDF9] hover:bg-white text-[#111111] border-[#D5A688] shadow-xs lg:bg-black/45 lg:hover:bg-black/60 lg:backdrop-blur-md lg:text-[#FFFDF9] lg:border-[#D5A688] lg:shadow-[0_4px_16px_rgba(0,0,0,0.28)]'
+                  : 'bg-[#FFFDF9] hover:bg-white text-[#111111] border-[#D5A688] shadow-xs'
+                : isDarkHero
+                  ? 'bg-[#FFFDF9] hover:bg-white text-[#243224] border-[#5E765E]/50 shadow-xs lg:bg-black/40 lg:hover:bg-black/55 lg:backdrop-blur-md lg:text-[#FFFDF9] lg:border-[#D5A688]/85 lg:shadow-[0_4px_16px_rgba(0,0,0,0.28)]'
+                  : 'bg-[#FFFDF9] hover:bg-white text-[#243224] border-[#5E765E]/50 shadow-xs'
+            }`}
+          >
+            <Award className="w-3.5 h-3.5 text-[#D5A688]" />
+            <span>
+              {!user ? 'Club VIP' : needsVipRegistration ? 'Activar VIP' : `${loyalty.stamps}/5`}
+            </span>
+            {user && !needsVipRegistration && (
+              <MiniLoyaltyProgressDots stamps={loyalty.stamps} isDarkHero={isDarkHero} />
+            )}
+            {user && !needsVipRegistration && loyalty.rewardsClaimed > 0 && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#5E765E] text-[#FFF2DE] font-bold">
+                {loyalty.rewardsClaimed}★
+              </span>
+            )}
+          </button>
+
+          <button
+            id="btn-header-booking"
+            type="button"
+            onClick={() => openBooking()}
+            className="meraki-btn-fluid inline-flex items-center gap-2 bg-[#5E765E] hover:bg-[#4d634d] text-[#FFF2DE] px-5 py-2.5 rounded-full text-xs font-['Montserrat',sans-serif] font-medium uppercase tracking-[0.14em] transition-all shadow-sm hover:shadow-md cursor-pointer whitespace-nowrap shrink-0"
+          >
+            <Calendar className="w-3.5 h-3.5 text-[#D5A688]" />
+            <span>Agendar Cita</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="lg:hidden p-2 text-[#111111] hover:text-[#5E765E] focus:outline-none transition-colors cursor-pointer"
+            aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+
+        {/* Mobile Actions: Direct VIP mini-progress, Booking, and Hamburger */}
+        <div className="flex sm:hidden items-center gap-2.5 shrink-0">
+          <button
+            type="button"
+            onClick={() => setIsVipModalOpen(true)}
+            aria-label={
+              user
+                ? needsVipRegistration
+                  ? 'Activar Club VIP con consentimiento'
+                  : `Club VIP: ${loyalty.stamps} de 5 sellos`
+                : 'Abrir Club VIP'
+            }
+            className="meraki-btn-fluid inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[40px] rounded-full border border-[#D5A688] bg-[#FFFDF9] hover:bg-white text-[#111111] text-[11px] font-semibold cursor-pointer shadow-xs whitespace-nowrap shrink-0"
+          >
+            <Award className="w-3.5 h-3.5 text-[#5E765E]" />
+            {!user ? (
+              <span className="text-[10px] text-[#243224] font-bold">Club VIP</span>
+            ) : needsVipRegistration ? (
+              <span className="text-[10px] text-[#243224] font-bold">Activar VIP</span>
+            ) : (
+              <>
+                <MiniLoyaltyProgressDots stamps={loyalty.stamps} isDarkHero={false} />
+                <span className="text-[10px] text-[#243224] font-bold">{loyalty.stamps}/5</span>
+              </>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => openBooking()}
+            className="bg-[#5E765E] text-[#FFF2DE] w-10 h-10 rounded-full inline-flex items-center justify-center text-xs cursor-pointer shadow-sm hover:bg-[#4d634d] transition-colors shrink-0"
+            aria-label="Agendar Cita"
+          >
+            <Calendar className="w-4 h-4 text-[#D5A688]" />
+          </button>
+
+          <button
+            id="btn-mobile-nav-toggle"
+            type="button"
+            onClick={() => setIsOpen(!isOpen)}
+            className="w-10 h-10 inline-flex items-center justify-center text-[#111111] hover:text-[#5E765E] focus:outline-none transition-colors cursor-pointer shrink-0"
+            aria-label={isOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={isOpen}
+          >
+            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
+        </div>
+      </div>
+
+      <VipLoyaltyModal isOpen={isVipModalOpen} onClose={() => setIsVipModalOpen(false)} />
+
+      {/* Mobile Menu Drawer */}
+      {drawerMounted && typeof document !== 'undefined' && createPortal(
+        <div
+          id="mobile-nav-drawer"
+          className={`fixed inset-0 z-[9999] bg-[#FFF2DE] text-[#111111] flex flex-col h-[100dvh] w-screen overflow-hidden lg:hidden transition-[transform,opacity] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+            drawerVisible ? 'translate-x-0 opacity-100' : 'translate-x-full opacity-0'
+          }`}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Menú principal de navegación"
+        >
+          <div className="flex items-center justify-between px-4 sm:px-6 py-4 border-b border-[#5E765E]/15 bg-[#FFF2DE] shrink-0">
+            <Link to="/" onClick={() => setIsOpen(false)} className="inline-block">
+              <Logo variant="horizontal" color="dark" />
+            </Link>
+
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  openBooking();
+                }}
+                className="bg-[#5E765E] text-[#FFF2DE] p-2 rounded-full text-xs cursor-pointer shadow-xs hover:bg-[#4d634d] transition-colors"
+                aria-label="Agendar Cita"
+              >
+                <Calendar className="w-4 h-4 text-[#D5A688]" />
+              </button>
+
+              <button
+                id="btn-mobile-nav-close"
+                type="button"
+                onClick={() => setIsOpen(false)}
+                className="p-2 text-[#111111] hover:text-[#5E765E] focus:outline-none rounded-full"
+                aria-label="Cerrar menú"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex-1 overflow-y-auto p-6 flex flex-col justify-between gap-6">
+            <div className="flex flex-col gap-5 pt-1">
+              <div className="flex justify-center pb-4 border-b border-[#5E765E]/20">
+                <Logo variant="stacked" color="dark" />
+              </div>
+
+              <nav className="flex flex-col gap-2 text-left">
+                <Link
+                  to="/"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Inicio</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <div className="py-2 border-b border-[#5E765E]/15">
+                  <button
+                    type="button"
+                    onClick={() => setMobileCatalogOpen(!mobileCatalogOpen)}
+                    className="w-full flex items-center justify-between font-['Cormorant_Garamond',serif] text-2xl text-[#111111]"
+                  >
+                    <span>Catálogo de Servicios</span>
+                    <ChevronDown
+                      className={`w-5 h-5 text-[#5E765E] transition-transform duration-200 ${
+                        mobileCatalogOpen ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+
+                  <div
+                    className={`grid transition-[grid-template-rows,opacity,margin] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+                      mobileCatalogOpen
+                        ? 'grid-rows-[1fr] opacity-100 mt-3'
+                        : 'grid-rows-[0fr] opacity-0 mt-0 pointer-events-none'
+                    }`}
+                  >
+                    <div className="overflow-hidden">
+                      <div className="space-y-2 pl-2">
+                        <Link
+                          to="/catalogo"
+                          onClick={() => setIsOpen(false)}
+                          tabIndex={mobileCatalogOpen ? 0 : -1}
+                          className="block p-2.5 rounded-xl bg-white/80 font-medium text-xs text-[#5E765E]"
+                        >
+                          Ver Catálogo Completo ({activeServices.length} Servicios) →
+                        </Link>
+                        {HEADER_CATEGORIES.map((item) => (
+                          <Link
+                            key={item.id}
+                            to={`/catalogo?cat=${item.categoryKey}`}
+                            onClick={() => setIsOpen(false)}
+                            tabIndex={mobileCatalogOpen ? 0 : -1}
+                            className="w-full text-left p-2.5 rounded-xl bg-white/60 hover:bg-white border border-[#5E765E]/15 flex items-center justify-between transition-colors"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-6 h-6 rounded bg-[#5E765E]/10 flex items-center justify-center">
+                                {renderIcon(item.icon)}
+                              </div>
+                              <span className="font-['Montserrat',sans-serif] text-xs font-medium text-[#111111]">
+                                {item.label}
+                              </span>
+                            </div>
+                            <span className="text-[10px] text-[#5E765E] font-semibold">
+                              {item.startingPrice}
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <Link
+                  to="/como-reservar"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Cómo Reservar</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <Link
+                  to="/nosotros"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Nosotros</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <Link
+                  to="/contacto"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-2xl text-[#111111] hover:text-[#5E765E] transition-colors py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Contacto</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </Link>
+
+                <a
+                  href="/workshop/"
+                  onClick={() => setIsOpen(false)}
+                  className="font-['Cormorant_Garamond',serif] text-xl text-[#5E765E] font-medium py-2 border-b border-[#5E765E]/15 flex items-center justify-between"
+                >
+                  <span>Press On Workshop</span>
+                  <ArrowRight className="w-4 h-4 text-[#5E765E]/60" />
+                </a>
+              </nav>
+            </div>
+
+            <div className="flex flex-col gap-3 pt-6 border-t border-[#5E765E]/20 text-center pb-6">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  setIsVipModalOpen(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-[#D5A688]/20 hover:bg-[#D5A688]/30 text-[#111111] border border-[#D5A688] py-3 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest transition-colors cursor-pointer"
+              >
+                <Award className="w-4 h-4 text-[#5E765E]" />
+                <span>
+                  {!user
+                    ? 'Club VIP & Tarjeta de Puntos'
+                    : needsVipRegistration
+                      ? 'Activar Mi Tarjeta VIP (Registro)'
+                      : `Mi Club VIP (${loyalty.stamps}/5 Sellos${loyalty.rewardsClaimed > 0 ? ` · ${loyalty.rewardsClaimed} canjes` : ''})`}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setIsOpen(false);
+                  openBooking();
+                }}
+                className="w-full flex items-center justify-center gap-2 bg-[#5E765E] text-[#FFF2DE] py-3.5 rounded-full font-['Montserrat',sans-serif] text-xs font-semibold uppercase tracking-widest shadow-md cursor-pointer hover:bg-[#4d634d] transition-colors"
+              >
+                <Sparkles className="w-4 h-4 text-[#D5A688]" />
+                <span>Agendar Cita</span>
+              </button>
+
+              <div className="text-xs font-['Montserrat',sans-serif] text-[#111111]/70 pt-1">
+                WhatsApp Directo: <span className="font-semibold text-[#5E765E]">{SPA_INFO.whatsappDisplay}</span>
+              </div>
+
+              <div className="flex justify-center gap-4 text-[11px] uppercase tracking-wider text-[#111111]/60 pt-2">
+                <Link to="/privacy" onClick={() => setIsOpen(false)}>
+                  Políticas de Privacidad
+                </Link>
+                <span>•</span>
+                <Link to="/libro-reclamaciones" onClick={() => setIsOpen(false)}>
+                  Libro de Reclamaciones
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body,
+      )}
+    </header>
+  );
+}

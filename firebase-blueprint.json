@@ -1,0 +1,290 @@
+{
+  "entities": {
+    "UserLoyalty": {
+      "title": "User Loyalty & Profile",
+      "description": "Stores client Google profile summary, WhatsApp contact, salon identification note, Meraki Club VIP loyalty stamps (0-5), completed cards, and visit history",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "maxLength": 160 },
+        "displayName": { "type": "string", "maxLength": 120 },
+        "phone": { "type": "string", "maxLength": 30 },
+        "adminNote": { "type": "string", "maxLength": 160 },
+        "photoURL": { "type": "string", "maxLength": 500 },
+        "dataConsentAccepted": { "type": "boolean" },
+        "dataConsentAt": { "type": "string", "maxLength": 40 },
+        "stamps": { "type": "integer" },
+        "rewardsClaimed": { "type": "integer" },
+        "history": { "type": "array" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "stamps", "rewardsClaimed", "history", "updatedAt"]
+    },
+    "StaffAccess": {
+      "title": "Staff Access Matrix",
+      "description": "Pancake-style granular permission matrix managed solely by central owner meraki.spa.pe@gmail.com",
+      "type": "object",
+      "properties": {
+        "email": { "type": "string", "minLength": 5, "maxLength": 160 },
+        "name": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "isActive": { "type": "boolean" },
+        "canManageAgenda": { "type": "boolean" },
+        "canManageBookings": { "type": "boolean" },
+        "canStampVip": { "type": "boolean" },
+        "createdBy": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "email",
+        "name",
+        "isActive",
+        "canManageAgenda",
+        "canManageBookings",
+        "canStampVip",
+        "createdBy",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ScheduleConfig": {
+      "title": "Global Schedule & VRPTW Config",
+      "description": "Stores 06:00-20:00 manual slot locks, blocked dates, geo travel rules, and payment mode",
+      "type": "object",
+      "properties": {
+        "blockedDates": { "type": "array" },
+        "blockedSlots": { "type": "array" },
+        "enableConditional0800": { "type": "boolean" },
+        "requireNearby0600For0800": { "type": "boolean" },
+        "maxTravelMinutes": { "type": "integer" },
+        "distantMinOrderPEN": { "type": "integer" },
+        "paymentMode": { "type": "string", "enum": ["manual_yape", "gateway_checkout"] },
+        "updatedAt": { "type": "string", "format": "date-time" },
+        "updatedBy": { "type": "string", "minLength": 1, "maxLength": 160 }
+      },
+      "required": [
+        "blockedDates",
+        "blockedSlots",
+        "enableConditional0800",
+        "requireNearby0600For0800",
+        "maxTravelMinutes",
+        "distantMinOrderPEN",
+        "paymentMode",
+        "updatedAt",
+        "updatedBy"
+      ]
+    },
+    "SlotLock": {
+      "title": "Non-PII Schedule Slot Lock",
+      "description": "Publicly queryable reservation footprint containing zero client PII for real-time 06:00-20:00 availability and Lima routing checks",
+      "type": "object",
+      "properties": {
+        "bookingCode": { "type": "string", "minLength": 3, "maxLength": 32 },
+        "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "maxLength": 10 },
+        "timeSlot": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$", "maxLength": 5 },
+        "locationType": { "type": "string", "enum": ["estudio", "casa", "trabajo"] },
+        "district": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "totalPEN": { "type": "integer" },
+        "estimatedDurationMin": { "type": "integer" },
+        "status": { "type": "string", "enum": ["active", "cancelled"] },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "bookingCode",
+        "date",
+        "timeSlot",
+        "locationType",
+        "district",
+        "totalPEN",
+        "estimatedDurationMin",
+        "status",
+        "createdAt"
+      ]
+    },
+    "Booking": {
+      "title": "Spa Reservation",
+      "description": "Complete client reservation with services, modality, payment mode/status, and Yape advance tracking",
+      "type": "object",
+      "properties": {
+        "bookingCode": { "type": "string", "minLength": 3, "maxLength": 32 },
+        "uid": { "type": "string", "maxLength": 128 },
+        "clientName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "clientPhone": { "type": "string", "minLength": 6, "maxLength": 30 },
+        "clientEmail": { "type": "string", "maxLength": 160 },
+        "specialNotes": { "type": "string", "maxLength": 600 },
+        "services": { "type": "array" },
+        "servicesSummary": { "type": "string", "minLength": 2, "maxLength": 400 },
+        "locationType": { "type": "string", "enum": ["estudio", "casa", "trabajo"] },
+        "district": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "address": { "type": "string", "maxLength": 240 },
+        "date": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$", "maxLength": 10 },
+        "timeSlot": { "type": "string", "pattern": "^[0-9]{2}:[0-9]{2}$", "maxLength": 5 },
+        "estimatedDurationMin": { "type": "integer" },
+        "totalPEN": { "type": "integer" },
+        "advancePEN": { "type": "integer" },
+        "paymentMode": { "type": "string", "enum": ["manual_yape", "gateway_checkout"] },
+        "paymentStatus": { "type": "string", "enum": ["pending_yape", "manual_code_submitted", "gateway_paid", "verified", "cancelled"] },
+        "yapeOperationCode": { "type": "string", "maxLength": 32 },
+        "status": { "type": "string", "enum": ["pending_yape", "manual_code_submitted", "confirmed", "completed", "cancelled"] },
+        "privacyAccepted": { "type": "boolean" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "bookingCode",
+        "uid",
+        "clientName",
+        "clientPhone",
+        "clientEmail",
+        "specialNotes",
+        "services",
+        "servicesSummary",
+        "locationType",
+        "district",
+        "address",
+        "date",
+        "timeSlot",
+        "estimatedDurationMin",
+        "totalPEN",
+        "advancePEN",
+        "paymentMode",
+        "paymentStatus",
+        "yapeOperationCode",
+        "status",
+        "privacyAccepted",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Complaint": {
+      "title": "INDECOPI Virtual Complaint",
+      "description": "Stores Peru INDECOPI Libro de Reclamaciones complaints and inquiries",
+      "type": "object",
+      "properties": {
+        "claimCode": { "type": "string", "minLength": 3, "maxLength": 32 },
+        "fullName": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "documentType": { "type": "string", "enum": ["DNI", "CE", "Pasaporte", "RUC"] },
+        "documentNumber": { "type": "string", "minLength": 6, "maxLength": 20 },
+        "phone": { "type": "string", "minLength": 6, "maxLength": 30 },
+        "email": { "type": "string", "minLength": 4, "maxLength": 160 },
+        "address": { "type": "string", "minLength": 3, "maxLength": 240 },
+        "isMinor": { "type": "boolean" },
+        "serviceContracted": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "amountClaimedPEN": { "type": "number" },
+        "complaintType": { "type": "string", "enum": ["reclamo", "queja"] },
+        "detail": { "type": "string", "minLength": 10, "maxLength": 2000 },
+        "consumerRequest": { "type": "string", "minLength": 5, "maxLength": 1000 },
+        "status": { "type": "string", "enum": ["pendiente", "atendido"] },
+        "adminResponse": { "type": "string", "maxLength": 1500 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "claimCode",
+        "fullName",
+        "documentType",
+        "documentNumber",
+        "phone",
+        "email",
+        "address",
+        "isMinor",
+        "serviceContracted",
+        "amountClaimedPEN",
+        "complaintType",
+        "detail",
+        "consumerRequest",
+        "status",
+        "adminResponse",
+        "createdAt"
+      ]
+    },
+    "CatalogService": {
+      "title": "Catalog Service Item",
+      "description": "Dynamic catalog service definition managed in /admin including pricing, variants, active/paused visibility, main image, and up to 10 gallery photos",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 80, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 120 },
+        "category": { "type": "string", "enum": ["manos", "pies", "pestanas", "depilacion", "masajes", "faciales"] },
+        "categoryLabel": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "subcategory": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "pricePEN": { "type": "integer" },
+        "priceOptions": { "type": "array" },
+        "priceNote": { "type": "string", "maxLength": 80 },
+        "description": { "type": "string", "minLength": 5, "maxLength": 1200 },
+        "includes": { "type": "array" },
+        "note": { "type": "string", "maxLength": 600 },
+        "popular": { "type": "boolean" },
+        "image": { "type": "string", "maxLength": 500 },
+        "gallery": { "type": "array" },
+        "active": { "type": "boolean" },
+        "durationMin": { "type": "integer" },
+        "displayOrder": { "type": "integer" },
+        "updatedBy": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": [
+        "id",
+        "name",
+        "category",
+        "categoryLabel",
+        "subcategory",
+        "description",
+        "includes",
+        "active",
+        "displayOrder",
+        "updatedBy",
+        "updatedAt"
+      ]
+    },
+    "CatalogMedia": {
+      "title": "Catalog Service Media Asset",
+      "description": "Compressed image document uploaded from Admin panel (max ~450KB WebP/JPEG) referenced via media://{id}",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 2, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "serviceId": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "dataUrl": { "type": "string", "minLength": 20, "maxLength": 450000 },
+        "mimeType": { "type": "string", "enum": ["image/webp", "image/jpeg", "image/png"] },
+        "width": { "type": "integer" },
+        "height": { "type": "integer" },
+        "updatedBy": { "type": "string", "minLength": 1, "maxLength": 160 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "serviceId", "dataUrl", "mimeType", "width", "height", "updatedBy", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "UserLoyalty",
+      "description": "User Club VIP loyalty document keyed by Firebase Auth uid"
+    },
+    "/staffAccess/{staffId}": {
+      "schema": "StaffAccess",
+      "description": "Granular staff access entries keyed by sanitized lowercase email"
+    },
+    "/scheduleConfig/{configId}": {
+      "schema": "ScheduleConfig",
+      "description": "Global schedule configuration document (configId = global)"
+    },
+    "/slotLocks/{lockId}": {
+      "schema": "SlotLock",
+      "description": "Non-PII occupied schedule locks keyed by bookingCode"
+    },
+    "/bookings/{bookingId}": {
+      "schema": "Booking",
+      "description": "Full client booking documents keyed by bookingCode"
+    },
+    "/complaints/{claimId}": {
+      "schema": "Complaint",
+      "description": "INDECOPI Libro de Reclamaciones claims keyed by claimCode"
+    },
+    "/catalogServices/{serviceId}": {
+      "schema": "CatalogService",
+      "description": "Publicly readable catalog service overrides and admin-created treatments keyed by serviceId"
+    },
+    "/catalogMedia/{mediaId}": {
+      "schema": "CatalogMedia",
+      "description": "Compressed image payloads for catalog service photos keyed by mediaId"
+    }
+  }
+}
