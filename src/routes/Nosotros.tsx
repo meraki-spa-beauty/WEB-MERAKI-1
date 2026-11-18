@@ -76,8 +76,12 @@ export function Nosotros() {
                 <div className="theme-card-surface rounded-3xl p-8 relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#D5A688]/15 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
 
-                  <div className="w-20 h-20 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-3xl font-bold mb-6 shadow-md">
-                    AMD
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-md border border-[#5E765E]/20">
+                    <img
+                      src="/assets/aistudio/1030391_6813bec7.jpg"
+                      alt="Ana Maria Díaz"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
 
                   <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#9A6342] block mb-1">

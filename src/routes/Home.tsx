@@ -233,8 +233,12 @@ export function Home() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
               <ScrollReveal variant="soft-scale" className="lg:col-span-5">
                 <div className="meraki-cream-card rounded-3xl p-8">
-                  <div className="w-16 h-16 rounded-2xl bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center font-['Cormorant_Garamond',serif] text-2xl font-bold mb-6 shadow-sm">
-                    AMD
+                  <div className="w-20 h-20 rounded-2xl overflow-hidden bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-md border border-[#5E765E]/20">
+                    <img
+                      src="/assets/aistudio/1030391_6813bec7.jpg"
+                      alt="Ana Maria Díaz"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <span className="text-[10px] font-['Montserrat',sans-serif] uppercase tracking-[0.2em] font-bold text-[#D5A688] block">
                     Fundadora de Meraki
