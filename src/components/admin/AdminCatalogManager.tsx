@@ -1104,14 +1104,14 @@ export function AdminCatalogManager({ actorEmail, onNotify }: AdminCatalogManage
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <div className="p-1.5 flex items-center justify-between gap-1 border-t border-[#5E765E]/10 bg-[#FFFDF9]">
+                        <div className="p-1.5 flex flex-wrap items-center justify-between gap-1 border-t border-[#5E765E]/10 bg-[#FFFDF9]">
                           <div className="flex items-center gap-0.5">
                             <button
                               type="button"
                               disabled={idx === 0}
                               onClick={() => handleMoveGalleryPhoto(idx, -1)}
                               aria-label="Mover foto a la izquierda"
-                              className="p-1.5 rounded hover:bg-[#EDF2EC] disabled:opacity-25 text-[#111111] cursor-pointer"
+                              className="p-1 rounded hover:bg-[#EDF2EC] disabled:opacity-25 text-[#111111] cursor-pointer"
                             >
                               <ArrowLeft className="w-3.5 h-3.5" />
                             </button>
@@ -1120,29 +1120,30 @@ export function AdminCatalogManager({ actorEmail, onNotify }: AdminCatalogManage
                               disabled={idx === editingDraft.gallery.length - 1}
                               onClick={() => handleMoveGalleryPhoto(idx, 1)}
                               aria-label="Mover foto a la derecha"
-                              className="p-1.5 rounded hover:bg-[#EDF2EC] disabled:opacity-25 text-[#111111] cursor-pointer"
+                              className="p-1 rounded hover:bg-[#EDF2EC] disabled:opacity-25 text-[#111111] cursor-pointer"
                             >
                               <ArrowRight className="w-3.5 h-3.5" />
                             </button>
                           </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handlePromoteToMain(idx)}
-                            title="Usar como foto principal"
-                            className="px-2 py-1 rounded text-[10px] font-semibold text-[#5E765E] hover:bg-[#EDF2EC] cursor-pointer"
-                          >
-                            Principal
-                          </button>
-
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveGalleryPhoto(idx)}
-                            aria-label={`Quitar foto ${idx + 1} de galería`}
-                            className="p-1.5 rounded text-red-600 hover:bg-red-50 cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => handlePromoteToMain(idx)}
+                              title="Usar como foto principal"
+                              className="px-1.5 py-0.5 rounded text-[10px] font-semibold text-[#5E765E] hover:bg-[#EDF2EC] cursor-pointer"
+                            >
+                              Principal
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveGalleryPhoto(idx)}
+                              aria-label={`Quitar foto ${idx + 1} de galería`}
+                              className="p-1 rounded text-red-600 hover:bg-red-50 cursor-pointer"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     ))}

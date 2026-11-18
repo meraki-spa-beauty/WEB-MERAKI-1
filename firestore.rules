@@ -463,7 +463,7 @@ service cloud.firestore {
 
     match /catalogServices/{serviceId} {
       allow get: if isValidId(serviceId);
-      allow list: if resource.data.id is string && resource.data.active is bool;
+      allow list: if true;
       allow create: if isValidId(serviceId) &&
         isStaffOrOwner('canManageAgenda') &&
         isValidCatalogService(incoming()) &&
