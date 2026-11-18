@@ -234,13 +234,13 @@ export function Home() {
               <ScrollReveal variant="soft-scale" className="lg:col-span-5">
                 <div className="meraki-cream-card rounded-3xl p-8">
                   <div
-                    style={{ width: '120px', height: '145px' }}
+                    style={{ width: '100%', height: '210px' }}
                     className="rounded-2xl overflow-hidden bg-[#5E765E] text-[#FFF2DE] flex items-center justify-center mb-6 shadow-md border border-[#5E765E]/20"
                   >
                     <img
                       src="/assets/aistudio/1030391_6813bec7.jpg"
                       alt="Ana Maria Díaz"
-                      style={{ width: '120px', height: '145px' }}
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 25%' }}
                       className="w-full h-full object-cover"
                     />
                   </div>
